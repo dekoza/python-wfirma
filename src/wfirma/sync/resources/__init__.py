@@ -1,0 +1,2 @@
+"""Synchronous resource implementations."""
+
