@@ -1,30 +1,40 @@
-# 🎉 Phase 3.3 Complete - Company Models Done!
+# 🎉 Phase 3.4 Complete - Contractor Models Done!
 
 **Project:** python-wfirma  
 **Last Update:** 2026-01-18  
-**Status:** ✅ Phase 3.3 COMPLETED (Company Models ✅)
+**Status:** ✅ Phase 3.4 COMPLETED (Contractor Models ✅)
 
 ---
 
-## ✅ Recent Completion: Company Models (2026-01-18)
+## ✅ Recent Completion: Contractor Models (2026-01-18)
+
+### Accomplishments
+- ✅ Implemented contractor models module (`src/wfirma/models/contractor.py`)
+- ✅ 18 comprehensive tests covering all contractor models
+- ✅ 100% code coverage for contractor module
+- ✅ All models exported via `wfirma.models` package
+- ✅ Fixed XML parsing with `search_mode="unordered"` for flexible element ordering
+
+**Contractor Models Implemented:**
+- `Contractor` - Full contractor model (customer/supplier)
+- `ContractorDetail` - Embedded contractor info for invoices
+
+**Contractor Fields:**
+- Identification: id, name, altname, nip, regon, pesel, tax_id_type
+- Main address: street, building_number, flat_number, zip, post, city, country
+- Contact address: contact_name, contact_street, etc.
+- Flags: buyer, seller, remind
+- Contact: phone, fax, email, url
+- Metadata: notes, tags, source
+- Relations: reference_company_id, translation_language_id, company_account_id, etc.
+- Timestamps: created, modified
+
+---
+
+## ✅ Earlier: Company Models (2026-01-18)
 
 ### Accomplishments
 - ✅ Implemented company models module (`src/wfirma/models/company.py`)
-- ✅ 24 comprehensive tests covering all company models
-- ✅ 100% code coverage for company module
-- ✅ All models exported via `wfirma.models` package
-
-**Company Models Implemented:**
-- `CompanyDetail` - Company information/details (name, NIP, address, bank info)
-- `CompanyAccount` - Company bank account model
-- `CompanyAddress` - Company address entry model
-- `UserCompany` - User-company relationship model
-
-**Features:**
-- XML serialization/deserialization via pydantic-xml
-- Immutable models (frozen)
-- Full datetime parsing with null value handling
-- All fields matching wFirma API structure
 
 ---
 

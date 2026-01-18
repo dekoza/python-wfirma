@@ -126,7 +126,7 @@ OptionalDateTimeField = Annotated[
 # ============================================================================
 
 
-class WFirmaBaseModel(BaseXmlModel):
+class WFirmaBaseModel(BaseXmlModel, search_mode="unordered"):
     """
     Base model for all wFirma data structures.
 
@@ -135,6 +135,7 @@ class WFirmaBaseModel(BaseXmlModel):
     - Immutable instances (frozen)
     - Extra XML elements ignored during parsing (API may add new fields)
     - Validation of assignments
+    - Unordered XML search mode (elements can appear in any order)
 
     Example:
         >>> from pydantic_xml import element

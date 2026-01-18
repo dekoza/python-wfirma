@@ -28,6 +28,10 @@ from wfirma.models.company import (
     CompanyDetail,
     UserCompany,
 )
+from wfirma.models.contractor import (
+    Contractor,
+    ContractorDetail,
+)
 
 __all__ = [
     # Base models
@@ -55,5 +59,8 @@ __all__ = [
     "CompanyAddress",
     "CompanyDetail",
     "UserCompany",
+    # Contractor models
+    "Contractor",
+    "ContractorDetail",
 ]
 

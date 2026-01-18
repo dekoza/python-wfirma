@@ -10,6 +10,7 @@
 **Phase 3.1 Status:** ✅ COMPLETED (2026-01-18) - Base Models
 **Phase 3.2 Status:** ✅ COMPLETED (2026-01-18) - Common Models
 **Phase 3.3 Status:** ✅ COMPLETED (2026-01-18) - Company Models
+**Phase 3.4 Status:** ✅ COMPLETED (2026-01-18) - Contractor Models
 
 ---
 
@@ -181,11 +182,36 @@ tests/models/test_company.py::TestUserCompany - 5 tests
 Coverage: 100% for models/company.py
 ```
 
-#### ⏳ Phase 3.4: Contractor Models (NEXT)
-1. ⏳ Create contractor models (`src/wfirma/models/contractor.py`)
-2. ⏳ Write tests for contractor models (`tests/models/test_contractor.py`)
+#### ✅ Phase 3.4: Contractor Models (COMPLETED - 2026-01-18)
 
-**Estimated Time Remaining:** 2-3 hours
+**Accomplishments:**
+- ✅ Created contractor models module (`src/wfirma/models/contractor.py`)
+- ✅ Implemented `Contractor` - Full contractor model with all API fields
+- ✅ Implemented `ContractorDetail` - Embedded contractor info for invoices
+- ✅ Added `search_mode="unordered"` to base models for flexible XML parsing
+- ✅ 18 tests passing with 100% coverage for contractor.py
+- ✅ All models exported via `wfirma.models`
+
+**Contractor Fields Implemented:**
+- Identification: id, name, altname, nip, regon, pesel, tax_id_type
+- Main address: street, building_number, flat_number, zip, post, city, country
+- Contact address: contact_name, contact_street, contact_building_number, contact_flat_number, contact_zip, contact_post, contact_city, contact_country
+- Flags: buyer, seller, remind
+- Contact info: phone, fax, email, url
+- Metadata: notes, tags, source
+- Relations: reference_company_id, translation_language_id, company_account_id, good_price_group_id, invoice_description_id, shop_buyer_id
+- Timestamps: created, modified
+
+**Test Results:**
+```
+tests/models/test_contractor.py::TestContractor - 14 tests
+tests/models/test_contractor.py::TestContractorDetail - 4 tests
+Coverage: 100% for models/contractor.py
+```
+
+#### ⏳ Phase 3.5: Good Models (NEXT)
+1. ⏳ Create good models (`src/wfirma/models/good.py`)
+2. ⏳ Write tests for good models (`tests/models/test_good.py`)
 
 ---
 
