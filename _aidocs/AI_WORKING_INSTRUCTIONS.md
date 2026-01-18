@@ -1,18 +1,18 @@
 # AI Agent Working Instructions
 
 **Project**: python-wfirma  
-**Last Updated**: 2026-01-16
+**Last Updated**: 2026-01-18
 
 ---
 
 ## Quick Reference
 
 ### Current Status
-- **Phase**: Phase 1 (API Documentation Scraping)
+- **Phase**: Phase 3 (Data Models - NEXT)
 - **Version**: 0.1.0-dev
-- **Tests**: 2/2 passing, 100% coverage
+- **Tests**: 74/74 passing, 98% coverage
 - **NOAI Tests**: 0
-- **AICOMPLETE Tests**: 0
+- **AICOMPLETE Tests**: 72 (5 scraper + 25 exceptions + 42 config)
 
 ### Essential Files to Check Before Starting
 1. `PROJECT_STATUS.md` - Current phase and todos
@@ -345,5 +345,53 @@ If stuck or unsure:
 
 ---
 
-**Good luck with Phase 1!** 🚀
+## Project-Specific Guidelines (python-wfirma)
+
+### DateTime Handling
+
+**IMPORTANT**: W tym projekcie **NIE używamy biblioteki `pendulum`**.
+
+Zamiast tego używamy wbudowanego modułu `datetime` z biblioteki standardowej Python:
+
+```python
+# ✅ CORRECT - use standard library datetime
+from datetime import datetime, timezone
+
+def parse_wfirma_datetime(value: str) -> datetime | None:
+    """Parse wFirma datetime format."""
+    if not value or value == "0000-00-00 00:00:00":
+        return None
+    return datetime.strptime(value, "%Y-%m-%d %H:%M:%S")
+
+def format_wfirma_datetime(dt: datetime) -> str:
+    """Format datetime for wFirma API."""
+    return dt.strftime("%Y-%m-%d %H:%M:%S")
+```
+
+```python
+# ❌ WRONG - do not use pendulum
+import pendulum  # FORBIDDEN in this project
+```
+
+**Powód**: `pydantic-xml` ma problemy z integracją `pendulum.DateTime` i wymaga skomplikowanej konfiguracji. Standardowy `datetime` działa out-of-the-box z Pydantic.
+
+### XML Serialization (pydantic-xml)
+
+Używając `pydantic-xml`, pamiętaj o jawnym oznaczaniu pól jako elementy XML:
+
+```python
+from pydantic_xml import BaseXmlModel, element
+
+class Invoice(BaseXmlModel, tag="invoice"):
+    # ✅ CORRECT - explicitly mark as XML element
+    id: int = element()
+    date: str = element()
+    
+    # ❌ WRONG - without element(), field becomes text content
+    # name: str  # This will NOT be serialized as <name>value</name>
+```
+
+---
+
+**Good luck with Phase 3!** 🚀
 

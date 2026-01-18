@@ -15,4 +15,3 @@ def test_fixture_availability(mock_wfirma_credentials):
     assert mock_wfirma_credentials["app_key"] == "test_app_key"
     assert mock_wfirma_credentials["secret"] == "test_secret"
     assert mock_wfirma_credentials["environment"] == "sandbox"
-

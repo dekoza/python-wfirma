@@ -2,9 +2,12 @@
 
 **Project:** python-wfirma  
 **Version:** 0.1.0-dev  
-**Last Updated:** 2026-01-16  
-**Current Phase:** Phase 1 - API Documentation Scraping  
+**Last Updated:** 2026-01-18  
+**Current Phase:** Phase 3 - Data Models (In Progress)  
 **Phase 0 Status:** ✅ COMPLETED (2026-01-16)
+**Phase 1 Status:** ✅ COMPLETED (2026-01-18)
+**Phase 2 Status:** ✅ COMPLETED (2026-01-18)
+**Phase 3.1 Status:** ✅ COMPLETED (2026-01-18) - Base Models
 
 ---
 
@@ -41,27 +44,106 @@ Coverage: 100%
 
 ---
 
+## Completed Phases
+
+### ✅ Phase 1: API Documentation Scraping (2026-01-18)
+
+**Accomplishments:**
+- ✅ Created web scraper script (`scripts/scrape_api_docs.py`)
+- ✅ Successfully scraped wFirma API documentation from Postman collection
+- ✅ Extracted 200+ endpoints with methods, paths, and parameters
+- ✅ Documented authentication requirements (OAuth 1.0a, OAuth 2.0, API Key)
+- ✅ Created structured API specification (`docs/api_spec.json` - 9016 lines)
+- ✅ Generated human-readable documentation (`docs/api_reference.md` - 1274 lines)
+- ✅ All tests passing (5/5 tests for scraper)
+
+**Test Results:**
+```
+tests/test_api_scraper.py::TestAPIScraper::test_can_fetch_postman_collection PASSED
+tests/test_api_scraper.py::TestAPIScraper::test_can_extract_endpoints PASSED
+tests/test_api_scraper.py::TestAPIScraper::test_can_extract_authentication_info PASSED
+tests/test_api_scraper.py::TestAPIScraper::test_can_save_structured_spec PASSED
+tests/test_api_scraper.py::TestAPIScraper::test_can_generate_markdown_docs PASSED
+```
+
 ## Current Status
 
-### 🚧 Phase 1: API Documentation Scraping
+### ✅ Phase 2: Core Infrastructure (COMPLETED)
 
-**Next Steps:**
-1. Create web scraper script (`scripts/scrape_api_docs.py`)
-2. Scrape wFirma API documentation from https://doc.wfirma.pl/
-3. Extract all endpoints, methods, parameters
-4. Document authentication requirements
-5. Extract request/response schemas
-6. Create structured API specification (`docs/api_spec.json`)
-7. Generate human-readable documentation (`docs/api_reference.md`)
+**Progress:**
+- ✅ Implemented complete exception hierarchy (`src/wfirma/exceptions.py`)
+- ✅ 25 tests for exception hierarchy (100% coverage)
+- ✅ Implemented configuration management system (`src/wfirma/config.py`)
+- ✅ 42 tests for configuration (96% coverage)
 
-**Estimated Time:** 4 hours
+**Completed Exception Classes:**
+- `WFirmaException` - Base exception
+- Authentication: `AuthenticationError`, `InvalidCredentialsError`, `TokenExpiredError`, `InsufficientPermissionsError`
+- Validation: `ValidationError`, `InvalidFieldError`, `MissingRequiredFieldError`
+- API: `APIError`, `RateLimitError`, `ServerError`, `BadRequestError`, `ServiceUnavailableError`
+- Resource: `ResourceError`, `ResourceNotFoundError`, `ResourceAlreadyExistsError`, `ResourceConflictError`
+- Network: `NetworkError`, `ConnectionError`, `TimeoutError`
+- Configuration: `ConfigurationError`, `MissingConfigurationError`, `InvalidConfigurationError`
+
+**Completed Configuration Classes:**
+- `Environment` - Enum for sandbox/production environments
+- `WFirmaConfig` - Immutable configuration dataclass with:
+  - Loading from environment variables (`from_env`)
+  - Loading from .env files (`from_dotenv`)
+  - Validation of required fields
+  - Safe serialization (secrets excluded)
+  - Multi-environment support
+- `get_config` - Convenience function for obtaining configuration
+
+**Total Tests:** 74 (all passing)
+**Total Coverage:** 98%
+
+---
+
+### ⏳ Phase 3: Data Models (IN PROGRESS)
+
+#### ✅ Phase 3.1: Base Models (COMPLETED - 2026-01-18)
+
+**Accomplishments:**
+- ✅ Created base Pydantic model (`src/wfirma/models/base.py`)
+- ✅ Implemented `WFirmaBaseModel` - base class with immutable config
+- ✅ Implemented `BaseXMLModel` - XML serialization support via pydantic-xml
+- ✅ Implemented `DateTimeField` / `OptionalDateTimeField` - datetime type aliases
+- ✅ Implemented `ResponseStatus` - API response status model
+- ✅ Implemented `ResponseParameters` - pagination parameters model
+- ✅ Helper functions: `parse_wfirma_datetime()`, `format_wfirma_datetime()`
+- ✅ 34 tests passing with 100% coverage for base.py
+- ✅ All models exported via `wfirma.models`
+
+**Important Note:** This library uses standard `datetime` instead of `pendulum` for better compatibility with pydantic-xml.
+
+**Test Results:**
+```
+tests/models/test_base.py::TestWFirmaBaseModel - 7 tests
+tests/models/test_base.py::TestBaseXMLModel - 5 tests  
+tests/models/test_base.py::TestDateTimeFunctions - 8 tests
+tests/models/test_base.py::TestDateTimeField - 5 tests
+tests/models/test_base.py::TestResponseStatus - 5 tests
+tests/models/test_base.py::TestResponseParameters - 5 tests
+Coverage: 100% for models/base.py
+```
+
+#### ⏳ Phase 3.2: Common Models (NEXT)
+1. ⏳ Create common models (`src/wfirma/models/common.py`)
+   - Address model
+   - Phone/Email validation
+   - Currency and decimal handling
+   - Tax rates (VAT types)
+2. ⏳ Write tests for common models (`tests/models/test_common.py`)
+
+**Estimated Time Remaining:** 3 hours
 
 ---
 
 ## Pending Phases
 
-- ⏳ Phase 2: Core Infrastructure (exceptions, config)
-- ⏳ Phase 3: Data Models (Pydantic with pydantic-xml)
+- ✅ Phase 2: Core Infrastructure (exceptions, config)
+- ⏳ Phase 3: Data Models (Pydantic with pydantic-xml) - **IN PROGRESS**
 - ⏳ Phase 4: Authentication Layer
 - ⏳ Phase 5: Base HTTP Client
 - ⏳ Phase 6-12: Resource Implementations
@@ -136,7 +218,7 @@ command > /tmp/wfirma_output.txt 2>&1
 - Tests marked `# AICOMPLETE` are ready for review
 - Tests marked `# NOAI` are immutable to AI
 - Report conflicts in `NOAI_PROBLEMS_REPORT.md`
-- Currently: **0 NOAI tests**, **0 AICOMPLETE tests**
+- Currently: **0 NOAI tests**, **5 AICOMPLETE tests** (scraper tests)
 
 ### TDD Workflow
 1. Write failing test

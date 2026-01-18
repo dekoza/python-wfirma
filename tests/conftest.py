@@ -1,6 +1,7 @@
 """
 Pytest configuration and shared fixtures.
 """
+
 import pytest
 
 
@@ -12,4 +13,3 @@ def mock_wfirma_credentials():
         "secret": "test_secret",
         "environment": "sandbox",
     }
-

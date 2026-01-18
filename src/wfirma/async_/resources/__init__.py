@@ -1,2 +1,1 @@
 """Asynchronous resource implementations."""
-

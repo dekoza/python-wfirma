@@ -68,7 +68,6 @@ examples = [
 scraping = [
     "beautifulsoup4>=4.12.0",
     "lxml>=5.1.0",
-    "requests>=2.31.0",
 ]
 
 [project.urls]
@@ -76,6 +75,15 @@ Homepage = "https://github.com/yourusername/python-wfirma"
 Documentation = "https://python-wfirma.readthedocs.io"
 Repository = "https://github.com/yourusername/python-wfirma"
 Issues = "https://github.com/yourusername/python-wfirma/issues"
+
+[dependency-groups]
+dev = [
+    "ipdb>=0.13.13",
+    "ipython>=9.9.0",
+    "pre-commit>=4.5.1",
+    "pre-commit-hooks>=6.0.0",
+    "ruff>=0.14.13",
+]
 
 [tool.ruff]
 line-length = 100

@@ -1,2 +1,1 @@
 """Synchronous resource implementations."""
-
