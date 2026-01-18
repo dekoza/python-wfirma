@@ -51,6 +51,11 @@ from wfirma.models.payment import (
     PaymentObjectType,
     PaymentType,
 )
+from wfirma.models.warehouse import (
+    WarehouseDocument,
+    WarehouseDocumentContent,
+    WarehouseDocumentType,
+)
 
 __all__ = [
     # Base models
@@ -97,5 +102,9 @@ __all__ = [
     "PaymentCashbox",
     "PaymentObjectType",
     "PaymentType",
+    # Warehouse models
+    "WarehouseDocument",
+    "WarehouseDocumentContent",
+    "WarehouseDocumentType",
 ]
 

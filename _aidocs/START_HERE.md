@@ -1,12 +1,50 @@
-# 🎉 Phase 3.7 Complete - Payment Models Done!
+# 🎉 Phase 3.8 Complete - Warehouse Models Done!
 
 **Project:** python-wfirma  
 **Last Update:** 2026-01-18  
-**Status:** ✅ Phase 3.7 COMPLETED (Payment Models ✅)
+**Status:** ✅ Phase 3.8 COMPLETED (Warehouse Models ✅)
 
 ---
 
-## ✅ Recent Completion: Payment Models (2026-01-18)
+## ✅ Recent Completion: Warehouse Models (2026-01-18)
+
+### Accomplishments
+- ✅ Implemented warehouse models module (`src/wfirma/models/warehouse.py`)
+- ✅ 25 comprehensive tests covering all warehouse models
+- ✅ 100% code coverage for warehouse module
+- ✅ All models exported via `wfirma.models` package
+
+**Warehouse Models Implemented:**
+- `WarehouseDocument` - Main warehouse document model
+- `WarehouseDocumentContent` - Document line item model
+- `WarehouseDocumentType` - Enum for document types (PW, PZ, R, RW, WZ, ZD, ZPD)
+
+**Warehouse Document Types:**
+- PW (Przyjęcie Wewnętrzne) - Internal receipt
+- PZ (Przyjęcie Zewnętrzne) - External receipt (from supplier)
+- R (Rozchód) - Issue/disbursement
+- RW (Rozchód Wewnętrzny) - Internal issue
+- WZ (Wydanie Zewnętrzne) - External issue (to customer)
+- ZD (Zwrot do Dostawcy) - Return to supplier
+- ZPD (Zwrot Przyjętych Dostaw) - Return of received deliveries
+
+**WarehouseDocument Fields:**
+- Identification: id, fullnumber
+- Date: date
+- Type: type
+- Metadata: description, notes, tags
+- Relations: contractor_id, company_id, series_id
+- Timestamps: created, modified
+
+**WarehouseDocumentContent Fields:**
+- Identification: id, name
+- Quantity: unit, unit_count, price
+- Relations: good_id, warehouse_document_id
+- Timestamps: created, modified
+
+---
+
+## ✅ Earlier: Payment Models (2026-01-18)
 
 ### Accomplishments
 - ✅ Implemented payment models module (`src/wfirma/models/payment.py`)
@@ -20,21 +58,6 @@
 - `PaymentObjectType` - Enum for payment object types (invoice, expense, invoicerecurring, expenserecurring)
 - `PaymentType` - Enum for payment types (income, expense)
 
-**Payment Fields:**
-- Identification: id
-- Document link: object_name, object_id
-- Payment details: value, date, type
-- Metadata: description
-- Relations: payment_cashbox_id, company_id
-- Timestamps: created, modified
-
-**PaymentCashbox Fields:**
-- Identification: id, name
-- Details: description, balance
-- Bank info: bank_account, bank_name
-- Flags: is_default
-- Relations: company_id
-- Timestamps: created, modified
 
 ---
 

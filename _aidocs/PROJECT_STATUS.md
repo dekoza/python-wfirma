@@ -14,6 +14,7 @@
 **Phase 3.5 Status:** ✅ COMPLETED (2026-01-18) - Good Models
 **Phase 3.6 Status:** ✅ COMPLETED (2026-01-18) - Invoice Models
 **Phase 3.7 Status:** ✅ COMPLETED (2026-01-18) - Payment Models
+**Phase 3.8 Status:** ✅ COMPLETED (2026-01-18) - Warehouse Models
 
 ---
 
@@ -298,9 +299,55 @@ tests/models/test_invoice.py::TestInvoice - 16 tests
 Coverage: 100% for models/invoice.py
 ```
 
-#### ⏳ Phase 3.7: Payment Models (NEXT)
-1. ⏳ Create payment models (`src/wfirma/models/payment.py`)
-2. ⏳ Write tests for payment models (`tests/models/test_payment.py`)
+#### ✅ Phase 3.7: Payment Models (COMPLETED - 2026-01-18)
+
+**Status**: Completed in previous session.
+
+#### ✅ Phase 3.8: Warehouse Models (COMPLETED - 2026-01-18)
+
+**Accomplishments:**
+- ✅ Created warehouse models module (`src/wfirma/models/warehouse.py`)
+- ✅ Implemented `WarehouseDocument` - Main warehouse document model
+- ✅ Implemented `WarehouseDocumentContent` - Warehouse document line item model
+- ✅ Implemented `WarehouseDocumentType` - Enum for document types (PW, PZ, R, RW, WZ, ZD, ZPD)
+- ✅ 25 tests passing with 100% coverage for warehouse.py
+- ✅ All models exported via `wfirma.models`
+
+**Warehouse Document Types Implemented:**
+- PW (Przyjęcie Wewnętrzne) - Internal receipt
+- PZ (Przyjęcie Zewnętrzne) - External receipt (from supplier)
+- R (Rozchód) - Issue/disbursement
+- RW (Rozchód Wewnętrzny) - Internal issue
+- WZ (Wydanie Zewnętrzne) - External issue (to customer)
+- ZD (Zwrot do Dostawcy) - Return to supplier
+- ZPD (Zwrot Przyjętych Dostaw) - Return of received deliveries
+
+**WarehouseDocument Fields:**
+- Identification: id, fullnumber
+- Date: date
+- Type: type (document type enum)
+- Metadata: description, notes, tags
+- Relations: contractor_id, company_id, series_id
+- Timestamps: created, modified
+
+**WarehouseDocumentContent Fields:**
+- Identification: id, name
+- Quantity: unit, unit_count, price
+- Relations: good_id, warehouse_document_id
+- Timestamps: created, modified
+
+**Test Results:**
+```
+tests/models/test_warehouse.py::TestWarehouseDocumentType - 3 tests
+tests/models/test_warehouse.py::TestWarehouseDocumentContent - 8 tests
+tests/models/test_warehouse.py::TestWarehouseDocument - 12 tests
+tests/models/test_warehouse.py::TestWarehouseModelsExport - 2 tests
+Coverage: 100% for models/warehouse.py
+```
+
+#### ⏳ Phase 3.9: Employee Models (NEXT)
+1. ⏳ Create employee models (`src/wfirma/models/employee.py`)
+2. ⏳ Write tests for employee models (`tests/models/test_employee.py`)
 
 ---
 
@@ -362,7 +409,7 @@ python-wfirma/
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
 | Test Coverage | ≥90% | 99% | ✅ |
-| Passing Tests | 100% | 100% (227/227) | ✅ |
+| Passing Tests | 100% | 100% (316/316) | ✅ |
 | Linting Errors | 0 | 0 | ✅ |
 | Type Errors | 0 | 0 | ✅ |
 | Documentation | Complete | Initialized | 🚧 |
