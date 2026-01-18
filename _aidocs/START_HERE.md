@@ -1,12 +1,48 @@
-# 🎉 Phase 3.4 Complete - Contractor Models Done!
+# 🎉 Phase 3.6 Complete - Invoice Models Done!
 
 **Project:** python-wfirma  
 **Last Update:** 2026-01-18  
-**Status:** ✅ Phase 3.4 COMPLETED (Contractor Models ✅)
+**Status:** ✅ Phase 3.6 COMPLETED (Invoice Models ✅)
 
 ---
 
-## ✅ Recent Completion: Contractor Models (2026-01-18)
+## ✅ Recent Completion: Invoice Models (2026-01-18)
+
+### Accomplishments
+- ✅ Implemented invoice models module (`src/wfirma/models/invoice.py`)
+- ✅ 38 comprehensive tests covering all invoice models
+- ✅ 100% code coverage for invoice module
+- ✅ All models exported via `wfirma.models` package
+
+**Invoice Models Implemented:**
+- `Invoice` - Full invoice model
+- `InvoiceContent` - Invoice line item model
+- `InvoiceType` - Enum for invoice types (normal, proforma, correction, receipt, final)
+- `PaymentMethod` - Enum for payment methods (cash, transfer, card, compensation, advance, check)
+- `PaymentState` - Enum for payment states (paid, unpaid, partial)
+- `DisposalDateFormat` - Enum for disposal date format (date, month)
+
+**Invoice Fields:**
+- Identification: id, fullnumber, number
+- Dates: date, disposaldate, paymentdate
+- Payment: paymentmethod, paymentstate
+- Type: type, type_of_sale
+- Totals: netto, brutto, tax, paid, remaining
+- Currency: currency, currency_exchange, currency_date, currency_label
+- Metadata: description, notes, tags
+- Relations: contractor_id, series_id, company_detail_id
+
+**InvoiceContent Fields:**
+- Identification: id, name, classification
+- Quantity: unit, count, price, price_modified
+- Discounts: discount, discount_percent
+- Totals: netto, brutto
+- Tax: vat, lumpcode
+- Relations: good_id, invoice_id
+
+---
+
+## ✅ Earlier: Good Models (2026-01-18)
 
 ### Accomplishments
 - ✅ Implemented contractor models module (`src/wfirma/models/contractor.py`)
@@ -137,8 +173,8 @@
 
 | Metric | Status |
 |--------|--------|
-| Tests Passing | ✅ 74/74 (100%) |
-| Code Coverage | ✅ 98% |
+| Tests Passing | ✅ 265/265 (100%) |
+| Code Coverage | ✅ 99% |
 | Linting Errors | ✅ 0 |
 | Type Errors | ✅ 0 |
 | Build Status | ✅ Success |

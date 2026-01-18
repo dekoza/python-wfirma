@@ -11,6 +11,8 @@
 **Phase 3.2 Status:** ✅ COMPLETED (2026-01-18) - Common Models
 **Phase 3.3 Status:** ✅ COMPLETED (2026-01-18) - Company Models
 **Phase 3.4 Status:** ✅ COMPLETED (2026-01-18) - Contractor Models
+**Phase 3.5 Status:** ✅ COMPLETED (2026-01-18) - Good Models
+**Phase 3.6 Status:** ✅ COMPLETED (2026-01-18) - Invoice Models
 
 ---
 
@@ -215,6 +217,92 @@ Coverage: 100% for models/contractor.py
 
 ---
 
+#### ✅ Phase 3.5: Good Models (COMPLETED - 2026-01-18)
+
+**Accomplishments:**
+- ✅ Created good models module (`src/wfirma/models/good.py`)
+- ✅ Implemented `Good` - Full product/service model
+- ✅ Implemented `GoodType` - Enum for good types (good, service)
+- ✅ Implemented `WarehouseType` - Enum for warehouse tracking types
+- ✅ 22 tests passing with 100% coverage for good.py
+- ✅ All models exported via `wfirma.models`
+
+**Good Fields Implemented:**
+- Identification: id, name, code (SKU)
+- Pricing: unit, netto
+- Type: type (good/service), warehouse_type (simple/detailed)
+- Inventory: count
+- Tax: vat, vat_code_id, lumpcode
+- Classification: classification (PKWiU)
+- Metadata: description, tags
+- Timestamps: created, modified
+
+**Test Results:**
+```
+tests/models/test_good.py::TestGoodType - 3 tests
+tests/models/test_good.py::TestWarehouseType - 3 tests
+tests/models/test_good.py::TestGood - 16 tests
+Coverage: 100% for models/good.py
+```
+
+#### ⏳ Phase 3.6: Invoice Models (NEXT)
+1. ⏳ Create invoice models (`src/wfirma/models/invoice.py`)
+2. ⏳ Write tests for invoice models (`tests/models/test_invoice.py`)
+
+---
+
+#### ✅ Phase 3.6: Invoice Models (COMPLETED - 2026-01-18)
+
+**Accomplishments:**
+- ✅ Created invoice models module (`src/wfirma/models/invoice.py`)
+- ✅ Implemented `Invoice` - Full invoice model
+- ✅ Implemented `InvoiceContent` - Invoice line item model
+- ✅ Implemented `InvoiceType` - Enum for invoice types (normal, proforma, correction, receipt, final)
+- ✅ Implemented `PaymentMethod` - Enum for payment methods (cash, transfer, card, compensation, advance, check)
+- ✅ Implemented `PaymentState` - Enum for payment states (paid, unpaid, partial)
+- ✅ Implemented `DisposalDateFormat` - Enum for disposal date format (date, month)
+- ✅ 38 tests passing with 100% coverage for invoice.py
+- ✅ All models exported via `wfirma.models`
+
+**Invoice Fields Implemented:**
+- Identification: id, fullnumber, number
+- Dates: date, disposaldate, disposaldate_format, paymentdate
+- Payment: paymentmethod, paymentstate
+- Type: type, type_of_sale
+- Totals: netto, brutto, tax, paid, remaining
+- Currency: currency, currency_exchange, currency_date, currency_label
+- Metadata: description, notes, tags
+- Flags: alreadysent, alreadysent_printed, fiscal, split_payment
+- Relations: contractor_id, series_id, company_detail_id, user_company_id, translation_language_id, corrected_invoice_id
+- Timestamps: created, modified
+
+**InvoiceContent Fields Implemented:**
+- Identification: id, name
+- Classification: classification
+- Quantity: unit, count, unit_count, price, price_modified
+- Discounts: discount, discount_percent
+- Totals: netto, brutto
+- Tax: vat, lumpcode
+- Relations: good_id, invoice_id, tangiblefixedasset_id, equipment_id, vehicle_id
+- Timestamps: created, modified
+
+**Test Results:**
+```
+tests/models/test_invoice.py::TestInvoiceType - 3 tests
+tests/models/test_invoice.py::TestPaymentMethod - 3 tests
+tests/models/test_invoice.py::TestPaymentState - 3 tests
+tests/models/test_invoice.py::TestDisposalDateFormat - 3 tests
+tests/models/test_invoice.py::TestInvoiceContent - 10 tests
+tests/models/test_invoice.py::TestInvoice - 16 tests
+Coverage: 100% for models/invoice.py
+```
+
+#### ⏳ Phase 3.7: Payment Models (NEXT)
+1. ⏳ Create payment models (`src/wfirma/models/payment.py`)
+2. ⏳ Write tests for payment models (`tests/models/test_payment.py`)
+
+---
+
 ## Pending Phases
 
 - ✅ Phase 2: Core Infrastructure (exceptions, config)
@@ -272,8 +360,8 @@ python-wfirma/
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Test Coverage | ≥90% | 100% | ✅ |
-| Passing Tests | 100% | 100% | ✅ |
+| Test Coverage | ≥90% | 99% | ✅ |
+| Passing Tests | 100% | 100% (227/227) | ✅ |
 | Linting Errors | 0 | 0 | ✅ |
 | Type Errors | 0 | 0 | ✅ |
 | Documentation | Complete | Initialized | 🚧 |
