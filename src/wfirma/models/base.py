@@ -78,8 +78,8 @@ def parse_wfirma_datetime(value: str | datetime | None) -> datetime | None:
         # Parse standard wFirma format
         try:
             return datetime.strptime(value, WFIRMA_DATETIME_FORMAT)
-        except ValueError:
-            raise ValueError(f"Invalid datetime format: {value}")
+        except ValueError as err:
+            raise ValueError(f"Invalid datetime format: {value}") from err
 
     raise ValueError(f"Expected datetime string or datetime object, got {type(value)}")
 

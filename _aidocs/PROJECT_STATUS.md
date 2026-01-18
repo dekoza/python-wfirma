@@ -8,6 +8,8 @@
 **Phase 1 Status:** ✅ COMPLETED (2026-01-18)
 **Phase 2 Status:** ✅ COMPLETED (2026-01-18)
 **Phase 3.1 Status:** ✅ COMPLETED (2026-01-18) - Base Models
+**Phase 3.2 Status:** ✅ COMPLETED (2026-01-18) - Common Models
+**Phase 3.3 Status:** ✅ COMPLETED (2026-01-18) - Company Models
 
 ---
 
@@ -128,15 +130,62 @@ tests/models/test_base.py::TestResponseParameters - 5 tests
 Coverage: 100% for models/base.py
 ```
 
-#### ⏳ Phase 3.2: Common Models (NEXT)
-1. ⏳ Create common models (`src/wfirma/models/common.py`)
-   - Address model
-   - Phone/Email validation
-   - Currency and decimal handling
-   - Tax rates (VAT types)
-2. ⏳ Write tests for common models (`tests/models/test_common.py`)
+#### ✅ Phase 3.2: Common Models (COMPLETED - 2026-01-18)
 
-**Estimated Time Remaining:** 3 hours
+**Accomplishments:**
+- ✅ Created common models module (`src/wfirma/models/common.py`)
+- ✅ Implemented `CountryCode` - ISO 3166-1 alpha-2 country codes enum
+- ✅ Implemented `TaxIdType` - Tax ID types (NIP, PESEL, custom, none)
+- ✅ Implemented `VATRate` - VAT rates enum with `as_decimal()` method
+- ✅ Implemented `Currency` - ISO 4217 currency codes enum
+- ✅ Implemented `Money` - Monetary amount model with auto-rounding
+- ✅ Implemented `Email` - Email validation model using Pydantic EmailStr
+- ✅ Implemented `Phone` - Phone number model with normalization
+- ✅ Implemented `Address` - Physical address model matching wFirma API
+- ✅ Implemented `BankAccount` - Bank account model
+- ✅ Added `email-validator>=2.0.0` dependency
+- ✅ 55 tests passing with 98% coverage for common.py
+- ✅ All models exported via `wfirma.models`
+
+**Test Results:**
+```
+tests/models/test_common.py::TestCountryCode - 3 tests
+tests/models/test_common.py::TestTaxIdType - 4 tests
+tests/models/test_common.py::TestVATRate - 7 tests
+tests/models/test_common.py::TestCurrency - 4 tests
+tests/models/test_common.py::TestMoney - 9 tests
+tests/models/test_common.py::TestEmail - 8 tests
+tests/models/test_common.py::TestPhone - 8 tests
+tests/models/test_common.py::TestAddress - 8 tests
+tests/models/test_common.py::TestBankAccount - 5 tests
+Coverage: 98% for models/common.py
+```
+
+#### ✅ Phase 3.3: Company Models (COMPLETED - 2026-01-18)
+
+**Accomplishments:**
+- ✅ Created company models module (`src/wfirma/models/company.py`)
+- ✅ Implemented `CompanyDetail` - Company information/details model
+- ✅ Implemented `CompanyAccount` - Company bank account model
+- ✅ Implemented `CompanyAddress` - Company address entry model
+- ✅ Implemented `UserCompany` - User-company relationship model
+- ✅ 24 tests passing with 100% coverage for company.py
+- ✅ All models exported via `wfirma.models`
+
+**Test Results:**
+```
+tests/models/test_company.py::TestCompanyDetail - 10 tests
+tests/models/test_company.py::TestCompanyAccount - 5 tests
+tests/models/test_company.py::TestCompanyAddress - 5 tests
+tests/models/test_company.py::TestUserCompany - 5 tests
+Coverage: 100% for models/company.py
+```
+
+#### ⏳ Phase 3.4: Contractor Models (NEXT)
+1. ⏳ Create contractor models (`src/wfirma/models/contractor.py`)
+2. ⏳ Write tests for contractor models (`tests/models/test_contractor.py`)
+
+**Estimated Time Remaining:** 2-3 hours
 
 ---
 
