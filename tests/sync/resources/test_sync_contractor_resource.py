@@ -386,10 +386,10 @@ class TestContractorResourceDelete:
 
             # Not found should raise ResourceNotFoundError
             from wfirma.exceptions import ResourceNotFoundError
+
             with pytest.raises(ResourceNotFoundError):
                 resource.delete(contractor_id=999)
 
         client.close()
 
         assert route.called
-

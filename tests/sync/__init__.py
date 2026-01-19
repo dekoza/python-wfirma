@@ -1,2 +1,1 @@
 """Sync tests package."""
-

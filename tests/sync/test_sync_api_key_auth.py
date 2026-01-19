@@ -13,6 +13,7 @@ from wfirma.exceptions import MissingConfigurationError, ValidationError
 from wfirma.sync.auth import APIKeyAuth
 
 
+@pytest.mark.aicomplete
 class TestAPIKeyAuth:
     """Tests for APIKeyAuth class."""
 
@@ -123,7 +124,7 @@ class TestAPIKeyAuth:
             app_key="test_app",
         )
         with pytest.raises(AttributeError):
-            auth.access_key = "new_value"  # type: ignore[misc]
+            auth.access_key = "new_value"  # type: ignore[assignment]
 
     def test_repr_hides_secrets(self) -> None:
         """Test that __repr__ does not expose secret values."""

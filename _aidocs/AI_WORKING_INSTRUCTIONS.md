@@ -9,10 +9,11 @@
 
 ### Current Status
 - **Phase**: Phase 6 (Resource Implementations - IN PROGRESS)
+- **OAuth Migration**: Phase 4.3 (Authlib) - PLANNED (see `_aidocs/PHASE_4.3_OAUTH_MIGRATION_PLAN.md`)
 - **Version**: 0.1.0-dev
 - **Tests**: 642/642 passing, 92% coverage
 - **NOAI Tests**: 0
-- **AICOMPLETE Tests**: 455 (5 scraper + 25 exceptions + 42 config + 34 base models + 55 common models + 24 company models + 18 contractor models + 22 good models + 38 invoice models + 26 payment models + 25 warehouse models + 48 API Key auth + 35 sync HTTP client + 38 async HTTP client + 20 contractor resource)
+- **AICOMPLETE Tests**: Use `@pytest.mark.aicomplete` (canonical) and optionally keep `# AICOMPLETE:` comments as human-readable notes
 
 ### Essential Files to Check Before Starting
 1. `PROJECT_STATUS.md` - Current phase and todos
@@ -27,16 +28,19 @@
 ### Testing
 ```bash
 # Run all tests
-uv run pytest
+uv run pytest --cache-clear
+
+# Run only AICOMPLETE tests (ready for review)
+uv run pytest --cache-clear -m aicomplete
 
 # Run specific test
-uv run pytest tests/path/to/test_file.py::test_name -v
+uv run pytest --cache-clear tests/path/to/test_file.py::test_name -v
 
 # Run with coverage
-uv run pytest --cov=wfirma --cov-report=html
+uv run pytest --cache-clear --cov=wfirma --cov-report=html
 
 # Run without coverage (faster)
-uv run pytest --no-cov
+uv run pytest --cache-clear --no-cov
 ```
 
 ### Code Quality
@@ -112,12 +116,27 @@ uv run tox -e lint,type
 
 ---
 
+## Resource Implementation Rule (Project-Specific)
+
+When implementing a resource group (e.g. invoices, contractors, payments), always implement the full CRUD surface whenever the wFirma API offers it:
+
+- ``get`` (GET /resource/get/{id})
+- ``find`` (GET /resource/find)
+- ``add`` (POST /resource/add)
+- ``edit`` (POST /resource/edit/{id})
+- ``delete`` (DELETE /resource/delete/{id})
+
+Tests for the resource should cover all supported methods (sync + async) before the work can be marked ``@pytest.mark.aicomplete``.
+
+---
+
 ## NOAI System Rules
 
 ### AICOMPLETE Tag
 - **When**: Feature is fully implemented and tested
-- **Format**: `# AICOMPLETE: Brief description - ready for review`
-- **Action**: Mark test for human review
+- **Canonical mechanism**: `@pytest.mark.aicomplete` (or module-level `pytestmark = pytest.mark.aicomplete`)
+- **Optional note**: `# AICOMPLETE: Brief description - ready for review`
+- **Action**: Mark test for human review and potential NOAI tagging
 
 ### NOAI Tag (Applied by Human)
 - **Meaning**: Test is IMMUTABLE to AI

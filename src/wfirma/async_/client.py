@@ -59,11 +59,16 @@ class WFirmaClient:
     - Automatic company_id injection
 
     Example:
+        >>> import asyncio
         >>> from wfirma.async_.auth import APIKeyAuth
-        >>> auth = APIKeyAuth(access_key="ak", secret_key="sk", app_key="appk")
-        >>> async with WFirmaClient(auth=auth) as client:
-        ...     users = await client.get_json("/users/get/123")
-        ...     print(users["users"]["0"]["user"]["login"])
+        >>>
+        >>> async def main() -> None:
+        ...     auth = APIKeyAuth(access_key="ak", secret_key="sk", app_key="appk")
+        ...     async with WFirmaClient(auth=auth) as client:
+        ...         users = await client.get_json("/users/get/123")
+        ...         print(users["users"]["0"]["user"]["login"])
+        >>>
+        >>> asyncio.run(main())
 
     Attributes:
         auth: Authentication provider (APIKeyAuth or OAuth2Auth).
@@ -130,6 +135,54 @@ class WFirmaClient:
         if resource is None:
             resource = ContractorResource(self)
             self._resources["contractors"] = resource
+        return resource
+
+    @property
+    def goods(self) -> Any:
+        """Convenience accessor for goods-related endpoints.
+
+        Returns:
+            GoodsResource instance bound to this client.
+        """
+        # Local import to avoid circular dependency between client and resources.
+        from wfirma.async_.resources.goods import GoodsResource
+
+        resource = self._resources.get("goods")
+        if resource is None:
+            resource = GoodsResource(self)
+            self._resources["goods"] = resource
+        return resource
+
+    @property
+    def invoices(self) -> Any:
+        """Convenience accessor for invoice-related endpoints.
+
+        Returns:
+            InvoicesResource instance bound to this client.
+        """
+        # Local import to avoid circular dependency between client and resources.
+        from wfirma.async_.resources.invoices import InvoicesResource
+
+        resource = self._resources.get("invoices")
+        if resource is None:
+            resource = InvoicesResource(self)
+            self._resources["invoices"] = resource
+        return resource
+
+    @property
+    def payments(self) -> Any:
+        """Convenience accessor for payment-related endpoints.
+
+        Returns:
+            PaymentsResource instance bound to this client.
+        """
+        # Local import to avoid circular dependency between client and resources.
+        from wfirma.async_.resources.payments import PaymentsResource
+
+        resource = self._resources.get("payments")
+        if resource is None:
+            resource = PaymentsResource(self)
+            self._resources["payments"] = resource
         return resource
 
     async def __aenter__(self) -> WFirmaClient:
@@ -330,7 +383,9 @@ class WFirmaClient:
 
         try:
             if json is not None:
-                response = await self._http_client.post(url, headers=headers, json=json, params=params)
+                response = await self._http_client.post(
+                    url, headers=headers, json=json, params=params
+                )
             else:
                 response = await self._http_client.post(
                     url, headers=headers, content=content, params=params
@@ -489,4 +544,3 @@ class WFirmaClient:
 __all__ = [
     "WFirmaClient",
 ]
-

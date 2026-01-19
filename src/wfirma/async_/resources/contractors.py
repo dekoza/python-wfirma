@@ -292,4 +292,3 @@ class ContractorResource:
         """
         contractor_data = {k: v for k, v in kwargs.items() if v is not None}
         return {"contractors": [{"contractor": contractor_data}]}
-

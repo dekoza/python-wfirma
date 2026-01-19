@@ -33,6 +33,7 @@ from wfirma.exceptions import (
     TokenExpiredError,
     ValidationError,
 )
+from wfirma.oauth._authlib import SyncOAuth2Backend
 
 logger = logging.getLogger(__name__)
 
@@ -198,8 +199,8 @@ class OAuth2Auth:
     redirect_uri: str
     environment: Environment
     token_store: TokenStore
-    store_key: str = "default"
-    debug: bool = False
+    store_key: str
+    debug: bool
 
     def __init__(
         self,
@@ -290,23 +291,23 @@ class OAuth2Auth:
 
         return f"{self.authorize_url}?{urlencode(params)}"
 
+    def _backend(self) -> SyncOAuth2Backend:
+        return SyncOAuth2Backend(
+            client_id=self.client_id,
+            client_secret=self.client_secret,
+            token_url=self.token_url,
+            redirect_uri=self.redirect_uri,
+            token_store=self.token_store,
+            store_key=self.store_key,
+        )
+
     def exchange_code(self, code: str) -> OAuthToken:
         """Exchange authorization code for access and refresh tokens."""
 
         self._validate_str(code, "code")
 
-        payload = {
-            "grant_type": "authorization_code",
-            "code": code,
-            "redirect_uri": self.redirect_uri,
-            "client_id": self.client_id,
-            "client_secret": self.client_secret,
-        }
-
         try:
-            with httpx.Client() as client:
-                response = client.post(self.token_url, data=payload)
-            response.raise_for_status()
+            token = self._backend().exchange_code(code=code)
         except httpx.HTTPStatusError as err:
             if self.debug:
                 logger.exception(
@@ -325,23 +326,17 @@ class OAuth2Auth:
                     "OAuth2 token request failed due to network error (url=%s).", err.request.url
                 )
             raise ConnectionError("OAuth2 token request failed due to network error.") from err
+        except Exception as err:
+            if err.__class__.__name__ == "OAuthError":
+                raise AuthenticationError("OAuth2 token request failed.") from err
+            raise
 
-        token = OAuthToken.from_oauth2_response(response.json())
         self.token_store.set(self.store_key, token)
         return token
 
     def _refresh(self, refresh_token: str) -> OAuthToken:
-        payload = {
-            "grant_type": "refresh_token",
-            "refresh_token": refresh_token,
-            "client_id": self.client_id,
-            "client_secret": self.client_secret,
-        }
-
         try:
-            with httpx.Client() as client:
-                response = client.post(self.token_url, data=payload)
-            response.raise_for_status()
+            token = self._backend().refresh(refresh_token=refresh_token)
         except httpx.HTTPStatusError as err:
             if self.debug:
                 logger.exception(
@@ -361,7 +356,6 @@ class OAuth2Auth:
                 )
             raise ConnectionError("OAuth2 token refresh failed due to network error.") from err
 
-        token = OAuthToken.from_oauth2_response(response.json())
         self.token_store.set(self.store_key, token)
         return token
 

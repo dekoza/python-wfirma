@@ -8,6 +8,9 @@ import pytest
 
 from wfirma.sync.auth import MemoryTokenStore, OAuthToken
 
+# Mark this module as finalized/ready for review.
+pytestmark = pytest.mark.aicomplete
+
 
 # AICOMPLETE: Sync token store behavior tested (CRUD, key separation) - ready for review
 class TestMemoryTokenStore:

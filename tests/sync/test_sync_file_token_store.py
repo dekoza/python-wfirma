@@ -11,6 +11,9 @@ import pytest
 from wfirma.exceptions import ConfigurationError, ValidationError
 from wfirma.sync.auth import FileTokenStore, OAuthToken
 
+# Mark this module as finalized/ready for review.
+pytestmark = pytest.mark.aicomplete
+
 
 # AICOMPLETE: Sync file token store behavior tested (persist, overwrite, corruption) - ready for review
 class TestFileTokenStore:

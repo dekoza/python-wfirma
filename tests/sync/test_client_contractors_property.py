@@ -2,9 +2,13 @@
 
 from __future__ import annotations
 
+import pytest
+
 from wfirma.sync.auth import APIKeyAuth
 from wfirma.sync.client import WFirmaClient
 from wfirma.sync.resources.contractors import ContractorResource
+
+pytestmark = pytest.mark.aicomplete
 
 
 class TestWFirmaClientContractorsProperty:
@@ -32,4 +36,3 @@ class TestWFirmaClientContractorsProperty:
         assert first is second
 
         client.close()
-

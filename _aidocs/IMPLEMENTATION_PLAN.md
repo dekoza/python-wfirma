@@ -482,7 +482,26 @@ WFirmaException (base)
 
 **Implementation:** `src/wfirma/async_/auth.py`
 
-**Tag Strategy:** Mark `AICOMPLETE` when both sync/async pass all auth scenarios
+#### 4.3 OAuth Migration to Authlib (TDD)
+
+**Goal:** Replace the in-house OAuth implementation with an Authlib-based one.
+
+**Internal Spec:** `_aidocs/PHASE_4.3_OAUTH_MIGRATION_PLAN.md`
+
+**Work Items:**
+- Introduce Authlib adapters for OAuth2 and OAuth1 (PLAINTEXT)
+- Integrate Authlib into sync and async auth helpers
+- Wire Authlib-based auth into `WFirmaClient` authentication flow
+- Replace legacy OAuth code paths and update docs
+
+**Testing:**
+- Add unit tests for token modeling and persistence adapters
+- Add mocked integration tests (`respx`) for OAuth2 code exchange and refresh
+- Add deterministic tests for OAuth1 PLAINTEXT Authorization header
+
+**Quality Gates:**
+- `tox -e lint,type` passes
+- Full pytest suite passes
 
 ---
 

@@ -40,6 +40,14 @@
 
 ---
 
+## ✅ Recent Completion: AICOMPLETE pytest marker enabled (2026-01-19)
+
+- ✅ Added `aicomplete` marker to pytest config (`pyproject.toml`)
+- ✅ Updated tests previously tagged only with `# AICOMPLETE:` to use `@pytest.mark.aicomplete` / module-level `pytestmark`
+- ✅ Verified `uv run pytest --cache-clear -m aicomplete` selects and runs tests
+
+---
+
 ## ✅ Earlier: Async HTTP Client (2026-01-19)
 
 ### Accomplishments
@@ -398,18 +406,19 @@ Building a professional Python library for wFirma API with:
 ## 📊 Progress Overview
 
 ```
-Phase 0: Project Setup           ✅ COMPLETED (2026-01-16)
-Phase 1: API Documentation       ✅ COMPLETED (2026-01-18)
-Phase 2: Core Infrastructure     ✅ COMPLETED (2026-01-18)
-Phase 3: Data Models             ✅ COMPLETED (2026-01-19)
-Phase 4: Authentication          ✅ COMPLETED (2026-01-19)
-Phase 5: Base HTTP Client        ✅ COMPLETED (2026-01-19)
+Phase 0: Project Setup            ✅ COMPLETED (2026-01-16)
+Phase 1: API Documentation        ✅ COMPLETED (2026-01-18)
+Phase 2: Core Infrastructure      ✅ COMPLETED (2026-01-18)
+Phase 3: Data Models              ✅ COMPLETED (2026-01-19)
+Phase 4: Authentication           ✅ COMPLETED (2026-01-19)
+Phase 4.3: OAuth Migration (Authlib) 🟡 PLANNED (see _aidocs/PHASE_4.3_OAUTH_MIGRATION_PLAN.md)
+Phase 5: Base HTTP Client         ✅ COMPLETED (2026-01-19)
 Phase 6: Resource Implementations 🟡 IN PROGRESS (Company ✅, Contractors ✅)
-Phase 7-12: Remaining Resources  ⏳ Pending
-Phase 13: Public API             ⏳ Pending
-Phase 14: Documentation          ⏳ Pending
-Phase 15: Examples               ⏳ Pending
-Phase 16: CI/CD                  ⏳ Pending
+Phase 7-12: Remaining Resources   ⏳ Pending
+Phase 13: Public API              ⏳ Pending
+Phase 14: Documentation           ⏳ Pending
+Phase 15: Examples                ⏳ Pending
+Phase 16: CI/CD                   ⏳ Pending
 ```
 
 **Overall Progress:** ~12% (2/16 phases)
@@ -432,4 +441,3 @@ Phase 16: CI/CD                  ⏳ Pending
 **Prepared by:** AI Agent  
 **For:** Human Developer  
 **Date:** 2026-01-16
-

@@ -1,6 +1,6 @@
 """Tests for synchronous authentication helpers.
 
-These tests cover pure token logic only (no HTTP).
+These tests cover token logic and OAuth flows with HTTP mocked via respx (no real network).
 """
 
 from __future__ import annotations
@@ -23,6 +23,7 @@ from wfirma.exceptions import (
 from wfirma.sync.auth import OAuth1Auth, OAuth2Auth, OAuthToken
 
 
+@pytest.mark.aicomplete
 class TestOAuthToken:
     # AICOMPLETE: OAuth token model (sync) - ready for review
 
@@ -159,7 +160,7 @@ class TestOAuthToken:
     def test_token_is_immutable(self) -> None:
         token = OAuthToken(access_token="a")
         with pytest.raises(FrozenInstanceError):
-            token.access_token = "b"  # type: ignore[misc]
+            token.access_token = "b"  # type: ignore[assignment]
 
 
 class TestOAuth2Auth:

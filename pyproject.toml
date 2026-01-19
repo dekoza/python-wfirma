@@ -36,6 +36,7 @@ dependencies = [
     "python-dotenv>=1.0.0",
     "email-validator>=2.3.0",
     "pendulum>=3.1.0",
+    "authlib>=1.6.6",
 ]
 
 [project.optional-dependencies]
@@ -113,6 +114,7 @@ ignore = [
 
 [tool.mypy]
 python_version = "3.12"
+files = ["src/wfirma"]
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = false  # Gradual typing
@@ -125,6 +127,9 @@ strict_equality = true
 
 [[tool.mypy.overrides]]
 module = "tests.*"
+[[tool.mypy.overrides]]
+module = ["authlib.*"]
+ignore_missing_imports = true
 disallow_untyped_defs = false
 
 [tool.pytest.ini_options]
@@ -138,8 +143,8 @@ asyncio_mode = "auto"
 markers = [
     "slow: marks tests as slow (deselect with '-m \"not slow\"')",
     "integration: marks tests as integration tests requiring API access",
-    "aicomplete: marks tests as complete and ready for NOAI tagging",
     "noai: marks tests as immutable by AI agents",
+    "aicomplete: marks tests as complete and ready for NOAI tagging",
 ]
 
 [tool.coverage.run]

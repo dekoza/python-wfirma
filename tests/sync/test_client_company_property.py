@@ -2,9 +2,13 @@
 
 from __future__ import annotations
 
+import pytest
+
 from wfirma.sync.auth import APIKeyAuth
 from wfirma.sync.client import WFirmaClient
 from wfirma.sync.resources.company import CompanyResource
+
+pytestmark = pytest.mark.aicomplete
 
 
 class TestWFirmaClientCompanyProperty:

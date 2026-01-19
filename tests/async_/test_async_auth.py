@@ -1,6 +1,6 @@
 """Tests for asynchronous authentication helpers.
 
-These tests cover pure token logic only (no HTTP).
+These tests cover token logic and OAuth flows with HTTP mocked via respx (no real network).
 """
 
 from __future__ import annotations

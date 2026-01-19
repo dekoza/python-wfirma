@@ -5,27 +5,23 @@ Requirements
 ------------
 
 * Python 3.12 or higher
-* pip or uv (recommended)
+* `uv` (recommended)
 
 Installing from PyPI
 --------------------
 
-The recommended way to install python-wfirma is from PyPI using uv::
-
-    uv pip install python-wfirma
-
-Or using pip::
+End users can install the package from PyPI using pip::
 
     pip install python-wfirma
 
-Installing from Source
-----------------------
+Development / contributing
+--------------------------
 
-To install the latest development version::
+This repository uses `uv` (see `uv.lock`). To set up a local development environment::
 
     git clone https://github.com/yourusername/python-wfirma.git
     cd python-wfirma
-    uv pip install -e .
+    uv sync
 
 Optional Dependencies
 ---------------------
@@ -33,40 +29,30 @@ Optional Dependencies
 Development Tools
 ~~~~~~~~~~~~~~~~~
 
-For development work, install the development dependencies::
+For development work, add the development dependency group::
 
-    uv pip install python-wfirma[dev]
-
-This includes:
-
-* pytest - Testing framework
-* pytest-asyncio - Async test support
-* pytest-cov - Code coverage
-* respx - HTTP mocking
-* ruff - Linting and formatting
-* mypy - Type checking
-* tox - Test automation
+    uv sync --group dev
 
 Documentation Tools
 ~~~~~~~~~~~~~~~~~~~
 
-To build documentation locally::
+To build documentation locally, add the docs extras::
 
-    uv pip install python-wfirma[docs]
+    uv sync --extra docs
 
 Examples and Integrations
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
-To run examples::
+To run examples, add the examples extras::
 
-    uv pip install python-wfirma[examples]
+    uv sync --extra examples
 
 All Optional Dependencies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To install everything::
 
-    uv pip install python-wfirma[dev,docs,examples]
+    uv sync --group dev --extra docs --extra examples
 
 Verifying Installation
 ----------------------

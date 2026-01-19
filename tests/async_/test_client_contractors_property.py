@@ -36,4 +36,3 @@ class TestWFirmaClientContractorsProperty:
         assert first is second
 
         await client.close()
-

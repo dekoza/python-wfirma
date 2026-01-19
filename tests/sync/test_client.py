@@ -25,9 +25,8 @@ from wfirma.exceptions import (
 from wfirma.sync.auth import APIKeyAuth, OAuth2Auth, OAuthToken
 
 
+@pytest.mark.aicomplete
 class TestWFirmaClientInitialization:
-    # AICOMPLETE: Client initialization tests - ready for review
-
     def test_client_initializes_with_api_key_auth(self) -> None:
         from wfirma.sync.client import WFirmaClient
 

@@ -10,6 +10,8 @@ Welcome to the documentation for **python-wfirma**, a modern Python library for 
    installation
    authentication
    quickstart
+   request_validation
+   warehouse_documents
    api_reference.rst
    troubleshooting
 

@@ -91,6 +91,10 @@ Synchronous resources example::
         company = client.company.get()  # CompanyDetail model
         address = client.company.find_main_address()  # CompanyAddress model
 
+        # Goods (typed resource)
+        goods = client.goods.find()  # list[Good] models
+        updated = client.goods.edit(456, name="Updated name")  # Good model
+
 Asynchronous resources example::
 
     from wfirma.async_ import APIKeyAuth, WFirmaClient
@@ -100,6 +104,10 @@ Asynchronous resources example::
     async with WFirmaClient(auth=auth, company_id=123) as client:
         company = await client.company.get()  # CompanyDetail model
         address = await client.company.find_main_address()  # CompanyAddress model
+
+        # Goods (typed resource)
+        goods = await client.goods.find()  # list[Good] models
+        updated = await client.goods.edit(456, name="Updated name")  # Good model
 
 See :doc:`authentication` for supported authentication methods and :doc:`troubleshooting`
 for common issues.

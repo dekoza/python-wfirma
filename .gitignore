@@ -100,3 +100,4 @@ wfirma_output.txt
 *.pem
 *.key
 
+.tmp_*

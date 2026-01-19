@@ -132,6 +132,54 @@ class WFirmaClient:
             self._resources["contractors"] = resource
         return resource
 
+    @property
+    def goods(self) -> Any:
+        """Convenience accessor for goods-related endpoints.
+
+        Returns:
+            GoodsResource instance bound to this client.
+        """
+        # Local import to avoid circular dependency between client and resources.
+        from wfirma.sync.resources.goods import GoodsResource
+
+        resource = self._resources.get("goods")
+        if resource is None:
+            resource = GoodsResource(self)
+            self._resources["goods"] = resource
+        return resource
+
+    @property
+    def invoices(self) -> Any:
+        """Convenience accessor for invoice-related endpoints.
+
+        Returns:
+            InvoicesResource instance bound to this client.
+        """
+        # Local import to avoid circular dependency between client and resources.
+        from wfirma.sync.resources.invoices import InvoicesResource
+
+        resource = self._resources.get("invoices")
+        if resource is None:
+            resource = InvoicesResource(self)
+            self._resources["invoices"] = resource
+        return resource
+
+    @property
+    def payments(self) -> Any:
+        """Convenience accessor for payment-related endpoints.
+
+        Returns:
+            PaymentsResource instance bound to this client.
+        """
+        # Local import to avoid circular dependency between client and resources.
+        from wfirma.sync.resources.payments import PaymentsResource
+
+        resource = self._resources.get("payments")
+        if resource is None:
+            resource = PaymentsResource(self)
+            self._resources["payments"] = resource
+        return resource
+
     def __enter__(self) -> WFirmaClient:
         """Enter the context manager."""
         return self

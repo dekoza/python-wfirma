@@ -32,4 +32,3 @@ class TestWFirmaClientCompanyProperty:
             first = client.company
             second = client.company
             assert first is second
-

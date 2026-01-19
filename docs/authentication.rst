@@ -3,6 +3,11 @@ Authentication
 
 wFirma API uses OAuth for authentication. This guide will help you set up authentication.
 
+.. note::
+   OAuth support in this library is implemented using **Authlib** under the hood.
+   The public APIs in ``wfirma.sync.auth`` and ``wfirma.async_.auth`` stay small and explicit,
+   while Authlib handles the protocol details.
+
 Getting API Credentials
 ------------------------
 
@@ -20,13 +25,13 @@ Environment Variables
 The recommended method for production::
 
     export WFIRMA_APP_KEY=your_app_key
-    export WFIRMA_SECRET=your_secret
+    export WFIRMA_APP_SECRET=your_app_secret
     export WFIRMA_ENVIRONMENT=sandbox  # or production
 
 Or create a ``.env`` file::
 
     WFIRMA_APP_KEY=your_app_key
-    WFIRMA_SECRET=your_secret
+    WFIRMA_APP_SECRET=your_app_secret
     WFIRMA_ENVIRONMENT=sandbox
 
 Direct Configuration

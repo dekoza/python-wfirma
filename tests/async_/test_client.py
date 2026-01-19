@@ -404,9 +404,7 @@ class TestWFirmaClientErrorHandling:
     @pytest.mark.asyncio
     @respx.mock
     async def test_handles_http_429_rate_limit(self) -> None:
-        respx.get("https://api2.wfirma.pl/test").mock(
-            return_value=httpx.Response(429)
-        )
+        respx.get("https://api2.wfirma.pl/test").mock(return_value=httpx.Response(429))
 
         with pytest.raises(RateLimitError, match="Rate limit exceeded"):
             await self.client.get("/test")
@@ -414,9 +412,7 @@ class TestWFirmaClientErrorHandling:
     @pytest.mark.asyncio
     @respx.mock
     async def test_handles_http_500_server_error(self) -> None:
-        respx.get("https://api2.wfirma.pl/test").mock(
-            return_value=httpx.Response(500)
-        )
+        respx.get("https://api2.wfirma.pl/test").mock(return_value=httpx.Response(500))
 
         with pytest.raises(ServerError, match="Server error"):
             await self.client.get("/test")
@@ -424,9 +420,7 @@ class TestWFirmaClientErrorHandling:
     @pytest.mark.asyncio
     @respx.mock
     async def test_handles_http_503_service_unavailable(self) -> None:
-        respx.get("https://api2.wfirma.pl/test").mock(
-            return_value=httpx.Response(503)
-        )
+        respx.get("https://api2.wfirma.pl/test").mock(return_value=httpx.Response(503))
 
         with pytest.raises(ServiceUnavailableError, match="Service unavailable"):
             await self.client.get("/test")
@@ -434,9 +428,7 @@ class TestWFirmaClientErrorHandling:
     @pytest.mark.asyncio
     @respx.mock
     async def test_handles_timeout_error(self) -> None:
-        respx.get("https://api2.wfirma.pl/test").mock(
-            side_effect=httpx.TimeoutException("Timeout")
-        )
+        respx.get("https://api2.wfirma.pl/test").mock(side_effect=httpx.TimeoutException("Timeout"))
 
         with pytest.raises(TimeoutError, match="Request timed out"):
             await self.client.get("/test")
@@ -636,4 +628,3 @@ class TestWFirmaClientOAuth2Integration:
         assert route.called
         request = route.calls.last.request
         assert "oauth_version=2" in str(request.url)
-
