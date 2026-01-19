@@ -7,7 +7,7 @@ from __future__ import annotations
 
 from dataclasses import FrozenInstanceError
 from datetime import datetime, timedelta
-from urllib.parse import parse_qs
+from urllib.parse import parse_qs, urlparse
 
 import httpx
 import pytest
@@ -290,6 +290,90 @@ class TestOAuth2Auth:
         )
 
         assert auth.token_url == "https://sandbox-api2.wfirma.pl/oauth2/token"
+
+    # AICOMPLETE: OAuth2 authorization URL builder (async module) - ready for review
+    def test_build_authorization_url_builds_expected_query_params(self) -> None:
+        auth = OAuth2Auth(
+            client_id="cid-123",
+            client_secret="csecret",
+            redirect_uri="https://app.local/callback",
+            environment=Environment.PRODUCTION,
+            token_store=self.store,
+        )
+
+        url = auth.build_authorization_url(scope="invoices-read", state="state-1")
+
+        parsed = urlparse(url)
+        assert parsed.scheme == "https"
+        assert parsed.netloc == "wfirma.pl"
+        assert parsed.path == "/oauth2/auth"
+
+        qs = parse_qs(parsed.query)
+        assert qs["response_type"] == ["code"]
+        assert qs["client_id"] == ["cid-123"]
+        assert qs["redirect_uri"] == ["https://app.local/callback"]
+        assert qs["scope"] == ["invoices-read"]
+        assert qs["state"] == ["state-1"]
+
+    def test_build_authorization_url_omits_optional_params_when_not_provided(self) -> None:
+        auth = OAuth2Auth(
+            client_id="cid-123",
+            client_secret="csecret",
+            redirect_uri="https://app.local/callback",
+            environment=Environment.PRODUCTION,
+            token_store=self.store,
+        )
+
+        url = auth.build_authorization_url()
+
+        parsed = urlparse(url)
+        qs = parse_qs(parsed.query)
+        assert qs["response_type"] == ["code"]
+        assert qs["client_id"] == ["cid-123"]
+        assert qs["redirect_uri"] == ["https://app.local/callback"]
+        assert "scope" not in qs
+        assert "state" not in qs
+
+    def test_build_authorization_url_encodes_redirect_uri(self) -> None:
+        auth = OAuth2Auth(
+            client_id="cid-123",
+            client_secret="csecret",
+            redirect_uri="https://app.local/callback?x=1&y=hello world",
+            environment=Environment.PRODUCTION,
+            token_store=self.store,
+        )
+
+        url = auth.build_authorization_url(scope="invoices-read")
+
+        qs = parse_qs(urlparse(url).query)
+        assert qs["redirect_uri"] == ["https://app.local/callback?x=1&y=hello world"]
+
+    def test_build_authorization_url_accepts_scope_as_list(self) -> None:
+        auth = OAuth2Auth(
+            client_id="cid-123",
+            client_secret="csecret",
+            redirect_uri="https://app.local/callback",
+            environment=Environment.PRODUCTION,
+            token_store=self.store,
+        )
+
+        url = auth.build_authorization_url(scope=["invoices-read", "payments-read"])
+
+        qs = parse_qs(urlparse(url).query)
+        assert qs["scope"] == ["invoices-read payments-read"]
+
+    @pytest.mark.parametrize("scope", ["", [], [""], [" "]])
+    def test_build_authorization_url_rejects_invalid_scope(self, scope) -> None:
+        auth = OAuth2Auth(
+            client_id="cid-123",
+            client_secret="csecret",
+            redirect_uri="https://app.local/callback",
+            environment=Environment.PRODUCTION,
+            token_store=self.store,
+        )
+
+        with pytest.raises(ValidationError):
+            auth.build_authorization_url(scope=scope)
 
 
 class TestOAuth1Auth:

@@ -10,6 +10,7 @@ from __future__ import annotations
 import os
 from dataclasses import dataclass
 from typing import Any
+from urllib.parse import urlencode
 
 import httpx
 
@@ -220,6 +221,60 @@ class OAuth2Auth:
     @property
     def token_url(self) -> str:
         return f"{self.environment.base_url}/oauth2/token"
+
+    @property
+    def authorize_url(self) -> str:
+        # wFirma OAuth2 consent/authorization endpoint is on the main domain.
+        return "https://wfirma.pl/oauth2/auth"
+
+    def build_authorization_url(
+        self,
+        *,
+        scope: str | list[str] | None = None,
+        state: str | None = None,
+        response_type: str = "code",
+    ) -> str:
+        """Build the OAuth2 authorization URL for the Authorization Code flow.
+
+        Args:
+            scope: OAuth2 scope as a single string (e.g. "invoices-read") or a list
+                of scopes. When a list is provided, values are joined with a single
+                space.
+            state: Optional state parameter for CSRF protection.
+            response_type: OAuth2 response type (defaults to "code").
+
+        Returns:
+            A full URL that can be used to redirect the user to the wFirma consent page.
+
+        Raises:
+            ValidationError: When inputs are invalid.
+        """
+        self._validate_str(response_type, "response_type")
+
+        params: dict[str, str] = {
+            "response_type": response_type,
+            "client_id": self.client_id,
+            "redirect_uri": self.redirect_uri,
+        }
+
+        if scope is not None:
+            if isinstance(scope, str):
+                if not scope.strip():
+                    raise ValidationError("Field 'scope' must be a non-empty string when provided.")
+                params["scope"] = scope
+            elif isinstance(scope, list):
+                normalized = [s.strip() for s in scope if isinstance(s, str) and s.strip()]
+                if not normalized:
+                    raise ValidationError("Field 'scope' must contain at least one non-empty scope.")
+                params["scope"] = " ".join(normalized)
+            else:
+                raise ValidationError("Field 'scope' must be a string, a list of strings, or None.")
+
+        if state is not None:
+            self._validate_str(state, "state")
+            params["state"] = state
+
+        return f"{self.authorize_url}?{urlencode(params)}"
 
     def exchange_code(self, code: str) -> OAuthToken:
         """Exchange authorization code for access and refresh tokens."""

@@ -149,13 +149,15 @@ Use when you can open the user consent page. Minimal sync example::
     )
 
     # Step 1: redirect user to wFirma consent page
-    consent_url = "https://wfirma.pl/oauth2/auth?response_type=code&client_id=your_client_id&scope=invoices-read&redirect_uri=https://your.app/callback"
+    consent_url = auth.build_authorization_url(scope="invoices-read", state="csrf-state")
 
     # Step 2: exchange authorization code received on redirect
     token = auth.exchange_code("authorization-code-from-callback")
 
     # Step 3: reuse token for API calls (auto-refresh when expired)
     token = auth.get_token()
+
+Async variants are available via ``wfirma.async_.auth.OAuth2Auth`` and ``wfirma.async_.auth.OAuth1Auth`` with identical APIs using ``httpx.AsyncClient`` under the hood.
 
 OAuth 1.0a
 ~~~~~~~~~~
