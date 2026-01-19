@@ -53,4 +53,3 @@ class TestOAuth1PlaintextSignature:
     def test_validates_token_secret_when_provided(self, value) -> None:
         with pytest.raises(ValidationError):
             sign_oauth1_plaintext(consumer_secret="cs", token_secret=value)  # type: ignore[arg-type]
-

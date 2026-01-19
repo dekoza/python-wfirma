@@ -82,7 +82,9 @@ class WarehouseDocumentType(str, Enum):
     ZPD = "z_p_d"
 
 
-class WarehouseDocumentContent(TimestampedFieldsMixin, BaseXMLModel, tag="warehouse_document_content"):
+class WarehouseDocumentContent(
+    TimestampedFieldsMixin, BaseXMLModel, tag="warehouse_document_content"
+):
     """
     Warehouse document line item model.
 

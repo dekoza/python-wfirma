@@ -9,4 +9,3 @@ Pytest will still collect tests from this module.
 from __future__ import annotations
 
 from .test_sync_token_store import TestMemoryTokenStore  # noqa: F401
-

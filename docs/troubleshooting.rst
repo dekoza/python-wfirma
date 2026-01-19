@@ -16,6 +16,32 @@ Authentication Errors
 3. Ensure credentials haven't expired
 4. Try regenerating your API credentials in wFirma settings
 
+**Problem**: ``AuthenticationError`` when exchanging an OAuth2 authorization code
+
+**Solution**: This library maps HTTP errors from the OAuth2 token endpoint (for example 401/400)
+into ``AuthenticationError`` for a consistent public API.
+
+1. Verify your ``client_id`` and ``client_secret``
+2. Verify you used the correct ``redirect_uri`` (must match the one configured in wFirma)
+3. Ensure the authorization ``code`` was not already used and did not expire
+
+**Problem**: ``ConnectionError`` / ``TimeoutError`` during OAuth2 token exchange
+
+**Solution**: Transport-level errors (DNS, connection failures, timeouts) raised by ``httpx`` are
+mapped to ``wfirma.exceptions.ConnectionError`` and ``wfirma.exceptions.TimeoutError``.
+
+If you need extra details (URL, underlying exception), enable debug logging on the auth helper::
+
+    auth = OAuth2Auth(
+        client_id="...",
+        client_secret="...",
+        redirect_uri="...",
+        environment=Environment.PRODUCTION,
+        debug=True,
+    )
+
+The ``debug`` flag logs exception details via the standard ``logging`` module.
+
 **Problem**: ``TokenExpiredError``
 
 **Solution**: The library should handle this automatically. If you see this error repeatedly:
@@ -180,4 +206,3 @@ A: Yes! See examples in ``examples/flask_integration`` and ``examples/fastapi_in
 **Q: Is async mode required?**
 
 A: No, both sync and async modes are fully supported. Choose based on your needs.
-

@@ -448,4 +448,3 @@ class TestOAuth1Auth:
 
         with pytest.raises(ValidationError):
             auth._parse_oauth1_response("invalid=true")
-

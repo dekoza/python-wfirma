@@ -7,6 +7,7 @@ This module provides authentication mechanisms for wFirma API:
 
 from __future__ import annotations
 
+import logging
 import os
 from dataclasses import dataclass
 from typing import Any
@@ -24,10 +25,15 @@ from wfirma.auth.common import (
 )
 from wfirma.config import Environment
 from wfirma.exceptions import (
+    AuthenticationError,
+    ConnectionError,
     MissingConfigurationError,
+    TimeoutError,
     TokenExpiredError,
     ValidationError,
 )
+
+logger = logging.getLogger(__name__)
 
 
 @dataclass(frozen=True, slots=True)
@@ -192,6 +198,7 @@ class OAuth2Auth:
     environment: Environment
     token_store: TokenStore
     store_key: str = "default"
+    debug: bool = False
 
     def __init__(
         self,
@@ -202,6 +209,7 @@ class OAuth2Auth:
         environment: Environment,
         token_store: TokenStore | None = None,
         store_key: str = "default",
+        debug: bool = False,
     ) -> None:
         self._validate_str(client_id, "client_id")
         self._validate_str(client_secret, "client_secret")
@@ -210,6 +218,8 @@ class OAuth2Auth:
             raise ValidationError("Field 'environment' must be an Environment enum value.")
         if not isinstance(store_key, str) or not store_key:
             raise ValidationError("Field 'store_key' must be a non-empty string.")
+        if not isinstance(debug, bool):
+            raise ValidationError("Field 'debug' must be a boolean.")
 
         self.client_id = client_id
         self.client_secret = client_secret
@@ -217,6 +227,7 @@ class OAuth2Auth:
         self.environment = environment
         self.token_store = token_store or MemoryTokenStore()
         self.store_key = store_key
+        self.debug = debug
 
     @property
     def token_url(self) -> str:
@@ -265,7 +276,9 @@ class OAuth2Auth:
             elif isinstance(scope, list):
                 normalized = [s.strip() for s in scope if isinstance(s, str) and s.strip()]
                 if not normalized:
-                    raise ValidationError("Field 'scope' must contain at least one non-empty scope.")
+                    raise ValidationError(
+                        "Field 'scope' must contain at least one non-empty scope."
+                    )
                 params["scope"] = " ".join(normalized)
             else:
                 raise ValidationError("Field 'scope' must be a string, a list of strings, or None.")
@@ -289,9 +302,29 @@ class OAuth2Auth:
             "client_secret": self.client_secret,
         }
 
-        with httpx.Client() as client:
-            response = client.post(self.token_url, data=payload)
-        response.raise_for_status()
+        try:
+            with httpx.Client() as client:
+                response = client.post(self.token_url, data=payload)
+            response.raise_for_status()
+        except httpx.HTTPStatusError as err:
+            if self.debug:
+                logger.exception(
+                    "OAuth2 token request failed (status=%s, url=%s).",
+                    err.response.status_code,
+                    err.request.url,
+                )
+            raise AuthenticationError("OAuth2 token request failed.") from err
+        except httpx.TimeoutException as err:
+            if self.debug:
+                logger.exception("OAuth2 token request timed out (url=%s).", err.request.url)
+            raise TimeoutError("OAuth2 token request timed out.") from err
+        except httpx.RequestError as err:
+            if self.debug:
+                logger.exception(
+                    "OAuth2 token request failed due to network error (url=%s).", err.request.url
+                )
+            raise ConnectionError("OAuth2 token request failed due to network error.") from err
+
         token = OAuthToken.from_oauth2_response(response.json())
         self.token_store.set(self.store_key, token)
         return token
@@ -304,9 +337,29 @@ class OAuth2Auth:
             "client_secret": self.client_secret,
         }
 
-        with httpx.Client() as client:
-            response = client.post(self.token_url, data=payload)
-        response.raise_for_status()
+        try:
+            with httpx.Client() as client:
+                response = client.post(self.token_url, data=payload)
+            response.raise_for_status()
+        except httpx.HTTPStatusError as err:
+            if self.debug:
+                logger.exception(
+                    "OAuth2 token refresh failed (status=%s, url=%s).",
+                    err.response.status_code,
+                    err.request.url,
+                )
+            raise AuthenticationError("OAuth2 token refresh failed.") from err
+        except httpx.TimeoutException as err:
+            if self.debug:
+                logger.exception("OAuth2 token refresh timed out (url=%s).", err.request.url)
+            raise TimeoutError("OAuth2 token refresh timed out.") from err
+        except httpx.RequestError as err:
+            if self.debug:
+                logger.exception(
+                    "OAuth2 token refresh failed due to network error (url=%s).", err.request.url
+                )
+            raise ConnectionError("OAuth2 token refresh failed due to network error.") from err
+
         token = OAuthToken.from_oauth2_response(response.json())
         self.token_store.set(self.store_key, token)
         return token

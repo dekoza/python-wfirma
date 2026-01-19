@@ -74,4 +74,3 @@ class TestMemoryTokenStore:
 
         with pytest.raises(TypeError):
             store.get(123)  # type: ignore[arg-type]
-
