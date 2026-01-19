@@ -205,4 +205,3 @@ __all__ = [
     "Contractor",
     "ContractorDetail",
 ]
-

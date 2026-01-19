@@ -2,8 +2,8 @@
 
 **Project:** python-wfirma  
 **Version:** 0.1.0-dev  
-**Last Updated:** 2026-01-18  
-**Current Phase:** Phase 3 - Data Models (In Progress)  
+**Last Updated:** 2026-01-19  
+**Current Phase:** Phase 4 - Authentication Layer (In Progress)  
 **Phase 0 Status:** ✅ COMPLETED (2026-01-16)
 **Phase 1 Status:** ✅ COMPLETED (2026-01-18)
 **Phase 2 Status:** ✅ COMPLETED (2026-01-18)
@@ -15,6 +15,8 @@
 **Phase 3.6 Status:** ✅ COMPLETED (2026-01-18) - Invoice Models
 **Phase 3.7 Status:** ✅ COMPLETED (2026-01-18) - Payment Models
 **Phase 3.8 Status:** ✅ COMPLETED (2026-01-18) - Warehouse Models
+**Phase 3.9 Status:** ✅ COMPLETED (2026-01-19) - Employee/User Models
+**Phase 4.1 Status:** ✅ COMPLETED (2026-01-19) - API Key Authentication
 
 ---
 
@@ -345,17 +347,79 @@ tests/models/test_warehouse.py::TestWarehouseModelsExport - 2 tests
 Coverage: 100% for models/warehouse.py
 ```
 
-#### ⏳ Phase 3.9: Employee Models (NEXT)
-1. ⏳ Create employee models (`src/wfirma/models/employee.py`)
-2. ⏳ Write tests for employee models (`tests/models/test_employee.py`)
+#### ✅ Phase 3.9: Employee/User Models (COMPLETED - 2026-01-19)
+
+**Accomplishments:**
+- ✅ Created employee models module (`src/wfirma/models/employee.py`)
+- ✅ Implemented `User` - User account model matching /users/get endpoint
+- ✅ 11 tests passing with 100% coverage for employee.py
+- ✅ All models exported via `wfirma.models`
+
+**Note:** In wFirma API, there is no dedicated "employees" endpoint. Instead:
+- `User` model represents user accounts (from /users/get endpoint)
+- `UserCompany` model (in company.py) represents user-company relationships
+
+**User Fields Implemented:**
+- Identification: id, login (email address)
+- Timestamps: created, modified
+- Handles wFirma's "0000-00-00 00:00:00" null datetime format
+
+**Test Results:**
+```
+tests/models/test_employee.py::TestUser - 9 tests
+tests/models/test_employee.py::TestEmployeeModuleExports - 2 tests
+Coverage: 100% for models/employee.py
+```
+
+---
+
+### ⏳ Phase 4: Authentication Layer (IN PROGRESS)
+
+#### ✅ Phase 4.1: API Key Authentication (COMPLETED - 2026-01-19)
+
+**Accomplishments:**
+- ✅ Implemented `APIKeyAuth` class for API Key authentication (sync and async)
+- ✅ Supports 3-key authentication (accessKey, secretKey, appKey headers)
+- ✅ Immutable dataclass with validation
+- ✅ `get_headers()` method returns authentication headers for HTTP requests
+- ✅ `from_env()` class method loads keys from environment variables
+- ✅ `to_dict()` method with optional secrets exclusion for safe logging
+- ✅ Fixed mypy type errors in existing `OAuthToken.from_dict()` method
+- ✅ 48 tests passing (24 sync + 24 async) with 97% coverage for auth modules
+- ✅ All code passes ruff lint and mypy type checks
+
+**Environment Variables Used:**
+- `WFIRMA_ACCESS_KEY` - User's access key
+- `WFIRMA_SECRET_KEY` - User's secret key
+- `WFIRMA_APP_KEY` - Application key
+
+**Test Results:**
+```
+tests/sync/test_sync_api_key_auth.py::TestAPIKeyAuth - 18 tests
+tests/sync/test_sync_api_key_auth.py::TestAPIKeyAuthFromEnv - 6 tests
+tests/async_/test_async_api_key_auth.py::TestAPIKeyAuth - 18 tests
+tests/async_/test_async_api_key_auth.py::TestAPIKeyAuthFromEnv - 6 tests
+Coverage: 97% for sync/auth.py and async_/auth.py
+```
+
+#### ⏳ Phase 4.2: OAuth Token Flow (NEXT)
+
+**Pending Tasks:**
+- ⏳ Implement OAuth 1.0a token acquisition flow
+- ⏳ Implement OAuth 2.0 Authorization Code flow
+- ⏳ Token refresh functionality
+- ⏳ Token storage abstraction
+
+**Total Project Tests:** 393 (all passing)
+**Total Coverage:** 99%
 
 ---
 
 ## Pending Phases
 
 - ✅ Phase 2: Core Infrastructure (exceptions, config)
-- ⏳ Phase 3: Data Models (Pydantic with pydantic-xml) - **IN PROGRESS**
-- ⏳ Phase 4: Authentication Layer
+- ✅ Phase 3: Data Models (Pydantic with pydantic-xml) - **COMPLETED**
+- ⏳ Phase 4: Authentication Layer - **IN PROGRESS**
 - ⏳ Phase 5: Base HTTP Client
 - ⏳ Phase 6-12: Resource Implementations
 - ⏳ Phase 13: Public API & Convenience Features
@@ -409,7 +473,7 @@ python-wfirma/
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
 | Test Coverage | ≥90% | 99% | ✅ |
-| Passing Tests | 100% | 100% (316/316) | ✅ |
+| Passing Tests | 100% | 100% (393/393) | ✅ |
 | Linting Errors | 0 | 0 | ✅ |
 | Type Errors | 0 | 0 | ✅ |
 | Documentation | Complete | Initialized | 🚧 |

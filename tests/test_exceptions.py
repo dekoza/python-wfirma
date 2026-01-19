@@ -2,7 +2,6 @@
 Tests for wFirma exception hierarchy.
 """
 
-
 from wfirma.exceptions import (
     # API errors
     APIError,

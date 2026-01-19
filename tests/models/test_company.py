@@ -362,4 +362,3 @@ class TestUserCompany:
         user_company = UserCompany(id=1, company_id=1)
         with pytest.raises(ValidationError):
             user_company.company_id = 999
-

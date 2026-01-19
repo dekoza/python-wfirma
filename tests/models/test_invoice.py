@@ -535,4 +535,3 @@ class TestInvoice:
         assert invoice.series_id == 1
         assert invoice.company_detail_id == 123
         assert invoice.user_company_id == 456
-

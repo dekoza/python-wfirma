@@ -332,4 +332,3 @@ class TestContractorDetail:
         detail = ContractorDetail(id=1, name="Test")
         with pytest.raises(ValidationError):
             detail.name = "Modified"
-

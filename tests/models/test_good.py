@@ -270,4 +270,3 @@ class TestGood:
             description="This is a detailed description of the product.",
         )
         assert good.description == "This is a detailed description of the product."
-

@@ -393,6 +393,7 @@ class TestWarehouseModelsExport:
             WarehouseDocumentContent,
             WarehouseDocumentType,
         )
+
         assert WarehouseDocument is not None
         assert WarehouseDocumentContent is not None
         assert WarehouseDocumentType is not None
@@ -400,8 +401,7 @@ class TestWarehouseModelsExport:
     def test_models_in_all_list(self) -> None:
         """Test all warehouse models are in __all__ list."""
         from wfirma import models
+
         assert "WarehouseDocument" in models.__all__
         assert "WarehouseDocumentContent" in models.__all__
         assert "WarehouseDocumentType" in models.__all__
-
-

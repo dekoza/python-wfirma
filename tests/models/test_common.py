@@ -424,4 +424,3 @@ class TestBankAccount:
         xml_str = xml_bytes.decode("utf-8")
         assert "<bank_account>" in xml_str
         assert "<bank_name>BZWBK</bank_name>" in xml_str
-

@@ -87,8 +87,7 @@ def _parse_environment(value: str | Environment) -> Environment:
     except ValueError as err:
         valid_values = [e.value for e in Environment]
         raise InvalidConfigurationError(
-            f"Invalid environment value: {value!r}. "
-            f"Valid values are: {valid_values}"
+            f"Invalid environment value: {value!r}. Valid values are: {valid_values}"
         ) from err
 
 
@@ -285,9 +284,7 @@ class WFirmaConfig:
         """
         path = Path(dotenv_path)
         if not path.exists():
-            raise InvalidConfigurationError(
-                f"Configuration file not found: {path}"
-            )
+            raise InvalidConfigurationError(f"Configuration file not found: {path}")
 
         # Load values from .env file
         env_values = dotenv_values(path)
@@ -428,4 +425,3 @@ def get_config(
         company_id=company_id,
         timeout=timeout,
     )
-

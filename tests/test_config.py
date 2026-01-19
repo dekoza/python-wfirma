@@ -375,9 +375,7 @@ class TestWFirmaConfigFromDotenv:
         """Config should load timeout from .env file."""
         dotenv_file = tmp_path / ".env"
         dotenv_file.write_text(
-            "WFIRMA_APP_KEY=dotenv_app_key\n"
-            "WFIRMA_APP_SECRET=dotenv_secret\n"
-            "WFIRMA_TIMEOUT=45\n"
+            "WFIRMA_APP_KEY=dotenv_app_key\nWFIRMA_APP_SECRET=dotenv_secret\nWFIRMA_TIMEOUT=45\n"
         )
 
         with patch.dict(os.environ, {}, clear=True):
@@ -503,4 +501,3 @@ class TestConfigImmutability:
 
 
 # AICOMPLETE: Configuration management tests - ready for review
-

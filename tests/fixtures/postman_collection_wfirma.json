@@ -1,0 +1,38 @@
+{
+  "info": {
+    "name": "wFirma.pl",
+    "description": "API Key auth supported. OAuth 1.0a supported. Oauth 2.0 supported.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Contractors",
+      "item": [
+        {
+          "name": "List contractors",
+          "request": {
+            "method": "GET",
+            "url": "https://api2.wfirma.pl/contractors"
+          }
+        }
+      ]
+    },
+    {
+      "name": "Invoices",
+      "item": [
+        {
+          "name": "List invoices",
+          "request": {
+            "method": "GET",
+            "url": {
+              "path": [
+                "invoices"
+              ]
+            }
+          }
+        }
+      ]
+    }
+  ]
+}
+

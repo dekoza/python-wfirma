@@ -32,6 +32,9 @@ from wfirma.models.contractor import (
     Contractor,
     ContractorDetail,
 )
+from wfirma.models.employee import (
+    User,
+)
 from wfirma.models.good import (
     Good,
     GoodType,
@@ -86,6 +89,8 @@ __all__ = [
     # Contractor models
     "Contractor",
     "ContractorDetail",
+    # Employee/User models
+    "User",
     # Good models
     "Good",
     "GoodType",
@@ -107,4 +112,3 @@ __all__ = [
     "WarehouseDocumentContent",
     "WarehouseDocumentType",
 ]
-

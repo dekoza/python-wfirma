@@ -129,4 +129,3 @@ __all__ = [
     "GoodType",
     "WarehouseType",
 ]
-

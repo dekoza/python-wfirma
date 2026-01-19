@@ -348,4 +348,3 @@ __all__ = [
     "TestPaymentObjectType",
     "TestPaymentType",
 ]
-
