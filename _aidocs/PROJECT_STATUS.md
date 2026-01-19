@@ -527,6 +527,30 @@ Coverage: 91% for async_/client.py
     - `tests/async_/test_client_contractors_property.py` (2 tests)
   - Coverage: 91% for contractor resources
 
+- ✅ Implemented `GoodsResource` (sync + async)
+  - Endpoints: get, find, add, edit, delete
+  - Ergonomics: `WFirmaClient.goods` (sync + async) returns cached `GoodsResource`
+  - Tests: `tests/sync/resources/test_sync_goods_resource.py`, `tests/async_/resources/test_async_goods_resource.py`
+
+- ✅ Implemented `InvoicesResource` (sync + async)
+  - Endpoints: get, find, add, edit, delete
+  - Ergonomics: `WFirmaClient.invoices` (sync + async) returns cached `InvoicesResource`
+  - Tests: `tests/sync/resources/test_sync_invoices_resource.py`, `tests/async_/resources/test_async_invoices_resource.py`
+
+- ✅ Implemented `PaymentsResource` (sync + async)
+  - Endpoints: get, find, add, edit, delete
+  - Ergonomics: `WFirmaClient.payments` (sync + async) returns cached `PaymentsResource`
+  - Tests: `tests/sync/resources/test_sync_payments_resource.py`, `tests/async_/resources/test_async_payments_resource.py`
+
+- ✅ Implemented `WarehouseDocumentPWResource` (sync + async) (2026-01-19)
+  - Endpoints: get, find, add, edit, delete
+  - Ergonomics: `WFirmaClient.warehouse_documents_pw` (sync + async) returns cached `WarehouseDocumentPWResource`
+  - Tests:
+    - `tests/sync/resources/test_sync_warehouse_documents_pw_resource.py`
+    - `tests/async_/resources/test_async_warehouse_documents_pw_resource.py`
+    - `tests/sync/test_client_warehouse_documents_pw_property.py` (2 tests)
+    - `tests/async_/test_client_warehouse_documents_pw_property.py` (2 tests)
+
 ---
 
 ## Pending Phases
@@ -535,7 +559,7 @@ Coverage: 91% for async_/client.py
 - ✅ Phase 3: Data Models (Pydantic with pydantic-xml) - **COMPLETED**
 - ✅ Phase 4: Authentication Layer - **COMPLETED**
 - ✅ Phase 5: Base HTTP Client - **COMPLETED**
-- 🟡 Phase 6: Resource Implementations - **IN PROGRESS** (Company ✅, Contractors ✅)
+- 🟡 Phase 6: Resource Implementations - **IN PROGRESS** (Company ✅, Contractors ✅, Goods ✅, Invoices ✅, Payments ✅, WarehouseDocumentPW ✅)
 - ⏳ Phase 7-12: Remaining Resources
 - ⏳ Phase 13: Public API & Convenience Features
 - ⏳ Phase 14: Documentation
@@ -549,7 +573,7 @@ Coverage: 91% for async_/client.py
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
 | Test Coverage | ≥90% | 92% | ✅ |
-| Passing Tests | 100% | 100% (642/642) | ✅ |
+| Passing Tests | 100% | 100% (710/710) | ✅ |
 | Linting Errors | 0 | 0 | ✅ |
 | Type Errors | 0 | 0 | ✅ |
 | Documentation | Complete | Initialized | 🚧 |

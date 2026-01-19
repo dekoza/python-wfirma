@@ -1,12 +1,59 @@
-# 🎉 Phase 6 Progress - Contractor Resource Done!
+# 🎉 Phase 6 Progress - WarehouseDocumentPW Property Added!
 
 **Project:** python-wfirma  
 **Last Update:** 2026-01-19  
-**Status:** 🟡 Phase 6 IN PROGRESS (Company ✅, Contractors ✅)
+**Status:** 🟡 Phase 6 IN PROGRESS (Company ✅, Contractors ✅, Goods ✅, Invoices ✅, Payments ✅, WarehouseDocumentPW ✅, Tags ✅)
 
 ---
 
-## ✅ Recent Completion: Contractor Resource (2026-01-19)
+## ✅ Recent Completion: Tags Resource + Client Property (2026-01-19)
+
+### Accomplishments
+- ✅ Implemented `TagsResource` (sync + async)
+- ✅ Added `tags` property to `WFirmaClient` (sync + async)
+- ✅ Full CRUD surface implemented for tags: get/find/add/edit/delete
+- ✅ Added tests for resource + client property
+- ✅ All tests passing (726)
+- ✅ Linter (ruff) and type checker (mypy) passing
+
+**New Features:**
+- `WFirmaClient.tags` property for convenient access
+- Automatic caching of resource instance
+
+**Resource Endpoints Implemented:**
+- `GET /tags/get/{tagId}`
+- `GET /tags/find`
+- `POST /tags/add`
+- `POST /tags/edit/{termId}`
+- `DELETE /tags/delete/{termId}`
+
+**Test Files Added:**
+- `tests/sync/resources/test_sync_tags_resource.py`
+- `tests/async_/resources/test_async_tags_resource.py`
+- `tests/sync/test_client_tags_property.py`
+- `tests/async_/test_client_tags_property.py`
+
+---
+
+## ✅ Recent Completion: WarehouseDocumentPW Client Property (2026-01-19)
+
+### Accomplishments
+- ✅ Added `warehouse_documents_pw` property to `WFirmaClient` (sync + async)
+- ✅ 4 new tests for client property (2 sync + 2 async)
+- ✅ All 710 tests passing
+- ✅ Linter and type checker passing
+
+**New Features:**
+- `WFirmaClient.warehouse_documents_pw` property for convenient access
+- Automatic caching of resource instance
+
+**Test Files Added:**
+- `tests/sync/test_client_warehouse_documents_pw_property.py` (2 tests)
+- `tests/async_/test_client_warehouse_documents_pw_property.py` (2 tests)
+
+---
+
+## ✅ Earlier: Contractor Resource (2026-01-19)
 
 ### Accomplishments
 - ✅ Implemented `ContractorResource` (sync + async)

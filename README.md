@@ -40,72 +40,55 @@ uv pip install python-wfirma[dev]
 ### Synchronous Usage
 
 ```python
-from wfirma import WFirmaClient
-from wfirma.models import Invoice, Contractor
+from wfirma.sync.auth import APIKeyAuth
+from wfirma.sync.client import WFirmaClient
 
-# Initialize client
-client = WFirmaClient(
-    app_key="your_app_key",
-    secret="your_secret",
-    environment="sandbox"  # or "production"
-)
+auth = APIKeyAuth(access_key="your_access_key", secret_key="your_secret_key", app_key="your_app_key")
 
-# Create a contractor
-contractor = Contractor(
-    name="Example Company Ltd.",
-    tax_id="1234567890",
-    email="contact@example.com"
-)
-created_contractor = client.contractors.create(contractor)
+with WFirmaClient(auth=auth, company_id=123) as client:
+    # Create a contractor
+    contractor = client.contractors.add(name="Example Company Ltd.", nip="1234567890")
 
-# Create an invoice
-invoice = Invoice(
-    contractor_id=created_contractor.id,
-    issue_date="2026-01-16",
-    # ... other fields
-)
-created_invoice = client.invoices.create(invoice)
+    # Create an invoice (raw payload, without the outer "invoices" wrapper)
+    invoice = client.invoices.add(
+        invoice={
+            "contractor_id": contractor.id,
+            "type": "normal",
+            "paid": "0",
+        }
+    )
 
-# List invoices
-invoices = client.invoices.list(limit=10)
-for invoice in invoices:
-    print(f"Invoice {invoice.number}: {invoice.total}")
+    # List invoices
+    invoices = client.invoices.find()
+    print(f"Invoices fetched: {len(invoices)}")
 ```
 
 ### Asynchronous Usage
 
 ```python
 import asyncio
-from wfirma import AsyncWFirmaClient
-from wfirma.models import Invoice, Contractor
 
-async def main():
-    # Initialize async client
-    async with AsyncWFirmaClient(
-        app_key="your_app_key",
-        secret="your_secret",
-        environment="sandbox"
-    ) as client:
-        # Create a contractor
-        contractor = Contractor(
-            name="Example Company Ltd.",
-            tax_id="1234567890",
-            email="contact@example.com"
+from wfirma.async_.auth import APIKeyAuth
+from wfirma.async_.client import WFirmaClient
+
+
+async def main() -> None:
+    auth = APIKeyAuth(access_key="your_access_key", secret_key="your_secret_key", app_key="your_app_key")
+
+    async with WFirmaClient(auth=auth, company_id=123) as client:
+        contractor = await client.contractors.add(name="Example Company Ltd.", nip="1234567890")
+
+        invoice = await client.invoices.add(
+            invoice={
+                "contractor_id": contractor.id,
+                "type": "normal",
+                "paid": "0",
+            }
         )
-        created_contractor = await client.contractors.create(contractor)
 
-        # Create an invoice
-        invoice = Invoice(
-            contractor_id=created_contractor.id,
-            issue_date="2026-01-16",
-            # ... other fields
-        )
-        created_invoice = await client.invoices.create(invoice)
+        invoices = await client.invoices.find()
+        print(f"Invoices fetched: {len(invoices)}")
 
-        # List invoices
-        invoices = await client.invoices.list(limit=10)
-        async for invoice in invoices:
-            print(f"Invoice {invoice.number}: {invoice.total}")
 
 asyncio.run(main())
 ```
@@ -117,33 +100,31 @@ asyncio.run(main())
 - ✅ **Goods**: Product and service catalog management
 - ✅ **Payments**: Track invoice payments
 - ✅ **Warehouse**: Inventory management and stock documents
+- ✅ **Tags**: Manage tags/labels (CRUD)
 - ✅ **Employees**: User and permission management
 - ✅ **Company**: Company information and settings
 
 ## Configuration
 
-The library can be configured via environment variables or directly in code:
+The library provides a small configuration layer that can load values from environment variables.
 
 ```bash
 # .env file
-WFIRMA_APP_KEY=your_app_key_here
-WFIRMA_SECRET=your_secret_here
 WFIRMA_ENVIRONMENT=sandbox  # or production
-WFIRMA_TIMEOUT=30
-WFIRMA_MAX_RETRIES=3
+WFIRMA_COMPANY_ID=123
+
+# API Key auth
+WFIRMA_APP_KEY=your_app_key_here
+WFIRMA_ACCESS_KEY=your_access_key_here
+WFIRMA_SECRET_KEY=your_secret_key_here
 ```
 
 ```python
-from wfirma import WFirmaClient
+from wfirma import get_config
 
-# Configuration via code
-client = WFirmaClient(
-    app_key="your_app_key",
-    secret="your_secret",
-    environment="production",
-    timeout=30,
-    max_retries=3
-)
+config = get_config()
+print(config.environment)
+print(config.company_id)
 ```
 
 ## Documentation
@@ -167,7 +148,12 @@ cd python-wfirma
 
 # Create virtual environment and install dependencies using uv
 uv venv
-uv pip install -e ".[dev,docs,examples]"
+
+# Install development dependencies (pytest, ruff, mypy, etc.)
+uv sync --extra dev
+
+# Optionally install docs / examples extras
+# uv sync --extra dev --extra docs --extra examples
 
 # Install pre-commit hooks
 uv run pre-commit install
@@ -177,13 +163,13 @@ uv run pre-commit install
 
 ```bash
 # All tests
-uv run pytest
+uv run pytest --cache-clear
 
 # With coverage
-uv run pytest --cov=wfirma --cov-report=html
+uv run pytest --cache-clear --cov=wfirma --cov-report=html
 
 # Specific test file
-uv run pytest tests/sync/test_client.py
+uv run pytest --cache-clear tests/sync/test_client.py
 
 # Parallel execution
 uv run pytest -n auto

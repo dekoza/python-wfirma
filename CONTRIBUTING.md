@@ -418,4 +418,3 @@ def test_create_invoice_with_full_validation():
 ---
 
 Thank you for contributing to python-wfirma! 🎉
-

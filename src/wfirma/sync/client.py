@@ -180,6 +180,38 @@ class WFirmaClient:
             self._resources["payments"] = resource
         return resource
 
+    @property
+    def warehouse_documents_pw(self) -> Any:
+        """Convenience accessor for PW warehouse document endpoints.
+
+        Returns:
+            WarehouseDocumentPWResource instance bound to this client.
+        """
+        # Local import to avoid circular dependency between client and resources.
+        from wfirma.sync.resources.warehouse_documents_pw import WarehouseDocumentPWResource
+
+        resource = self._resources.get("warehouse_documents_pw")
+        if resource is None:
+            resource = WarehouseDocumentPWResource(self)
+            self._resources["warehouse_documents_pw"] = resource
+        return resource
+
+    @property
+    def tags(self) -> Any:
+        """Convenience accessor for tag-related endpoints.
+
+        Returns:
+            TagsResource instance bound to this client.
+        """
+        # Local import to avoid circular dependency between client and resources.
+        from wfirma.sync.resources.tags import TagsResource
+
+        resource = self._resources.get("tags")
+        if resource is None:
+            resource = TagsResource(self)
+            self._resources["tags"] = resource
+        return resource
+
     def __enter__(self) -> WFirmaClient:
         """Enter the context manager."""
         return self

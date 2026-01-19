@@ -14,6 +14,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from wfirma._payloads import extract_object_list_payloads, extract_single_object_payload
 from wfirma.async_.client import WFirmaClient
 from wfirma.models.invoice import Invoice
 
@@ -89,35 +90,21 @@ class InvoicesResource:
     @staticmethod
     def _extract_invoice_payload(data: dict[str, Any]) -> dict[str, Any]:
         """Extract Invoice payload from a wFirma JSON response."""
-        container = data.get("invoices")
-        if isinstance(container, dict):
-            first_item = next(iter(container.values()), None)
-            if isinstance(first_item, dict):
-                inner = first_item.get("invoice")
-                if isinstance(inner, dict):
-                    return inner
-            if "invoice" in container and isinstance(container["invoice"], dict):
-                return container["invoice"]
-
-        raise KeyError("Unable to locate invoice payload in response.")
+        return extract_single_object_payload(
+            data=data,
+            container_key="invoices",
+            object_key="invoice",
+        )
 
     @staticmethod
     def _extract_invoice_list(data: dict[str, Any]) -> list[Invoice]:
         """Extract list of Invoices from a wFirma JSON response."""
-        container = data.get("invoices")
-        if not isinstance(container, dict):
-            return []
-
-        invoices: list[Invoice] = []
-        for key, item in container.items():
-            if not key.isdigit():
-                continue
-            if isinstance(item, dict):
-                inner = item.get("invoice")
-                if isinstance(inner, dict):
-                    invoices.append(Invoice.model_validate(inner))
-
-        return invoices
+        payloads = extract_object_list_payloads(
+            data,
+            container_key="invoices",
+            object_key="invoice",
+        )
+        return [Invoice.model_validate(payload) for payload in payloads]
 
 
 __all__ = [

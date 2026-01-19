@@ -95,6 +95,10 @@ Synchronous resources example::
         goods = client.goods.find()  # list[Good] models
         updated = client.goods.edit(456, name="Updated name")  # Good model
 
+        # Tags (resource returns raw dict payloads)
+        tags = client.tags.find()  # list[dict[str, Any]]
+        tag = client.tags.add(name="New tag", visibility="visible")
+
 Asynchronous resources example::
 
     from wfirma.async_ import APIKeyAuth, WFirmaClient
@@ -108,6 +112,10 @@ Asynchronous resources example::
         # Goods (typed resource)
         goods = await client.goods.find()  # list[Good] models
         updated = await client.goods.edit(456, name="Updated name")  # Good model
+
+        # Tags (resource returns raw dict payloads)
+        tags = await client.tags.find()  # list[dict[str, Any]]
+        tag = await client.tags.add(name="New tag", visibility="visible")
 
 See :doc:`authentication` for supported authentication methods and :doc:`troubleshooting`
 for common issues.

@@ -14,6 +14,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from wfirma._payloads import extract_object_list_payloads, extract_single_object_payload
 from wfirma.async_.client import WFirmaClient
 from wfirma.models.warehouse import WarehouseDocument
 
@@ -92,37 +93,21 @@ class WarehouseDocumentPWResource:
     @staticmethod
     def _extract_document_payload(data: dict[str, Any]) -> dict[str, Any]:
         """Extract WarehouseDocument payload from a wFirma JSON response."""
-        container = data.get("warehouse_documents")
-        if isinstance(container, dict):
-            first_item = next(iter(container.values()), None)
-            if isinstance(first_item, dict):
-                inner = first_item.get("warehouse_document")
-                if isinstance(inner, dict):
-                    return inner
-            if "warehouse_document" in container and isinstance(
-                container["warehouse_document"], dict
-            ):
-                return container["warehouse_document"]
-
-        raise KeyError("Unable to locate warehouse_document payload in response.")
+        return extract_single_object_payload(
+            data=data,
+            container_key="warehouse_documents",
+            object_key="warehouse_document",
+        )
 
     @staticmethod
     def _extract_document_list(data: dict[str, Any]) -> list[WarehouseDocument]:
         """Extract list of WarehouseDocuments from a wFirma JSON response."""
-        container = data.get("warehouse_documents")
-        if not isinstance(container, dict):
-            return []
-
-        documents: list[WarehouseDocument] = []
-        for key, item in container.items():
-            if not key.isdigit():
-                continue
-            if isinstance(item, dict):
-                inner = item.get("warehouse_document")
-                if isinstance(inner, dict):
-                    documents.append(WarehouseDocument.model_validate(inner))
-
-        return documents
+        payloads = extract_object_list_payloads(
+            data,
+            container_key="warehouse_documents",
+            object_key="warehouse_document",
+        )
+        return [WarehouseDocument.model_validate(payload) for payload in payloads]
 
 
 __all__ = [

@@ -397,7 +397,18 @@ class Invoice(BaseXmlModel, tag="invoice"):
     # name: str  # This will NOT be serialized as <name>value</name>
 ```
 
+### Payload Extraction (Resources)
+
+wFirma JSON responses often wrap objects in a container and then use an indexed mapping ("0", "1", ...).
+
+**Rule:** when implementing new resources, do not duplicate response parsing helpers.
+Prefer the internal utilities from `wfirma._payloads`:
+
+- `extract_single_object_payload(...)` for `get/add/edit`-style endpoints
+  - Contract: raises `KeyError` when the payload cannot be located.
+- `extract_object_list_payloads(...)` for `find`-style endpoints
+  - Contract: returns an empty list (`[]`) when the container is missing or not a dict.
+
+This keeps resource behavior consistent and reduces copy/paste bugs.
+
 ---
-
-**Good luck with Phase 3!** 🚀
-

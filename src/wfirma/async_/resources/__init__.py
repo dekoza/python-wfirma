@@ -5,6 +5,7 @@ from wfirma.async_.resources.contractors import ContractorResource
 from wfirma.async_.resources.goods import GoodsResource
 from wfirma.async_.resources.invoices import InvoicesResource
 from wfirma.async_.resources.payments import PaymentsResource
+from wfirma.async_.resources.tags import TagsResource
 from wfirma.async_.resources.warehouse_documents_pw import WarehouseDocumentPWResource
 
 __all__ = [
@@ -14,4 +15,5 @@ __all__ = [
     "InvoicesResource",
     "PaymentsResource",
     "WarehouseDocumentPWResource",
+    "TagsResource",
 ]

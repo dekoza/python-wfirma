@@ -14,6 +14,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from wfirma._payloads import extract_object_list_payloads, extract_single_object_payload
 from wfirma.async_.client import WFirmaClient
 from wfirma.models.payment import Payment
 
@@ -94,35 +95,21 @@ class PaymentsResource:
     @staticmethod
     def _extract_payment_payload(data: dict[str, Any]) -> dict[str, Any]:
         """Extract Payment payload from a wFirma JSON response."""
-        container = data.get("payments")
-        if isinstance(container, dict):
-            first_item = next(iter(container.values()), None)
-            if isinstance(first_item, dict):
-                inner = first_item.get("payment")
-                if isinstance(inner, dict):
-                    return inner
-            if "payment" in container and isinstance(container["payment"], dict):
-                return container["payment"]
-
-        raise KeyError("Unable to locate payment payload in response.")
+        return extract_single_object_payload(
+            data=data,
+            container_key="payments",
+            object_key="payment",
+        )
 
     @staticmethod
     def _extract_payment_list(data: dict[str, Any]) -> list[Payment]:
         """Extract list of Payments from a wFirma JSON response."""
-        container = data.get("payments")
-        if not isinstance(container, dict):
-            return []
-
-        payments: list[Payment] = []
-        for key, item in container.items():
-            if not key.isdigit():
-                continue
-            if not isinstance(item, dict):
-                continue
-            inner = item.get("payment")
-            if isinstance(inner, dict):
-                payments.append(Payment.model_validate(inner))
-        return payments
+        payloads = extract_object_list_payloads(
+            data,
+            container_key="payments",
+            object_key="payment",
+        )
+        return [Payment.model_validate(payload) for payload in payloads]
 
 
 __all__ = ["PaymentsResource"]
