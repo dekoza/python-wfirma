@@ -7,11 +7,20 @@ from __future__ import annotations
 
 from dataclasses import FrozenInstanceError
 from datetime import datetime, timedelta
+from urllib.parse import parse_qs
 
+import httpx
 import pytest
+import respx
 
-from wfirma.exceptions import ValidationError
-from wfirma.sync.auth import OAuthToken
+from wfirma.auth.common import MemoryTokenStore
+from wfirma.config import Environment
+from wfirma.exceptions import (
+    MissingConfigurationError,
+    TokenExpiredError,
+    ValidationError,
+)
+from wfirma.sync.auth import OAuth1Auth, OAuth2Auth, OAuthToken
 
 
 class TestOAuthToken:
@@ -151,3 +160,207 @@ class TestOAuthToken:
         token = OAuthToken(access_token="a")
         with pytest.raises(FrozenInstanceError):
             token.access_token = "b"  # type: ignore[misc]
+
+
+class TestOAuth2Auth:
+    # AICOMPLETE: OAuth2 sync flow (exchange, reuse, refresh) - ready for review
+
+    def setup_method(self) -> None:
+        self.store = MemoryTokenStore()
+
+    @respx.mock
+    def test_exchange_code_stores_token(self) -> None:
+        route = respx.post("https://api2.wfirma.pl/oauth2/token").mock(
+            return_value=httpx.Response(
+                200,
+                json={"access_token": "acc", "refresh_token": "ref", "expires_in": 1200},
+            )
+        )
+        auth = OAuth2Auth(
+            client_id="cid",
+            client_secret="csecret",
+            redirect_uri="https://app.local/callback",
+            environment=Environment.PRODUCTION,
+            token_store=self.store,
+        )
+
+        token = auth.exchange_code("code-123")
+
+        assert token.access_token == "acc"
+        assert token.refresh_token == "ref"
+        assert token.expires_at is not None
+        assert self.store.get("default") == token
+        assert route.called
+
+    @respx.mock
+    def test_get_token_returns_cached_when_valid(self) -> None:
+        expires_at = datetime.now() + timedelta(minutes=5)
+        cached = OAuthToken(access_token="cached", refresh_token="ref", expires_at=expires_at)
+        self.store.set("default", cached)
+        auth = OAuth2Auth(
+            client_id="cid",
+            client_secret="csecret",
+            redirect_uri="https://app.local/callback",
+            environment=Environment.PRODUCTION,
+            token_store=self.store,
+        )
+
+        token = auth.get_token()
+
+        assert token == cached
+
+    @respx.mock
+    def test_get_token_refreshes_when_expired(self) -> None:
+        expired = OAuthToken(
+            access_token="old",
+            refresh_token="refresh-me",
+            expires_at=datetime.now() - timedelta(seconds=1),
+        )
+        self.store.set("default", expired)
+        route = respx.post("https://api2.wfirma.pl/oauth2/token").mock(
+            return_value=httpx.Response(
+                200,
+                json={"access_token": "new", "refresh_token": "new-ref", "expires_in": 600},
+            )
+        )
+        auth = OAuth2Auth(
+            client_id="cid",
+            client_secret="csecret",
+            redirect_uri="https://app.local/callback",
+            environment=Environment.PRODUCTION,
+            token_store=self.store,
+        )
+
+        token = auth.get_token()
+
+        assert token.access_token == "new"
+        assert token.refresh_token == "new-ref"
+        assert token.expires_at is not None
+        assert self.store.get("default") == token
+        assert route.called
+
+    def test_get_token_raises_when_missing(self) -> None:
+        auth = OAuth2Auth(
+            client_id="cid",
+            client_secret="csecret",
+            redirect_uri="https://app.local/callback",
+            environment=Environment.PRODUCTION,
+            token_store=self.store,
+        )
+
+        with pytest.raises(MissingConfigurationError):
+            auth.get_token()
+
+    def test_get_token_raises_when_expired_without_refresh(self) -> None:
+        expired = OAuthToken(access_token="old", refresh_token=None, expires_at=datetime.now())
+        self.store.set("default", expired)
+        auth = OAuth2Auth(
+            client_id="cid",
+            client_secret="csecret",
+            redirect_uri="https://app.local/callback",
+            environment=Environment.PRODUCTION,
+            token_store=self.store,
+        )
+
+        with pytest.raises(TokenExpiredError):
+            auth.get_token()
+
+    @respx.mock
+    def test_custom_store_key_is_used(self) -> None:
+        route = respx.post("https://api2.wfirma.pl/oauth2/token").mock(
+            return_value=httpx.Response(200, json={"access_token": "a", "refresh_token": None}),
+        )
+        auth = OAuth2Auth(
+            client_id="cid",
+            client_secret="csecret",
+            redirect_uri="https://app.local/callback",
+            environment=Environment.PRODUCTION,
+            token_store=self.store,
+            store_key="company-123",
+        )
+
+        auth.exchange_code("code-123")
+
+        assert self.store.get("company-123").access_token == "a"
+        assert route.called
+
+    def test_sandbox_environment_uses_sandbox_base_url(self) -> None:
+        auth = OAuth2Auth(
+            client_id="cid",
+            client_secret="csecret",
+            redirect_uri="https://app.local/callback",
+            environment=Environment.SANDBOX,
+            token_store=self.store,
+        )
+
+        assert auth.token_url == "https://sandbox-api2.wfirma.pl/oauth2/token"
+
+
+class TestOAuth1Auth:
+    # AICOMPLETE: OAuth1 sync flow (request/access token) - ready for review
+
+    def setup_method(self) -> None:
+        self.store = MemoryTokenStore()
+
+    @respx.mock
+    def test_request_and_access_token_flow(self) -> None:
+        request_route = respx.get("https://wfirma.pl/oauth/requestToken").mock(
+            return_value=httpx.Response(200, text="oauth_token=req&oauth_token_secret=reqsec"),
+        )
+        access_route = respx.get("https://wfirma.pl/oauth/accessToken").mock(
+            return_value=httpx.Response(200, text="oauth_token=acc&oauth_token_secret=accsec"),
+        )
+        auth = OAuth1Auth(
+            consumer_key="ck",
+            consumer_secret="cs",
+            scope="invoices-read",
+            callback_url="https://app.local/callback",
+            token_store=self.store,
+        )
+
+        request_token = auth.fetch_request_token()
+        authorize_url = auth.build_authorization_url(request_token)
+        access_token = auth.fetch_access_token(
+            oauth_token=request_token.access_token,
+            oauth_token_secret=request_token.refresh_token or "",
+            oauth_verifier="verifier-123",
+        )
+
+        assert request_route.called
+        assert access_route.called
+        assert request_token.access_token == "req"
+        assert request_token.refresh_token == "reqsec"
+        assert "oauth_token=req" in authorize_url
+        assert access_token.access_token == "acc"
+        assert access_token.refresh_token == "accsec"
+        assert self.store.get("default") == access_token
+
+    def test_parse_qs_matches_helper_used_by_auth(self) -> None:
+        parsed = parse_qs("oauth_token=a&oauth_token_secret=b")
+        assert parsed["oauth_token"] == ["a"]
+        assert parsed["oauth_token_secret"] == ["b"]
+
+    def test_get_token_raises_when_missing(self) -> None:
+        auth = OAuth1Auth(
+            consumer_key="ck",
+            consumer_secret="cs",
+            scope="invoices-read",
+            callback_url=None,
+            token_store=self.store,
+        )
+
+        with pytest.raises(MissingConfigurationError):
+            auth.get_token()
+
+    def test_fetch_request_token_raises_on_invalid_payload(self) -> None:
+        auth = OAuth1Auth(
+            consumer_key="ck",
+            consumer_secret="cs",
+            scope="invoices-read",
+            callback_url=None,
+            token_store=self.store,
+        )
+
+        with pytest.raises(ValidationError):
+            auth._parse_oauth1_response("invalid=true")
+

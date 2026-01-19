@@ -26,7 +26,6 @@ from typing import Annotated
 from pydantic import BeforeValidator, ConfigDict, PlainSerializer
 from pydantic_xml import BaseXmlModel, element
 
-
 # ============================================================================
 # DateTime Parsing and Formatting Functions
 # ============================================================================

@@ -9,16 +9,22 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass
+from typing import Any
+
+import httpx
 
 from wfirma.auth.common import (
     FileTokenStore,
     MemoryTokenStore,
-    OAuthToken as SharedOAuthToken,
     TokenStore,
 )
+from wfirma.auth.common import (
+    OAuthToken as SharedOAuthToken,
+)
+from wfirma.config import Environment
 from wfirma.exceptions import (
-    ConfigurationError,
     MissingConfigurationError,
+    TokenExpiredError,
     ValidationError,
 )
 
@@ -175,10 +181,205 @@ OAuthToken = SharedOAuthToken
 """Backward-compatible alias for shared OAuthToken (type alias, not subclass)."""
 
 
+@dataclass(slots=True)
+class OAuth2Auth:
+    """OAuth 2.0 Authorization Code flow helper (synchronous)."""
+
+    client_id: str
+    client_secret: str
+    redirect_uri: str
+    environment: Environment
+    token_store: TokenStore
+    store_key: str = "default"
+
+    def __init__(
+        self,
+        *,
+        client_id: str,
+        client_secret: str,
+        redirect_uri: str,
+        environment: Environment,
+        token_store: TokenStore | None = None,
+        store_key: str = "default",
+    ) -> None:
+        self._validate_str(client_id, "client_id")
+        self._validate_str(client_secret, "client_secret")
+        self._validate_str(redirect_uri, "redirect_uri")
+        if not isinstance(environment, Environment):
+            raise ValidationError("Field 'environment' must be an Environment enum value.")
+        if not isinstance(store_key, str) or not store_key:
+            raise ValidationError("Field 'store_key' must be a non-empty string.")
+
+        self.client_id = client_id
+        self.client_secret = client_secret
+        self.redirect_uri = redirect_uri
+        self.environment = environment
+        self.token_store = token_store or MemoryTokenStore()
+        self.store_key = store_key
+
+    @property
+    def token_url(self) -> str:
+        return f"{self.environment.base_url}/oauth2/token"
+
+    def exchange_code(self, code: str) -> OAuthToken:
+        """Exchange authorization code for access and refresh tokens."""
+
+        self._validate_str(code, "code")
+
+        payload = {
+            "grant_type": "authorization_code",
+            "code": code,
+            "redirect_uri": self.redirect_uri,
+            "client_id": self.client_id,
+            "client_secret": self.client_secret,
+        }
+
+        with httpx.Client() as client:
+            response = client.post(self.token_url, data=payload)
+        response.raise_for_status()
+        token = OAuthToken.from_oauth2_response(response.json())
+        self.token_store.set(self.store_key, token)
+        return token
+
+    def _refresh(self, refresh_token: str) -> OAuthToken:
+        payload = {
+            "grant_type": "refresh_token",
+            "refresh_token": refresh_token,
+            "client_id": self.client_id,
+            "client_secret": self.client_secret,
+        }
+
+        with httpx.Client() as client:
+            response = client.post(self.token_url, data=payload)
+        response.raise_for_status()
+        token = OAuthToken.from_oauth2_response(response.json())
+        self.token_store.set(self.store_key, token)
+        return token
+
+    def get_token(self) -> OAuthToken:
+        token = self.token_store.get(self.store_key)
+        if token is None:
+            raise MissingConfigurationError("OAuth2 token is not available in the token store.")
+
+        if token.is_expired():
+            if token.refresh_token:
+                return self._refresh(token.refresh_token)
+            raise TokenExpiredError("OAuth2 token expired and no refresh_token provided.")
+
+        return token
+
+    @staticmethod
+    def _validate_str(value: Any, field_name: str) -> None:
+        if not isinstance(value, str) or not value:
+            raise ValidationError(f"Field '{field_name}' must be a non-empty string.")
+
+
+@dataclass(slots=True)
+class OAuth1Auth:
+    """OAuth 1.0a helper (PLAINTEXT signature)."""
+
+    consumer_key: str
+    consumer_secret: str
+    scope: str
+    callback_url: str | None
+    token_store: TokenStore
+    store_key: str = "default"
+
+    request_token_url: str = "https://wfirma.pl/oauth/requestToken"
+    authorize_url: str = "https://wfirma.pl/oauth/authorize"
+    access_token_url: str = "https://wfirma.pl/oauth/accessToken"
+
+    def __init__(
+        self,
+        *,
+        consumer_key: str,
+        consumer_secret: str,
+        scope: str,
+        callback_url: str | None,
+        token_store: TokenStore | None = None,
+        store_key: str = "default",
+    ) -> None:
+        for name, value in (
+            ("consumer_key", consumer_key),
+            ("consumer_secret", consumer_secret),
+            ("scope", scope),
+        ):
+            self._validate_str(value, name)
+
+        if callback_url is not None and (not isinstance(callback_url, str) or not callback_url):
+            raise ValidationError("Field 'callback_url' must be a non-empty string when provided.")
+        if not isinstance(store_key, str) or not store_key:
+            raise ValidationError("Field 'store_key' must be a non-empty string.")
+
+        self.consumer_key = consumer_key
+        self.consumer_secret = consumer_secret
+        self.scope = scope
+        self.callback_url = callback_url
+        self.token_store = token_store or MemoryTokenStore()
+        self.store_key = store_key
+        self.request_token_url = "https://wfirma.pl/oauth/requestToken"
+        self.authorize_url = "https://wfirma.pl/oauth/authorize"
+        self.access_token_url = "https://wfirma.pl/oauth/accessToken"
+
+    def fetch_request_token(self) -> OAuthToken:
+        params = {"scope": self.scope}
+        if self.callback_url:
+            params["callback"] = self.callback_url
+
+        with httpx.Client() as client:
+            response = client.get(self.request_token_url, params=params)
+        response.raise_for_status()
+        return self._parse_oauth1_response(response.text)
+
+    def build_authorization_url(self, token: OAuthToken) -> str:
+        return f"{self.authorize_url}?oauth_token={token.access_token}"
+
+    def fetch_access_token(
+        self,
+        *,
+        oauth_token: str,
+        oauth_token_secret: str,
+        oauth_verifier: str,
+    ) -> OAuthToken:
+        for name, value in (
+            ("oauth_token", oauth_token),
+            ("oauth_token_secret", oauth_token_secret),
+            ("oauth_verifier", oauth_verifier),
+        ):
+            self._validate_str(value, name)
+
+        params = {"oauth_token": oauth_token, "oauth_verifier": oauth_verifier}
+
+        with httpx.Client() as client:
+            response = client.get(self.access_token_url, params=params)
+        response.raise_for_status()
+
+        token = self._parse_oauth1_response(response.text)
+        self.token_store.set(self.store_key, token)
+        return token
+
+    def get_token(self) -> OAuthToken:
+        token = self.token_store.get(self.store_key)
+        if token is None:
+            raise MissingConfigurationError("OAuth1 token is not available in the token store.")
+        return token
+
+    @staticmethod
+    def _parse_oauth1_response(payload: str) -> OAuthToken:
+        return OAuthToken.from_oauth1_response(payload)
+
+    @staticmethod
+    def _validate_str(value: Any, field_name: str) -> None:
+        if not isinstance(value, str) or not value:
+            raise ValidationError(f"Field '{field_name}' must be a non-empty string.")
+
+
 __all__ = [
     "TokenStore",
     "MemoryTokenStore",
     "FileTokenStore",
     "APIKeyAuth",
     "OAuthToken",
+    "OAuth2Auth",
+    "OAuth1Auth",
 ]

@@ -9,9 +9,10 @@ import json
 import os
 import tempfile
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import datetime, timedelta
 from pathlib import Path
 from typing import Any, Protocol
+from urllib.parse import quote
 
 from wfirma.exceptions import ConfigurationError, ValidationError
 from wfirma.models import format_wfirma_datetime, parse_wfirma_datetime
@@ -20,10 +21,10 @@ from wfirma.models import format_wfirma_datetime, parse_wfirma_datetime
 class TokenStore(Protocol):
     """A minimal storage interface for OAuth tokens."""
 
-    def get(self, key: str) -> "OAuthToken | None":
+    def get(self, key: str) -> OAuthToken | None:
         """Retrieve token for a given key."""
 
-    def set(self, key: str, token: "OAuthToken") -> None:
+    def set(self, key: str, token: OAuthToken) -> None:
         """Store token under a given key."""
 
     def delete(self, key: str) -> None:
@@ -37,17 +38,17 @@ class TokenStore(Protocol):
 class MemoryTokenStore:
     """In-memory token storage (not persistent, not thread-safe)."""
 
-    _tokens: dict[str, "OAuthToken"]
+    _tokens: dict[str, OAuthToken]
 
     def __init__(self) -> None:
         self._tokens = {}
 
-    def get(self, key: str) -> "OAuthToken | None":
+    def get(self, key: str) -> OAuthToken | None:
         if not isinstance(key, str):
             raise TypeError("Key must be a string.")
         return self._tokens.get(key)
 
-    def set(self, key: str, token: "OAuthToken") -> None:
+    def set(self, key: str, token: OAuthToken) -> None:
         if not isinstance(key, str):
             raise TypeError("Key must be a string.")
         self._tokens[key] = token
@@ -70,7 +71,7 @@ class FileTokenStore:
     def __init__(self, path: str | os.PathLike[str]) -> None:
         self.path = Path(path)
 
-    def get(self, key: str) -> "OAuthToken | None":
+    def get(self, key: str) -> OAuthToken | None:
         self._validate_key(key)
         payload = self._read_payload()
         token_payload = payload.get(key)
@@ -80,7 +81,7 @@ class FileTokenStore:
             raise ValidationError("Stored token payload must be a dictionary.")
         return OAuthToken.from_dict(token_payload)
 
-    def set(self, key: str, token: "OAuthToken") -> None:
+    def set(self, key: str, token: OAuthToken) -> None:
         self._validate_key(key)
         payload = self._read_payload()
         payload[key] = token.to_dict()
@@ -178,7 +179,7 @@ class OAuthToken:
         }
 
     @classmethod
-    def from_dict(cls, data: dict[str, Any]) -> "OAuthToken":
+    def from_dict(cls, data: dict[str, Any]) -> OAuthToken:
         if not isinstance(data, dict):
             raise ValidationError("Token payload must be a dictionary.")
 
@@ -199,10 +200,103 @@ class OAuthToken:
             expires_at=expires_at,
         )
 
+    @classmethod
+    def from_oauth2_response(cls, data: dict[str, Any]) -> OAuthToken:
+        """Create token from OAuth2 token endpoint response."""
+
+        if not isinstance(data, dict):
+            raise ValidationError("OAuth2 response must be a dictionary.")
+
+        access_token = data.get("access_token")
+        refresh_token = data.get("refresh_token")
+        expires_in = data.get("expires_in")
+
+        if not isinstance(access_token, str) or not access_token:
+            raise ValidationError("OAuth2 response missing valid 'access_token'.")
+
+        if refresh_token is not None and (not isinstance(refresh_token, str) or not refresh_token):
+            raise ValidationError("OAuth2 response contains invalid 'refresh_token'.")
+
+        expires_at: datetime | None = None
+        if expires_in is not None:
+            if not isinstance(expires_in, (int, float)):
+                raise ValidationError("OAuth2 response field 'expires_in' must be a number.")
+            expires_at = datetime.now() + timedelta(seconds=int(expires_in))
+
+        return cls(access_token=access_token, refresh_token=refresh_token, expires_at=expires_at)
+
+    @classmethod
+    def from_oauth1_response(cls, payload: str) -> OAuthToken:
+        """Create token from OAuth1 x-www-form-urlencoded response body."""
+
+        if not isinstance(payload, str) or not payload:
+            raise ValidationError("OAuth1 response must be a non-empty string.")
+
+        parts = dict(part.split("=", 1) for part in payload.split("&") if "=" in part)
+
+        access_token = parts.get("oauth_token")
+        token_secret = parts.get("oauth_token_secret")
+
+        if not access_token or not token_secret:
+            raise ValidationError("OAuth1 response missing required token fields.")
+
+        return cls(access_token=access_token, refresh_token=token_secret, expires_at=None)
+
+
+def oauth_percent_encode(value: str) -> str:
+    """Percent-encode a string as required by OAuth 1.0.
+
+    OAuth uses RFC 3986 encoding with space encoded as ``%20`` (not ``+``).
+
+    Args:
+        value: Input string.
+
+    Returns:
+        Percent-encoded string.
+
+    Raises:
+        ValidationError: When value is not a non-empty string.
+    """
+
+    if not isinstance(value, str):
+        raise ValidationError("OAuth value must be a string.")
+
+    return quote(value, safe="~-._")
+
+
+def sign_oauth1_plaintext(*, consumer_secret: str, token_secret: str | None) -> str:
+    """Build OAuth 1.0a PLAINTEXT signature value.
+
+    wFirma documentation states that OAuth 1.0a uses PLAINTEXT signature method.
+
+    Args:
+        consumer_secret: OAuth consumer secret.
+        token_secret: OAuth token secret (optional).
+
+    Returns:
+        Signature string in form ``{consumer_secret}&{token_secret}`` with each part
+        percent-encoded.
+
+    Raises:
+        ValidationError: When inputs are invalid.
+    """
+
+    if not isinstance(consumer_secret, str) or not consumer_secret:
+        raise ValidationError("Field 'consumer_secret' must be a non-empty string.")
+
+    if token_secret is not None and (not isinstance(token_secret, str) or not token_secret):
+        raise ValidationError("Field 'token_secret' must be a non-empty string when provided.")
+
+    encoded_consumer = oauth_percent_encode(consumer_secret)
+    encoded_token = oauth_percent_encode(token_secret) if token_secret is not None else ""
+    return f"{encoded_consumer}&{encoded_token}"
+
 
 __all__ = [
     "TokenStore",
     "MemoryTokenStore",
     "FileTokenStore",
     "OAuthToken",
+    "oauth_percent_encode",
+    "sign_oauth1_plaintext",
 ]

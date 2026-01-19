@@ -127,3 +127,70 @@ Next Steps
 
 * :doc:`quickstart` - Make your first API call
 * :doc:`guides/error_handling` - Handle authentication errors
+
+OAuth Flows
+-----------
+
+OAuth 2.0 (Authorization Code)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Use when you can open the user consent page. Minimal sync example::
+
+    from wfirma.sync.auth import OAuth2Auth
+    from wfirma.auth.common import FileTokenStore
+    from wfirma.config import Environment
+
+    auth = OAuth2Auth(
+        client_id="your_client_id",
+        client_secret="your_client_secret",
+        redirect_uri="https://your.app/callback",
+        environment=Environment.PRODUCTION,
+        token_store=FileTokenStore("~/.cache/wfirma/tokens.json"),
+    )
+
+    # Step 1: redirect user to wFirma consent page
+    consent_url = "https://wfirma.pl/oauth2/auth?response_type=code&client_id=your_client_id&scope=invoices-read&redirect_uri=https://your.app/callback"
+
+    # Step 2: exchange authorization code received on redirect
+    token = auth.exchange_code("authorization-code-from-callback")
+
+    # Step 3: reuse token for API calls (auto-refresh when expired)
+    token = auth.get_token()
+
+OAuth 1.0a
+~~~~~~~~~~
+
+Use when the integration cannot open an OAuth2 consent page. Minimal sync example::
+
+    from wfirma.sync.auth import OAuth1Auth
+    from wfirma.auth.common import MemoryTokenStore
+
+    auth = OAuth1Auth(
+        consumer_key="your_consumer_key",
+        consumer_secret="your_consumer_secret",
+        scope="invoices-read",
+        callback_url="https://your.app/callback",
+        token_store=MemoryTokenStore(),
+    )
+
+    request_token = auth.fetch_request_token()
+    authorization_url = auth.build_authorization_url(request_token)
+    # Redirect the user to authorization_url, receive oauth_verifier
+    access_token = auth.fetch_access_token(
+        oauth_token=request_token.access_token,
+        oauth_token_secret=request_token.refresh_token or "",
+        oauth_verifier="oauth-verifier-from-callback",
+    )
+
+Async variants are available via ``wfirma.async_.auth.OAuth2Auth`` and ``wfirma.async_.auth.OAuth1Auth`` with identical APIs using ``httpx.AsyncClient`` under the hood.
+
+OAuth 1.0a signature details
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+wFirma OAuth 1.0a implementation uses the ``PLAINTEXT`` signature method (per API documentation).
+This library exposes two low-level helpers in ``wfirma.auth.common``:
+
+* ``oauth_percent_encode(value: str) -> str`` - RFC3986 percent-encoding used by OAuth (spaces are encoded as ``%20``, not ``+``)
+* ``sign_oauth1_plaintext(consumer_secret: str, token_secret: str | None) -> str`` - builds the ``PLAINTEXT`` signature value
+
+These helpers are used internally, but they are also available if you need to debug request signing.
