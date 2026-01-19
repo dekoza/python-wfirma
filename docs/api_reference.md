@@ -1269,5 +1269,3 @@ Supported authentication methods: oauth2, apikey
 **Method:** `DELETE`
 
 **Path:** `/{{host}}/webhooks/delete/{{webhookId}}?outputFormat=xml&inputFormat=xml&company_id={{companyId}}`
-
----

@@ -3,7 +3,7 @@
 **Project:** python-wfirma  
 **Version:** 0.1.0-dev  
 **Last Updated:** 2026-01-19  
-**Current Phase:** Phase 5 - Base HTTP Client (In Progress)  
+**Current Phase:** Phase 6 - Resource Implementations (Next)  
 **Phase 0 Status:** ✅ COMPLETED (2026-01-16)
 **Phase 1 Status:** ✅ COMPLETED (2026-01-18)
 **Phase 2 Status:** ✅ COMPLETED (2026-01-18)
@@ -19,6 +19,7 @@
 **Phase 4.1 Status:** ✅ COMPLETED (2026-01-19) - API Key Authentication
 **Phase 4.2 Status:** ✅ COMPLETED (2026-01-19) - OAuth Token Flow
 **Phase 5.1 Status:** ✅ COMPLETED (2026-01-19) - Synchronous HTTP Client
+**Phase 5.2 Status:** ✅ COMPLETED (2026-01-19) - Asynchronous HTTP Client
 
 ---
 
@@ -454,14 +455,76 @@ tests/sync/test_client.py::TestWFirmaClientOAuth2Integration - 2 tests
 Coverage: 87% for sync/client.py
 ```
 
-#### ⏳ Phase 5.2: Asynchronous HTTP Client (NEXT)
+#### ✅ Phase 5.2: Asynchronous HTTP Client (COMPLETED - 2026-01-19)
 
-**Pending Tasks:**
-- ⏳ Create async client (`src/wfirma/async_/client.py`)
-- ⏳ Write tests for async client (`tests/async_/test_client.py`)
+**Accomplishments:**
+- ✅ Created async HTTP client (`src/wfirma/async_/client.py`)
+- ✅ `WFirmaClient` class with full async API communication support
+- ✅ Support for API Key and OAuth2 authentication
+- ✅ GET and POST request methods with async/await
+- ✅ JSON and XML format support (get_json, get_xml, post_json, post_xml)
+- ✅ Automatic company_id injection for multi-company accounts
+- ✅ Comprehensive error handling matching sync client behavior
+- ✅ Async context manager support (async with)
+- ✅ OAuth2 Bearer token header support with async get_token()
+- ✅ 38 tests passing with 91% coverage for async/client.py
+- ✅ All code passes ruff lint and mypy type checks
+- ✅ Exported via `wfirma.async_` module
 
-**Total Project Tests:** 574 (all passing)
-**Total Coverage:** 94%
+**Key Implementation Details:**
+- Async `_get_auth_headers()` method to support async OAuth2 token retrieval
+- Uses `httpx.AsyncClient` for async HTTP operations
+- Mirrors sync client API for consistency
+- Proper async context manager with `__aenter__` and `__aexit__`
+
+**Test Results:**
+```
+tests/async_/test_client.py::TestWFirmaClientInitialization - 7 tests
+tests/async_/test_client.py::TestWFirmaClientHTTPMethods - 6 tests
+tests/async_/test_client.py::TestWFirmaClientErrorHandling - 18 tests
+tests/async_/test_client.py::TestWFirmaClientFormatHandling - 4 tests
+tests/async_/test_client.py::TestWFirmaClientContextManager - 2 tests
+tests/async_/test_client.py::TestWFirmaClientOAuth2Integration - 2 tests
+Coverage: 91% for async_/client.py
+```
+
+**Total Project Tests:** 622 (all passing)
+**Total Coverage:** 93%
+
+---
+
+## Phase 6 Progress (Resource Implementations)
+
+**Status:** 🟡 Started
+
+- ✅ Implemented first resource wrapper: `CompanyResource` (sync + async)
+  - Endpoints:
+    - `GET /companies/get/{companyId}` → `CompanyDetail`
+    - `GET /company_addresses/findmain` → `CompanyAddress`
+  - Ergonomics:
+    - `WFirmaClient.company` (sync + async) returns cached `CompanyResource`
+  - Tests:
+    - `tests/sync/resources/test_sync_company_resource.py`
+    - `tests/async_/resources/test_async_company_resource.py`
+    - `tests/sync/test_client_company_property.py`
+    - `tests/async_/test_client_company_property.py`
+
+- ✅ Implemented second resource wrapper: `ContractorResource` (sync + async) (2026-01-19)
+  - Endpoints:
+    - `GET /contractors/get/{contractorId}` → `Contractor`
+    - `GET /contractors/find` → `list[Contractor]`
+    - `POST /contractors/add` → `Contractor`
+    - `POST /contractors/edit/{contractorId}` → `Contractor`
+    - `DELETE /contractors/delete/{contractorId}` → `bool`
+  - Ergonomics:
+    - `WFirmaClient.contractors` (sync + async) returns cached `ContractorResource`
+  - Added `delete` and `delete_json` methods to HTTP clients (sync + async)
+  - Tests (20 tests total):
+    - `tests/sync/resources/test_sync_contractor_resource.py` (8 tests)
+    - `tests/async_/resources/test_async_contractor_resource.py` (8 tests)
+    - `tests/sync/test_client_contractors_property.py` (2 tests)
+    - `tests/async_/test_client_contractors_property.py` (2 tests)
+  - Coverage: 91% for contractor resources
 
 ---
 
@@ -470,8 +533,9 @@ Coverage: 87% for sync/client.py
 - ✅ Phase 2: Core Infrastructure (exceptions, config)
 - ✅ Phase 3: Data Models (Pydantic with pydantic-xml) - **COMPLETED**
 - ✅ Phase 4: Authentication Layer - **COMPLETED**
-- ⏳ Phase 5: Base HTTP Client - **IN PROGRESS**
-- ⏳ Phase 6-12: Resource Implementations
+- ✅ Phase 5: Base HTTP Client - **COMPLETED**
+- 🟡 Phase 6: Resource Implementations - **IN PROGRESS** (Company ✅, Contractors ✅)
+- ⏳ Phase 7-12: Remaining Resources
 - ⏳ Phase 13: Public API & Convenience Features
 - ⏳ Phase 14: Documentation
 - ⏳ Phase 15: Examples & Integrations
@@ -479,51 +543,12 @@ Coverage: 87% for sync/client.py
 
 ---
 
-## Development Environment
-
-**Tools:**
-- Python: 3.12+
-- Package Manager: uv (v0.x)
-- Linter: ruff
-- Type Checker: mypy
-- Test Framework: pytest + pytest-asyncio + pytest-cov
-- Documentation: Sphinx + sphinx-rtd-theme
-- Build: hatchling
-
-**Dependencies Installed:**
-- httpx[http2] ✅
-- anyio ✅
-- pydantic ✅
-- pydantic-xml ✅
-- python-dotenv ✅
-- All dev dependencies ✅
-
-**Project Structure:**
-```
-python-wfirma/
-├── src/wfirma/          # Source code
-│   ├── sync/            # Synchronous implementation
-│   ├── async_/          # Asynchronous implementation
-│   └── models/          # Pydantic models
-├── tests/               # Test suite
-│   ├── sync/
-│   ├── async_/
-│   ├── models/
-│   └── integration/
-├── docs/                # Sphinx documentation
-├── examples/            # Usage examples
-├── scripts/             # Utility scripts
-└── .github/workflows/   # CI/CD configuration
-```
-
----
-
 ## Quality Metrics
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Test Coverage | ≥90% | 94% | ✅ |
-| Passing Tests | 100% | 100% (574/574) | ✅ |
+| Test Coverage | ≥90% | 92% | ✅ |
+| Passing Tests | 100% | 100% (642/642) | ✅ |
 | Linting Errors | 0 | 0 | ✅ |
 | Type Errors | 0 | 0 | ✅ |
 | Documentation | Complete | Initialized | 🚧 |
@@ -543,7 +568,7 @@ command > /tmp/wfirma_output.txt 2>&1
 - Tests marked `# AICOMPLETE` are ready for review
 - Tests marked `# NOAI` are immutable to AI
 - Report conflicts in `NOAI_PROBLEMS_REPORT.md`
-- Currently: **0 NOAI tests**, **5 AICOMPLETE tests** (scraper tests)
+- Currently: **0 NOAI tests**
 
 ### TDD Workflow
 1. Write failing test

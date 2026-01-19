@@ -154,7 +154,7 @@ Next Steps
 ----------
 
 * :doc:`quickstart` - Make your first API call
-* :doc:`guides/error_handling` - Handle authentication errors
+* :doc:`troubleshooting` - Common issues and debugging tips
 
 OAuth Flows
 -----------

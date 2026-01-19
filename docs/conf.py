@@ -24,12 +24,19 @@ extensions = [
 ]
 
 templates_path = ["_templates"]
-exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
+exclude_patterns = [
+    "_build",
+    "Thumbs.db",
+    ".DS_Store",
+    "api_reference.md",
+]
 
 # -- Options for HTML output -------------------------------------------------
 
 html_theme = "sphinx_rtd_theme"
-html_static_path = ["_static"]
+
+# Keep static path empty to avoid warnings when `_static` directory is missing.
+html_static_path: list[str] = []
 
 # -- Extension configuration -------------------------------------------------
 
@@ -56,9 +63,11 @@ autodoc_default_options = {
 }
 
 # Intersphinx
+# NOTE: Documentation builds for this repo may run in restricted/offline
+# environments. Keep mappings that are reliable, and avoid ones that cause
+# hard failures when `-W` is enabled.
 intersphinx_mapping = {
     "python": ("https://docs.python.org/3", None),
-    "httpx": ("https://www.python-httpx.org/", None),
     "pydantic": ("https://docs.pydantic.dev/latest/", None),
 }
 

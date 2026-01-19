@@ -487,4 +487,3 @@ class TestOAuth1Auth:
 
         with pytest.raises(MissingConfigurationError):
             auth.get_headers(nonce="nonce", timestamp=123)
-

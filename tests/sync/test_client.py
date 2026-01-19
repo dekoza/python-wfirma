@@ -580,4 +580,3 @@ class TestWFirmaClientOAuth2Integration:
         assert route.called
         request = route.calls.last.request
         assert "oauth_version=2" in str(request.url)
-

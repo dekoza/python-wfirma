@@ -1,6 +1,6 @@
-"""Synchronous HTTP client for wFirma API.
+"""Asynchronous HTTP client for wFirma API.
 
-This module provides the base HTTP client for communicating with the wFirma API.
+This module provides the async base HTTP client for communicating with the wFirma API.
 It handles authentication, request formatting, response parsing, and error handling.
 """
 
@@ -49,7 +49,7 @@ class OAuth2AuthProvider(Protocol):
 
 
 class WFirmaClient:
-    """Synchronous HTTP client for wFirma API.
+    """Asynchronous HTTP client for wFirma API.
 
     This client handles:
     - Authentication (API Key or OAuth2)
@@ -59,10 +59,10 @@ class WFirmaClient:
     - Automatic company_id injection
 
     Example:
-        >>> from wfirma.sync.auth import APIKeyAuth
+        >>> from wfirma.async_.auth import APIKeyAuth
         >>> auth = APIKeyAuth(access_key="ak", secret_key="sk", app_key="appk")
-        >>> with WFirmaClient(auth=auth) as client:
-        ...     users = client.get_json("/users/get/123")
+        >>> async with WFirmaClient(auth=auth) as client:
+        ...     users = await client.get_json("/users/get/123")
         ...     print(users["users"]["0"]["user"]["login"])
 
     Attributes:
@@ -92,7 +92,7 @@ class WFirmaClient:
         self.environment = environment
         self.company_id = company_id
         self.timeout = timeout
-        self._http_client = httpx.Client(timeout=timeout)
+        self._http_client = httpx.AsyncClient(timeout=timeout)
         self._resources: dict[str, Any] = {}
 
     @property
@@ -108,7 +108,7 @@ class WFirmaClient:
             CompanyResource instance bound to this client.
         """
         # Local import to avoid circular dependency between client and resources.
-        from wfirma.sync.resources.company import CompanyResource
+        from wfirma.async_.resources.company import CompanyResource
 
         resource = self._resources.get("company")
         if resource is None:
@@ -124,7 +124,7 @@ class WFirmaClient:
             ContractorResource instance bound to this client.
         """
         # Local import to avoid circular dependency between client and resources.
-        from wfirma.sync.resources.contractors import ContractorResource
+        from wfirma.async_.resources.contractors import ContractorResource
 
         resource = self._resources.get("contractors")
         if resource is None:
@@ -132,30 +132,30 @@ class WFirmaClient:
             self._resources["contractors"] = resource
         return resource
 
-    def __enter__(self) -> WFirmaClient:
-        """Enter the context manager."""
+    async def __aenter__(self) -> WFirmaClient:
+        """Enter the async context manager."""
         return self
 
-    def __exit__(
+    async def __aexit__(
         self,
         exc_type: type[BaseException] | None,
         exc_val: BaseException | None,
         exc_tb: TracebackType | None,
     ) -> None:
-        """Exit the context manager and close the HTTP client."""
-        self.close()
+        """Exit the async context manager and close the HTTP client."""
+        await self.close()
 
-    def close(self) -> None:
+    async def close(self) -> None:
         """Close the HTTP client."""
-        self._http_client.close()
+        await self._http_client.aclose()
 
-    def _get_auth_headers(self) -> dict[str, str]:
+    async def _get_auth_headers(self) -> dict[str, str]:
         """Get authentication headers based on auth type."""
         # Check if it's an OAuth2Auth by looking for get_token method
         if hasattr(self.auth, "get_token"):
             # Safe to cast - we just checked for get_token attribute
             auth_with_token = cast(OAuth2AuthProvider, self.auth)
-            token = auth_with_token.get_token()
+            token = await auth_with_token.get_token()
             return {"Authorization": f"Bearer {token.access_token}"}
         # Otherwise it's API Key auth
         return self.auth.get_headers()
@@ -270,7 +270,7 @@ class WFirmaClient:
         # Unknown error code
         raise APIError(f"API error: {code}")
 
-    def get(
+    async def get(
         self,
         path: str,
         *,
@@ -286,11 +286,11 @@ class WFirmaClient:
             Parsed response data.
         """
         url = self._build_url(path)
-        headers = self._get_auth_headers()
+        headers = await self._get_auth_headers()
         params = self._add_default_params(params)
 
         try:
-            response = self._http_client.get(url, headers=headers, params=params)
+            response = await self._http_client.get(url, headers=headers, params=params)
         except httpx.TimeoutException as err:
             raise TimeoutError("Request timed out.") from err
         except httpx.ConnectError as err:
@@ -300,7 +300,7 @@ class WFirmaClient:
 
         return self._handle_response(response)
 
-    def post(
+    async def post(
         self,
         path: str,
         *,
@@ -322,7 +322,7 @@ class WFirmaClient:
             Parsed response data.
         """
         url = self._build_url(path)
-        headers = self._get_auth_headers()
+        headers = await self._get_auth_headers()
         params = self._add_default_params(params)
 
         if content is not None:
@@ -330,9 +330,9 @@ class WFirmaClient:
 
         try:
             if json is not None:
-                response = self._http_client.post(url, headers=headers, json=json, params=params)
+                response = await self._http_client.post(url, headers=headers, json=json, params=params)
             else:
-                response = self._http_client.post(
+                response = await self._http_client.post(
                     url, headers=headers, content=content, params=params
                 )
         except httpx.TimeoutException as err:
@@ -344,7 +344,7 @@ class WFirmaClient:
 
         return self._handle_response(response)
 
-    def get_json(
+    async def get_json(
         self,
         path: str,
         *,
@@ -361,9 +361,9 @@ class WFirmaClient:
         """
         params = params.copy() if params else {}
         params["outputFormat"] = "json"
-        return self.get(path, params=params)
+        return await self.get(path, params=params)
 
-    def get_xml(
+    async def get_xml(
         self,
         path: str,
         *,
@@ -380,14 +380,14 @@ class WFirmaClient:
         """
         params = params.copy() if params else {}
         params["outputFormat"] = "xml"
-        result = self.get(path, params=params)
+        result = await self.get(path, params=params)
         # If the response was XML, it will be in the "raw" key
         if "raw" in result:
             return str(result["raw"])
         # Otherwise return the JSON representation (shouldn't happen normally)
         return str(result)
 
-    def post_json(
+    async def post_json(
         self,
         path: str,
         *,
@@ -407,9 +407,9 @@ class WFirmaClient:
         params = params.copy() if params else {}
         params["inputFormat"] = "json"
         params["outputFormat"] = "json"
-        return self.post(path, json=data, params=params)
+        return await self.post(path, json=data, params=params)
 
-    def post_xml(
+    async def post_xml(
         self,
         path: str,
         *,
@@ -429,14 +429,14 @@ class WFirmaClient:
         params = params.copy() if params else {}
         params["inputFormat"] = "xml"
         params["outputFormat"] = "xml"
-        result = self.post(path, content=data, content_type="application/xml", params=params)
+        result = await self.post(path, content=data, content_type="application/xml", params=params)
         # If the response was XML, it will be in the "raw" key
         if "raw" in result:
             return str(result["raw"])
         # Otherwise return the JSON representation (shouldn't happen normally)
         return str(result)
 
-    def delete(
+    async def delete(
         self,
         path: str,
         *,
@@ -452,11 +452,11 @@ class WFirmaClient:
             Parsed response data.
         """
         url = self._build_url(path)
-        headers = self._get_auth_headers()
+        headers = await self._get_auth_headers()
         params = self._add_default_params(params)
 
         try:
-            response = self._http_client.delete(url, headers=headers, params=params)
+            response = await self._http_client.delete(url, headers=headers, params=params)
         except httpx.TimeoutException as err:
             raise TimeoutError("Request timed out.") from err
         except httpx.ConnectError as err:
@@ -466,7 +466,7 @@ class WFirmaClient:
 
         return self._handle_response(response)
 
-    def delete_json(
+    async def delete_json(
         self,
         path: str,
         *,
@@ -483,9 +483,10 @@ class WFirmaClient:
         """
         params = params.copy() if params else {}
         params["outputFormat"] = "json"
-        return self.delete(path, params=params)
+        return await self.delete(path, params=params)
 
 
 __all__ = [
     "WFirmaClient",
 ]
+

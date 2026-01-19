@@ -10,8 +10,7 @@ Welcome to the documentation for **python-wfirma**, a modern Python library for 
    installation
    authentication
    quickstart
-   api_reference
-   guides/index
+   api_reference.rst
    troubleshooting
 
 Features
@@ -28,24 +27,31 @@ Quick Example
 
 Synchronous usage::
 
-    from wfirma import WFirmaClient
+    from wfirma.sync import APIKeyAuth, WFirmaClient
 
-    client = WFirmaClient(
-        app_key="your_app_key",
-        secret="your_secret"
-    )
+    auth = APIKeyAuth(access_key="ak", secret_key="sk", app_key="appk")
 
-    invoices = client.invoices.list(limit=10)
+    with WFirmaClient(auth=auth, company_id=123) as client:
+        # Low-level HTTP calls (dict payload)
+        data = client.get_json("/users/get/123")
+
+        # Higher-level typed resources (Pydantic models)
+        company = client.company.get()
+        address = client.company.find_main_address()
 
 Asynchronous usage::
 
-    from wfirma import AsyncWFirmaClient
+    from wfirma.async_ import APIKeyAuth, WFirmaClient
 
-    async with AsyncWFirmaClient(
-        app_key="your_app_key",
-        secret="your_secret"
-    ) as client:
-        invoices = await client.invoices.list(limit=10)
+    auth = APIKeyAuth(access_key="ak", secret_key="sk", app_key="appk")
+
+    async with WFirmaClient(auth=auth, company_id=123) as client:
+        # Low-level HTTP calls (dict payload)
+        data = await client.get_json("/users/get/123")
+
+        # Higher-level typed resources (Pydantic models)
+        company = await client.company.get()
+        address = await client.company.find_main_address()
 
 Indices and tables
 ==================
@@ -53,4 +59,3 @@ Indices and tables
 * :ref:`genindex`
 * :ref:`modindex`
 * :ref:`search`
-

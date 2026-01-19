@@ -1,12 +1,75 @@
-# 🎉 Phase 3.8 Complete - Warehouse Models Done!
+# 🎉 Phase 6 Progress - Contractor Resource Done!
 
 **Project:** python-wfirma  
-**Last Update:** 2026-01-18  
-**Status:** ✅ Phase 3.8 COMPLETED (Warehouse Models ✅)
+**Last Update:** 2026-01-19  
+**Status:** 🟡 Phase 6 IN PROGRESS (Company ✅, Contractors ✅)
 
 ---
 
-## ✅ Recent Completion: Warehouse Models (2026-01-18)
+## ✅ Recent Completion: Contractor Resource (2026-01-19)
+
+### Accomplishments
+- ✅ Implemented `ContractorResource` (sync + async)
+- ✅ 20 comprehensive tests covering all contractor resource functionality
+- ✅ 91% code coverage for contractor resource modules
+- ✅ All features exported via `wfirma.sync.resources` and `wfirma.async_.resources`
+
+**ContractorResource Features:**
+- Full CRUD operations for contractors
+- GET, POST, DELETE HTTP method support
+- `WFirmaClient.contractors` property for convenient access
+- Automatic response parsing to Pydantic `Contractor` models
+
+**Endpoints Implemented:**
+- `GET /contractors/get/{contractorId}` → `Contractor`
+- `GET /contractors/find` → `list[Contractor]`
+- `POST /contractors/add` → `Contractor`
+- `POST /contractors/edit/{contractorId}` → `Contractor`
+- `DELETE /contractors/delete/{contractorId}` → `bool`
+
+**HTTP Client Enhancements:**
+- Added `delete()` and `delete_json()` methods to both sync and async clients
+
+**Test Coverage:**
+- GET tests (2 tests per client)
+- FIND tests (4 tests per client)
+- ADD tests (4 tests per client)
+- EDIT tests (2 tests per client)
+- DELETE tests (4 tests per client)
+- Property caching tests (4 tests)
+
+---
+
+## ✅ Earlier: Async HTTP Client (2026-01-19)
+
+### Accomplishments
+- ✅ Implemented async HTTP client module (`src/wfirma/async_/client.py`)
+- ✅ 38 comprehensive tests covering all async client functionality
+- ✅ 91% code coverage for async client module
+- ✅ All features exported via `wfirma.async_` package
+
+**WFirmaClient (Async) Features:**
+- Full async/await support using `httpx.AsyncClient`
+- API Key and OAuth2 authentication support
+- GET and POST methods with JSON/XML format handling
+- Comprehensive error handling (API status codes, HTTP errors, network errors)
+- Automatic company_id injection for multi-company accounts
+- Async context manager support (`async with`)
+- OAuth2 Bearer token with async `get_token()` method
+
+
+---
+
+## ✅ Earlier: Sync HTTP Client (2026-01-19)
+
+### Accomplishments
+- ✅ Implemented synchronous HTTP client module (`src/wfirma/sync/client.py`)
+- ✅ 35 comprehensive tests covering all sync client functionality
+- ✅ 87% code coverage for sync client module
+
+---
+
+## ✅ Earlier: Warehouse Models (2026-01-18)
 
 ### Accomplishments
 - ✅ Implemented warehouse models module (`src/wfirma/models/warehouse.py`)
@@ -228,8 +291,8 @@
 
 | Metric | Status |
 |--------|--------|
-| Tests Passing | ✅ 265/265 (100%) |
-| Code Coverage | ✅ 99% |
+| Tests Passing | ✅ 642/642 (100%) |
+| Code Coverage | ✅ 92% |
 | Linting Errors | ✅ 0 |
 | Type Errors | ✅ 0 |
 | Build Status | ✅ Success |
@@ -337,12 +400,12 @@ Building a professional Python library for wFirma API with:
 ```
 Phase 0: Project Setup           ✅ COMPLETED (2026-01-16)
 Phase 1: API Documentation       ✅ COMPLETED (2026-01-18)
-Phase 2: Core Infrastructure     🚧 NEXT
-Phase 3: Data Models             ⏳ Pending
-Phase 3: Data Models             ⏳ Pending
-Phase 4: Authentication          ⏳ Pending
-Phase 5: Base HTTP Client        ⏳ Pending
-Phase 6-12: Resources            ⏳ Pending
+Phase 2: Core Infrastructure     ✅ COMPLETED (2026-01-18)
+Phase 3: Data Models             ✅ COMPLETED (2026-01-19)
+Phase 4: Authentication          ✅ COMPLETED (2026-01-19)
+Phase 5: Base HTTP Client        ✅ COMPLETED (2026-01-19)
+Phase 6: Resource Implementations 🟡 IN PROGRESS (Company ✅, Contractors ✅)
+Phase 7-12: Remaining Resources  ⏳ Pending
 Phase 13: Public API             ⏳ Pending
 Phase 14: Documentation          ⏳ Pending
 Phase 15: Examples               ⏳ Pending
