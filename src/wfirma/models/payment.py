@@ -29,7 +29,7 @@ from enum import Enum
 
 from pydantic_xml import element
 
-from wfirma.models.base import BaseXMLModel, OptionalDateTimeField
+from wfirma.models.base import BaseXMLModel, TimestampedFieldsMixin
 
 
 class PaymentObjectType(str, Enum):
@@ -64,7 +64,7 @@ class PaymentType(str, Enum):
     EXPENSE = "expense"
 
 
-class PaymentCashbox(BaseXMLModel, tag="payment_cashbox"):
+class PaymentCashbox(TimestampedFieldsMixin, BaseXMLModel, tag="payment_cashbox"):
     """
     Payment cashbox (kasa) model.
 
@@ -111,12 +111,10 @@ class PaymentCashbox(BaseXMLModel, tag="payment_cashbox"):
     # Foreign keys
     company_id: int | None = element(default=None)
 
-    # Timestamps
-    created: OptionalDateTimeField = element(default=None)
-    modified: OptionalDateTimeField = element(default=None)
+    # Timestamps provided by TimestampedFieldsMixin
 
 
-class Payment(BaseXMLModel, tag="payment"):
+class Payment(TimestampedFieldsMixin, BaseXMLModel, tag="payment"):
     """
     Payment model representing a financial transaction.
 
@@ -172,9 +170,7 @@ class Payment(BaseXMLModel, tag="payment"):
     payment_cashbox_id: int | None = element(default=None)
     company_id: int | None = element(default=None)
 
-    # Timestamps
-    created: OptionalDateTimeField = element(default=None)
-    modified: OptionalDateTimeField = element(default=None)
+    # Timestamps provided by TimestampedFieldsMixin
 
 
 __all__ = [

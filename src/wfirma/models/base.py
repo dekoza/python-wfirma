@@ -26,6 +26,7 @@ from typing import Annotated
 from pydantic import BeforeValidator, ConfigDict, PlainSerializer
 from pydantic_xml import BaseXmlModel, element
 
+
 # ============================================================================
 # DateTime Parsing and Formatting Functions
 # ============================================================================
@@ -119,6 +120,13 @@ OptionalDateTimeField = Annotated[
     BeforeValidator(parse_wfirma_datetime),
     PlainSerializer(format_wfirma_datetime, return_type=str | None),
 ]
+
+
+class TimestampedFieldsMixin:
+    """Shared timestamp fields for wFirma models."""
+
+    created: OptionalDateTimeField = element(default=None)
+    modified: OptionalDateTimeField = element(default=None)
 
 
 # ============================================================================

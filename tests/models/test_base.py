@@ -15,6 +15,7 @@ from wfirma.models.base import (
     BaseXMLModel,
     DateTimeField,
     OptionalDateTimeField,
+    TimestampedFieldsMixin,
     ResponseParameters,
     ResponseStatus,
     WFirmaBaseModel,
@@ -259,7 +260,7 @@ class TestDateTimeField:
         assert result["created"] == "2024-01-15 10:30:45"
 
     def test_datetime_field_optional_with_null(self) -> None:
-        """Test optional DateTimeField with null datetime."""
+        """Test optional datetime field handles null/empty values."""
 
         class SampleModel(WFirmaBaseModel):
             created: OptionalDateTimeField = element(default=None)
@@ -277,8 +278,31 @@ class TestDateTimeField:
         assert instance.created is None
 
 
+class TestTimestampedFieldsMixin:
+    """Tests for shared timestamp fields mixin."""
+
+    def test_mixin_provides_created_and_modified(self) -> None:
+        class SampleModel(TimestampedFieldsMixin, BaseXMLModel, tag="sample"):
+            name: str = element()
+
+        model = SampleModel(name="x")
+        assert model.created is None
+        assert model.modified is None
+
+    def test_mixin_serializes_datetime_fields(self) -> None:
+        dt = datetime(2024, 1, 1, 12, 0, 0)
+
+        class SampleModel(TimestampedFieldsMixin, BaseXMLModel, tag="sample"):
+            name: str = element()
+
+        model = SampleModel(name="x", created=dt, modified=dt)
+        payload = model.model_dump(mode="json")
+        assert payload["created"] == "2024-01-01 12:00:00"
+        assert payload["modified"] == "2024-01-01 12:00:00"
+
+
 class TestResponseStatus:
-    """Tests for API response status model."""
+    """Tests for ResponseStatus model."""
 
     # AICOMPLETE: Response status tests - ready for review
 

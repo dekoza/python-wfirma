@@ -19,10 +19,10 @@ Note:
 
 from pydantic_xml import element
 
-from wfirma.models.base import BaseXMLModel, OptionalDateTimeField
+from wfirma.models.base import BaseXMLModel, OptionalDateTimeField, TimestampedFieldsMixin
 
 
-class User(BaseXMLModel, tag="user"):
+class User(TimestampedFieldsMixin, BaseXMLModel, tag="user"):
     """
     User model representing a wFirma system user.
 

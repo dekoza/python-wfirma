@@ -42,7 +42,7 @@ from enum import Enum
 
 from pydantic_xml import element
 
-from wfirma.models.base import BaseXMLModel, OptionalDateTimeField
+from wfirma.models.base import BaseXMLModel, TimestampedFieldsMixin
 
 
 class WarehouseDocumentType(str, Enum):
@@ -82,7 +82,7 @@ class WarehouseDocumentType(str, Enum):
     ZPD = "z_p_d"
 
 
-class WarehouseDocumentContent(BaseXMLModel, tag="warehouse_document_content"):
+class WarehouseDocumentContent(TimestampedFieldsMixin, BaseXMLModel, tag="warehouse_document_content"):
     """
     Warehouse document line item model.
 
@@ -128,12 +128,10 @@ class WarehouseDocumentContent(BaseXMLModel, tag="warehouse_document_content"):
     good_id: int | None = element(default=None)
     warehouse_document_id: int | None = element(default=None)
 
-    # Timestamps
-    created: OptionalDateTimeField = element(default=None)
-    modified: OptionalDateTimeField = element(default=None)
+    # Timestamps provided by TimestampedFieldsMixin
 
 
-class WarehouseDocument(BaseXMLModel, tag="warehouse_document"):
+class WarehouseDocument(TimestampedFieldsMixin, BaseXMLModel, tag="warehouse_document"):
     """
     Warehouse document model representing inventory movement.
 
@@ -195,9 +193,7 @@ class WarehouseDocument(BaseXMLModel, tag="warehouse_document"):
     company_id: int | None = element(default=None)
     series_id: int | None = element(default=None)
 
-    # Timestamps
-    created: OptionalDateTimeField = element(default=None)
-    modified: OptionalDateTimeField = element(default=None)
+    # Timestamps provided by TimestampedFieldsMixin
 
 
 __all__ = [

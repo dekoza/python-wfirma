@@ -80,6 +80,28 @@ The library handles token management automatically:
 * Expired tokens are automatically renewed
 * No manual token handling required
 
+OAuth Token Store
+-----------------
+
+You can persist OAuth tokens using the built-in token stores:
+
+* ``MemoryTokenStore`` – in-process, non-persistent (default for tests/quick scripts)
+* ``FileTokenStore`` – JSON file-based store for persistence between runs
+
+Example (file-based store)::
+
+
+    from wfirma.auth.common import FileTokenStore
+
+    store = FileTokenStore("~/.cache/wfirma/tokens.json")
+    store.set("default", token)
+    restored = store.get("default")
+
+
+Tokens are stored as JSON objects keyed by a string you choose (e.g., ``default`` or per-company). Invalid JSON or non-mapping payloads raise ``ValidationError``; write failures raise ``ConfigurationError``. Keys must be strings.
+
+All token store classes are shared between sync and async authentication modules.
+
 Multi-Company Support
 ---------------------
 
@@ -105,4 +127,3 @@ Next Steps
 
 * :doc:`quickstart` - Make your first API call
 * :doc:`guides/error_handling` - Handle authentication errors
-

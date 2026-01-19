@@ -24,10 +24,10 @@ Example:
 
 from pydantic_xml import element
 
-from wfirma.models.base import BaseXMLModel, OptionalDateTimeField
+from wfirma.models.base import BaseXMLModel, TimestampedFieldsMixin
 
 
-class Contractor(BaseXMLModel, tag="contractor"):
+class Contractor(TimestampedFieldsMixin, BaseXMLModel, tag="contractor"):
     """
     Contractor model representing a customer/supplier.
 
@@ -142,12 +142,8 @@ class Contractor(BaseXMLModel, tag="contractor"):
     invoice_description_id: int | None = element(default=None)
     shop_buyer_id: int | None = element(default=None)
 
-    # Timestamps
-    created: OptionalDateTimeField = element(default=None)
-    modified: OptionalDateTimeField = element(default=None)
 
-
-class ContractorDetail(BaseXMLModel, tag="contractor_detail"):
+class ContractorDetail(TimestampedFieldsMixin, BaseXMLModel, tag="contractor_detail"):
     """
     Contractor detail model for embedded contractor info.
 
@@ -195,10 +191,6 @@ class ContractorDetail(BaseXMLModel, tag="contractor_detail"):
     post: str | None = element(default=None)
     city: str | None = element(default=None)
     country: str | None = element(default=None)
-
-    # Timestamps
-    created: OptionalDateTimeField = element(default=None)
-    modified: OptionalDateTimeField = element(default=None)
 
 
 __all__ = [

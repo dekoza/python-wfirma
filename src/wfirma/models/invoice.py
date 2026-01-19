@@ -32,7 +32,7 @@ from enum import Enum
 
 from pydantic_xml import element
 
-from wfirma.models.base import BaseXMLModel, OptionalDateTimeField
+from wfirma.models.base import BaseXMLModel, TimestampedFieldsMixin
 
 
 class InvoiceType(str, Enum):
@@ -105,7 +105,7 @@ class DisposalDateFormat(str, Enum):
     MONTH = "month"
 
 
-class InvoiceContent(BaseXMLModel, tag="invoicecontent"):
+class InvoiceContent(TimestampedFieldsMixin, BaseXMLModel, tag="invoicecontent"):
     """
     Invoice line item model.
 
@@ -176,12 +176,10 @@ class InvoiceContent(BaseXMLModel, tag="invoicecontent"):
     equipment_id: int | None = element(default=None)
     vehicle_id: int | None = element(default=None)
 
-    # Timestamps
-    created: OptionalDateTimeField = element(default=None)
-    modified: OptionalDateTimeField = element(default=None)
+    # Timestamps provided by TimestampedFieldsMixin
 
 
-class Invoice(BaseXMLModel, tag="invoice"):
+class Invoice(TimestampedFieldsMixin, BaseXMLModel, tag="invoice"):
     """
     Invoice model representing a sales/purchase invoice.
 
@@ -287,9 +285,7 @@ class Invoice(BaseXMLModel, tag="invoice"):
     translation_language_id: int | None = element(default=None)
     corrected_invoice_id: int | None = element(default=None)
 
-    # Timestamps
-    created: OptionalDateTimeField = element(default=None)
-    modified: OptionalDateTimeField = element(default=None)
+    # Timestamps provided by TimestampedFieldsMixin
 
 
 __all__ = [

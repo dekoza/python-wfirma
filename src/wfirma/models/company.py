@@ -21,10 +21,10 @@ Example:
 
 from pydantic_xml import element
 
-from wfirma.models.base import BaseXMLModel, OptionalDateTimeField
+from wfirma.models.base import BaseXMLModel, TimestampedFieldsMixin
 
 
-class CompanyDetail(BaseXMLModel, tag="company_detail"):
+class CompanyDetail(TimestampedFieldsMixin, BaseXMLModel, tag="company_detail"):
     """
     Company detail model representing company information.
 
@@ -72,11 +72,9 @@ class CompanyDetail(BaseXMLModel, tag="company_detail"):
     bank_account: str | None = element(default=None)
     bank_swift: str | None = element(default=None)
     bank_address: str | None = element(default=None)
-    created: OptionalDateTimeField = element(default=None)
-    modified: OptionalDateTimeField = element(default=None)
 
 
-class CompanyAccount(BaseXMLModel, tag="company_account"):
+class CompanyAccount(TimestampedFieldsMixin, BaseXMLModel, tag="company_account"):
     """
     Company bank account model.
 
@@ -105,11 +103,9 @@ class CompanyAccount(BaseXMLModel, tag="company_account"):
     bank_name: str | None = element(default=None)
     swift: str | None = element(default=None)
     is_default: bool | None = element(default=None)
-    created: OptionalDateTimeField = element(default=None)
-    modified: OptionalDateTimeField = element(default=None)
 
 
-class CompanyAddress(BaseXMLModel, tag="company_address"):
+class CompanyAddress(TimestampedFieldsMixin, BaseXMLModel, tag="company_address"):
     """
     Company address model.
 
@@ -148,11 +144,9 @@ class CompanyAddress(BaseXMLModel, tag="company_address"):
     city: str = element()
     country: str | None = element(default=None)
     is_main: bool | None = element(default=None)
-    created: OptionalDateTimeField = element(default=None)
-    modified: OptionalDateTimeField = element(default=None)
 
 
-class UserCompany(BaseXMLModel, tag="user_company"):
+class UserCompany(TimestampedFieldsMixin, BaseXMLModel, tag="user_company"):
     """
     User-company relationship model.
 
@@ -184,7 +178,6 @@ class UserCompany(BaseXMLModel, tag="user_company"):
     company_name: str | None = element(default=None)
     role: str | None = element(default=None)
     is_active: bool | None = element(default=None)
-    created: OptionalDateTimeField = element(default=None)
 
 
 __all__ = [

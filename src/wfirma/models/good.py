@@ -27,7 +27,7 @@ from enum import Enum
 
 from pydantic_xml import element
 
-from wfirma.models.base import BaseXMLModel, OptionalDateTimeField
+from wfirma.models.base import BaseXMLModel, TimestampedFieldsMixin
 
 
 class GoodType(str, Enum):
@@ -56,7 +56,7 @@ class WarehouseType(str, Enum):
     DETAILED = "detailed"
 
 
-class Good(BaseXMLModel, tag="good"):
+class Good(TimestampedFieldsMixin, BaseXMLModel, tag="good"):
     """
     Good model representing a product or service.
 
@@ -119,9 +119,7 @@ class Good(BaseXMLModel, tag="good"):
     code: str | None = element(default=None)
     tags: str | None = element(default=None)
 
-    # Timestamps
-    created: OptionalDateTimeField = element(default=None)
-    modified: OptionalDateTimeField = element(default=None)
+    # Timestamps provided by TimestampedFieldsMixin
 
 
 __all__ = [
