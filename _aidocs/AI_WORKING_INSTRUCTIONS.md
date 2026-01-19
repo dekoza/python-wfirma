@@ -8,11 +8,11 @@
 ## Quick Reference
 
 ### Current Status
-- **Phase**: Phase 4 (Authentication Layer - IN PROGRESS)
+- **Phase**: Phase 5 (Base HTTP Client - IN PROGRESS)
 - **Version**: 0.1.0-dev
-- **Tests**: 393/393 passing, 99% coverage
+- **Tests**: 574/574 passing, 94% coverage
 - **NOAI Tests**: 0
-- **AICOMPLETE Tests**: 362 (5 scraper + 25 exceptions + 42 config + 34 base models + 55 common models + 24 company models + 18 contractor models + 22 good models + 38 invoice models + 26 payment models + 25 warehouse models + 48 API Key auth)
+- **AICOMPLETE Tests**: 397 (5 scraper + 25 exceptions + 42 config + 34 base models + 55 common models + 24 company models + 18 contractor models + 22 good models + 38 invoice models + 26 payment models + 25 warehouse models + 48 API Key auth + 35 HTTP client)
 
 ### Essential Files to Check Before Starting
 1. `PROJECT_STATUS.md` - Current phase and todos
@@ -52,19 +52,6 @@ uv run mypy src
 
 # All checks
 uv run tox -e lint,type
-```
-
-### Package Management
-```bash
-# Install dependencies
-uv pip install -e ".[dev]"
-
-# Add new dependency
-# 1. Edit pyproject.toml
-# 2. uv pip install -e ".[dev]"
-
-# Update dependencies
-uv pip install --upgrade -e ".[dev]"
 ```
 
 ---
@@ -136,7 +123,7 @@ uv pip install --upgrade -e ".[dev]"
 - **Meaning**: Test is IMMUTABLE to AI
 - **Format**: `# NOAI: Brief description - verified YYYY-MM-DD`
 - **AI Actions**:
-  - ❌ CANNOT modify test
+  - ❌ CANNOT modify the test
   - ❌ CANNOT delete test
   - ❌ CANNOT refactor test
   - ✅ CAN read test
@@ -180,7 +167,7 @@ command > /tmp/wfirma_output.txt 2>&1
 ### Example:
 ```bash
 # Instead of: uv run pytest
-uv run pytest > /tmp/pytest_output.txt 2>&1
+uv run pytest --cache-clear > /tmp/pytest_output.txt 2>&1
 # Then: read_file("/tmp/pytest_output.txt")
 ```
 

@@ -102,6 +102,34 @@ Tokens are stored as JSON objects keyed by a string you choose (e.g., ``default`
 
 All token store classes are shared between sync and async authentication modules.
 
+.. note::
+   When running tests locally, use pytest's built-in cache clearing flag
+   (``--cache-clear``) at the start of the run.
+
+OAuth 1.0a request signing helper
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+If you need to sign raw HTTP requests (for example, when building your own client),
+you can build the OAuth1 ``Authorization`` header using ``wfirma.auth.common``::
+
+    from wfirma.auth.common import OAuthToken, build_oauth1_authorization_header
+
+    token = OAuthToken(access_token="oauth-token", refresh_token="oauth-token-secret")
+
+    auth_header_value = build_oauth1_authorization_header(
+        consumer_key="your_consumer_key",
+        consumer_secret="your_consumer_secret",
+        token=token,
+        nonce="nonce",
+        realm=None,
+    )
+
+    headers = {"Authorization": auth_header_value}
+
+The helper uses the ``PLAINTEXT`` signature method and produces a header value starting
+with ``OAuth ``. ``realm`` is optional. If you do not pass ``timestamp``, the current Unix
+timestamp is used.
+
 Multi-Company Support
 ---------------------
 
@@ -196,3 +224,58 @@ This library exposes two low-level helpers in ``wfirma.auth.common``:
 * ``sign_oauth1_plaintext(consumer_secret: str, token_secret: str | None) -> str`` - builds the ``PLAINTEXT`` signature value
 
 These helpers are used internally, but they are also available if you need to debug request signing.
+
+OAuth 1.0a
+----------
+
+OAuth 1.0a in wFirma uses the ``PLAINTEXT`` signature method.
+
+The library provides ``OAuth1Auth`` helpers in both sync and async modules.
+
+Generating request headers
+~~~~~~~~~~~~~~~~~~~~~~~~~~
+
+Once you have an access token stored in the token store, you can generate the
+``Authorization`` header for authenticated requests:
+
+.. code-block:: python
+
+   from wfirma.sync.auth import OAuth1Auth, OAuthToken
+
+   auth = OAuth1Auth(
+       consumer_key="...",
+       consumer_secret="...",
+       scope="invoices-read",
+       callback_url=None,
+   )
+
+   # The OAuth 1.0a token secret is stored in token.refresh_token.
+   auth.token_store.set(
+       "default",
+       OAuthToken(access_token="oauth_token", refresh_token="oauth_token_secret"),
+   )
+
+   headers = auth.get_headers()
+   # {'Authorization': 'OAuth oauth_consumer_key="...", ...'}
+
+The async variant works the same way:
+
+.. code-block:: python
+
+   from wfirma.async_.auth import OAuth1Auth, OAuthToken
+
+   auth = OAuth1Auth(
+       consumer_key="...",
+       consumer_secret="...",
+       scope="invoices-read",
+       callback_url=None,
+   )
+
+   auth.token_store.set(
+       "default",
+       OAuthToken(access_token="oauth_token", refresh_token="oauth_token_secret"),
+   )
+
+   headers = auth.get_headers()
+
+For deterministic tests you can provide ``nonce`` and ``timestamp`` overrides.

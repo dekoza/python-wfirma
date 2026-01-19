@@ -3,7 +3,7 @@
 **Project:** python-wfirma  
 **Version:** 0.1.0-dev  
 **Last Updated:** 2026-01-19  
-**Current Phase:** Phase 4 - Authentication Layer (In Progress)  
+**Current Phase:** Phase 5 - Base HTTP Client (In Progress)  
 **Phase 0 Status:** ✅ COMPLETED (2026-01-16)
 **Phase 1 Status:** ✅ COMPLETED (2026-01-18)
 **Phase 2 Status:** ✅ COMPLETED (2026-01-18)
@@ -17,6 +17,8 @@
 **Phase 3.8 Status:** ✅ COMPLETED (2026-01-18) - Warehouse Models
 **Phase 3.9 Status:** ✅ COMPLETED (2026-01-19) - Employee/User Models
 **Phase 4.1 Status:** ✅ COMPLETED (2026-01-19) - API Key Authentication
+**Phase 4.2 Status:** ✅ COMPLETED (2026-01-19) - OAuth Token Flow
+**Phase 5.1 Status:** ✅ COMPLETED (2026-01-19) - Synchronous HTTP Client
 
 ---
 
@@ -402,16 +404,64 @@ tests/async_/test_async_api_key_auth.py::TestAPIKeyAuthFromEnv - 6 tests
 Coverage: 97% for sync/auth.py and async_/auth.py
 ```
 
-#### ⏳ Phase 4.2: OAuth Token Flow (NEXT)
+#### ✅ Phase 4.2: OAuth Token Flow (COMPLETED - 2026-01-19)
+
+**Accomplishments:**
+- ✅ OAuth 1.0a token acquisition flow implemented
+- ✅ OAuth 2.0 Authorization Code flow implemented
+- ✅ Token refresh functionality implemented
+- ✅ Token storage abstraction (MemoryTokenStore, FileTokenStore)
+- ✅ OAuth1Auth and OAuth2Auth classes for sync/async
+- ✅ All tests passing (96 tests for auth modules)
+
+---
+
+#### ✅ Phase 5.1: Synchronous HTTP Client (COMPLETED - 2026-01-19)
+
+**Accomplishments:**
+- ✅ Created base HTTP client (`src/wfirma/sync/client.py`)
+- ✅ `WFirmaClient` class with full API communication support
+- ✅ Support for API Key and OAuth2 authentication
+- ✅ GET and POST request methods
+- ✅ JSON and XML format support (get_json, get_xml, post_json, post_xml)
+- ✅ Automatic company_id injection for multi-company accounts
+- ✅ Comprehensive error handling based on wFirma status codes:
+  - AUTH, AUTH FAILED LIMIT WAIT 5 MINUTES → AuthenticationError
+  - DENIED SCOPE REQUESTED, ACCESS DENIED → AuthenticationError
+  - NOT FOUND, ACTION NOT FOUND → ResourceNotFoundError
+  - INPUT ERROR → BadRequestError
+  - ERROR → ValidationError
+  - FATAL → ServerError
+  - OUT OF SERVICE, SNAPSHOT LOCK → ServiceUnavailableError
+  - TOTAL REQUESTS LIMIT EXCEEDED, TOTAL EXECUTION TIME LIMIT EXCEEDED → RateLimitError
+- ✅ HTTP status code handling (429, 500, 503)
+- ✅ Network error handling (TimeoutError, ConnectionError)
+- ✅ Context manager support
+- ✅ OAuth2 Bearer token header support
+- ✅ oauth_version=2 parameter for OAuth2
+- ✅ 35 tests passing with 87% coverage for client.py
+- ✅ All code passes ruff lint and mypy type checks
+- ✅ Exported via `wfirma.sync` module
+
+**Test Results:**
+```
+tests/sync/test_client.py::TestWFirmaClientInitialization - 7 tests
+tests/sync/test_client.py::TestWFirmaClientHTTPMethods - 6 tests
+tests/sync/test_client.py::TestWFirmaClientErrorHandling - 14 tests
+tests/sync/test_client.py::TestWFirmaClientFormatHandling - 4 tests
+tests/sync/test_client.py::TestWFirmaClientContextManager - 2 tests
+tests/sync/test_client.py::TestWFirmaClientOAuth2Integration - 2 tests
+Coverage: 87% for sync/client.py
+```
+
+#### ⏳ Phase 5.2: Asynchronous HTTP Client (NEXT)
 
 **Pending Tasks:**
-- ⏳ Implement OAuth 1.0a token acquisition flow
-- ⏳ Implement OAuth 2.0 Authorization Code flow
-- ⏳ Token refresh functionality
-- ⏳ Token storage abstraction
+- ⏳ Create async client (`src/wfirma/async_/client.py`)
+- ⏳ Write tests for async client (`tests/async_/test_client.py`)
 
-**Total Project Tests:** 393 (all passing)
-**Total Coverage:** 99%
+**Total Project Tests:** 574 (all passing)
+**Total Coverage:** 94%
 
 ---
 
@@ -419,8 +469,8 @@ Coverage: 97% for sync/auth.py and async_/auth.py
 
 - ✅ Phase 2: Core Infrastructure (exceptions, config)
 - ✅ Phase 3: Data Models (Pydantic with pydantic-xml) - **COMPLETED**
-- ⏳ Phase 4: Authentication Layer - **IN PROGRESS**
-- ⏳ Phase 5: Base HTTP Client
+- ✅ Phase 4: Authentication Layer - **COMPLETED**
+- ⏳ Phase 5: Base HTTP Client - **IN PROGRESS**
 - ⏳ Phase 6-12: Resource Implementations
 - ⏳ Phase 13: Public API & Convenience Features
 - ⏳ Phase 14: Documentation
@@ -472,8 +522,8 @@ python-wfirma/
 
 | Metric | Target | Current | Status |
 |--------|--------|---------|--------|
-| Test Coverage | ≥90% | 99% | ✅ |
-| Passing Tests | 100% | 100% (393/393) | ✅ |
+| Test Coverage | ≥90% | 94% | ✅ |
+| Passing Tests | 100% | 100% (574/574) | ✅ |
 | Linting Errors | 0 | 0 | ✅ |
 | Type Errors | 0 | 0 | ✅ |
 | Documentation | Complete | Initialized | 🚧 |
@@ -533,4 +583,3 @@ cd docs && uv run sphinx-build -b html . _build/html
 ---
 
 **Ready for Phase 1!** 🚀
-

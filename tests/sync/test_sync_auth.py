@@ -382,7 +382,7 @@ class TestOAuth2Auth:
 
 
 class TestOAuth1Auth:
-    # AICOMPLETE: OAuth1 sync flow (request/access token) - ready for review
+    # AICOMPLETE: OAuth1 sync flow basics (request/access token, auth URL, headers) - ready for review
 
     def setup_method(self) -> None:
         self.store = MemoryTokenStore()
@@ -448,3 +448,47 @@ class TestOAuth1Auth:
 
         with pytest.raises(ValidationError):
             auth._parse_oauth1_response("invalid=true")
+
+    def test_get_headers_contains_expected_authorization_header(self) -> None:
+        auth = OAuth1Auth(
+            consumer_key="ck",
+            consumer_secret="cs",
+            scope="invoices",
+            callback_url=None,
+            token_store=self.store,
+        )
+        self.store.set("default", OAuthToken(access_token="token", refresh_token="secret"))
+
+        headers = auth.get_headers(nonce="nonce", timestamp=123)
+
+        assert headers["Authorization"].startswith("OAuth ")
+        assert 'oauth_consumer_key="ck"' in headers["Authorization"]
+        assert 'oauth_token="token"' in headers["Authorization"]
+        assert 'oauth_signature="cs%26secret"' in headers["Authorization"]
+        assert 'oauth_timestamp="123"' in headers["Authorization"]
+        assert 'oauth_nonce="nonce"' in headers["Authorization"]
+
+    def test_get_headers_raises_validation_error_when_token_secret_missing(self) -> None:
+        auth = OAuth1Auth(
+            consumer_key="ck",
+            consumer_secret="cs",
+            scope="invoices",
+            callback_url=None,
+            token_store=self.store,
+        )
+        self.store.set("default", OAuthToken(access_token="token", refresh_token=None))
+
+        with pytest.raises(ValidationError):
+            auth.get_headers(nonce="nonce", timestamp=123)
+
+    def test_get_headers_raises_when_token_missing(self) -> None:
+        auth = OAuth1Auth(
+            consumer_key="ck",
+            consumer_secret="cs",
+            scope="invoices",
+            callback_url=None,
+            token_store=self.store,
+        )
+
+        with pytest.raises(MissingConfigurationError):
+            auth.get_headers(nonce="nonce", timestamp=123)

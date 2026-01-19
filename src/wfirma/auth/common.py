@@ -7,7 +7,9 @@ from __future__ import annotations
 
 import json
 import os
+import secrets
 import tempfile
+import time
 from dataclasses import dataclass
 from datetime import datetime, timedelta
 from pathlib import Path
@@ -292,6 +294,87 @@ def sign_oauth1_plaintext(*, consumer_secret: str, token_secret: str | None) -> 
     return f"{encoded_consumer}&{encoded_token}"
 
 
+def _validate_non_empty_str(value: str, field_name: str) -> None:
+    if not isinstance(value, str) or not value:
+        raise ValidationError(f"Field '{field_name}' must be a non-empty string.")
+
+
+def build_oauth1_authorization_header(
+    *,
+    consumer_key: str,
+    consumer_secret: str,
+    token: OAuthToken,
+    nonce: str | None = None,
+    timestamp: int | None = None,
+    realm: str | None = None,
+) -> str:
+    """Build OAuth 1.0a Authorization header value.
+
+    This helper builds the value for the HTTP ``Authorization`` header.
+
+    wFirma uses OAuth 1.0a with the ``PLAINTEXT`` signature method.
+
+    Args:
+        consumer_key: OAuth consumer key.
+        consumer_secret: OAuth consumer secret.
+        token: OAuth token container. ``token.access_token`` is used as ``oauth_token``.
+            ``token.refresh_token`` must contain the OAuth1 token secret.
+        nonce: OAuth nonce. When omitted, a random nonce is generated.
+        timestamp: OAuth timestamp (seconds since epoch). When omitted, current time is used.
+        realm: Optional realm parameter.
+
+    Returns:
+        A header value starting with ``OAuth ``.
+
+    Raises:
+        ValidationError: When inputs are invalid.
+    """
+
+    _validate_non_empty_str(consumer_key, "consumer_key")
+    _validate_non_empty_str(consumer_secret, "consumer_secret")
+    if not isinstance(token, OAuthToken):
+        raise ValidationError("Field 'token' must be an OAuthToken instance.")
+
+    token_secret = token.refresh_token
+    if not isinstance(token_secret, str) or not token_secret:
+        raise ValidationError("OAuth1 token is missing required token secret.")
+
+    resolved_nonce = nonce if nonce is not None else secrets.token_urlsafe(16)
+    _validate_non_empty_str(resolved_nonce, "nonce")
+
+    resolved_timestamp = int(time.time()) if timestamp is None else timestamp
+    if not isinstance(resolved_timestamp, int) or resolved_timestamp <= 0:
+        raise ValidationError("Field 'timestamp' must be a positive integer.")
+
+    if realm is not None:
+        _validate_non_empty_str(realm, "realm")
+
+    signature = sign_oauth1_plaintext(consumer_secret=consumer_secret, token_secret=token_secret)
+
+    # sign_oauth1_plaintext() already percent-encodes both secret parts; for the header
+    # we additionally need to encode the '&' delimiter.
+    signature_for_header = signature.replace("&", "%26")
+
+    items: list[tuple[str, str]] = []
+    if realm is not None:
+        items.append(("realm", oauth_percent_encode(realm)))
+
+    items.extend(
+        [
+            ("oauth_consumer_key", oauth_percent_encode(consumer_key)),
+            ("oauth_token", oauth_percent_encode(token.access_token)),
+            ("oauth_signature_method", "PLAINTEXT"),
+            ("oauth_signature", signature_for_header),
+            ("oauth_timestamp", str(resolved_timestamp)),
+            ("oauth_nonce", oauth_percent_encode(resolved_nonce)),
+            ("oauth_version", "1.0"),
+        ]
+    )
+
+    rendered = ", ".join(f'{key}="{value}"' for key, value in items)
+    return f"OAuth {rendered}"
+
+
 __all__ = [
     "TokenStore",
     "MemoryTokenStore",
@@ -299,4 +382,5 @@ __all__ = [
     "OAuthToken",
     "oauth_percent_encode",
     "sign_oauth1_plaintext",
+    "build_oauth1_authorization_header",
 ]

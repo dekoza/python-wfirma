@@ -24,6 +24,7 @@ from wfirma.auth.common import (
     FileTokenStore,
     MemoryTokenStore,
     TokenStore,
+    build_oauth1_authorization_header,
 )
 from wfirma.auth.common import (
     OAuthToken as SharedOAuthToken,
@@ -476,6 +477,44 @@ class OAuth1Auth:
         if token is None:
             raise MissingConfigurationError("OAuth1 token is not available in the token store.")
         return token
+
+    def get_headers(
+        self,
+        *,
+        nonce: str | None = None,
+        timestamp: int | None = None,
+        realm: str | None = None,
+    ) -> dict[str, str]:
+        """Return HTTP headers for OAuth1 authenticated requests.
+
+        This method is synchronous because it only builds a header value.
+
+        Args:
+            nonce: Optional nonce override (useful for deterministic tests).
+            timestamp: Optional timestamp override (useful for deterministic tests).
+            realm: Optional realm parameter.
+
+        Returns:
+            Dictionary containing the ``Authorization`` header.
+
+        Raises:
+            MissingConfigurationError: When token is missing from the token store.
+            ValidationError: When token is invalid (e.g. missing token secret).
+        """
+
+        token = self.token_store.get(self.store_key)
+        if token is None:
+            raise MissingConfigurationError("OAuth1 token is not available in the token store.")
+
+        authorization = build_oauth1_authorization_header(
+            consumer_key=self.consumer_key,
+            consumer_secret=self.consumer_secret,
+            token=token,
+            nonce=nonce,
+            timestamp=timestamp,
+            realm=realm,
+        )
+        return {"Authorization": authorization}
 
     @staticmethod
     def _parse_oauth1_response(payload: str) -> OAuthToken:
