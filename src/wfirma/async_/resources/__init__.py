@@ -11,6 +11,7 @@ from wfirma.async_.resources.interests import InterestsResource
 from wfirma.async_.resources.invoice_descriptions import InvoiceDescriptionsResource
 from wfirma.async_.resources.invoices import InvoicesResource
 from wfirma.async_.resources.ledger_accountant_years import LedgerAccountantYearsResource
+from wfirma.async_.resources.ledger_operation_schemas import LedgerOperationSchemasResource
 from wfirma.async_.resources.payments import PaymentsResource
 from wfirma.async_.resources.tags import TagsResource
 from wfirma.async_.resources.warehouse_documents_pw import WarehouseDocumentPWResource
@@ -27,6 +28,7 @@ __all__ = [
     "InvoicesResource",
     "InvoiceDescriptionsResource",
     "LedgerAccountantYearsResource",
+    "LedgerOperationSchemasResource",
     "PaymentsResource",
     "TagsResource",
     "WarehouseDocumentPWResource",

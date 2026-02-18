@@ -11,6 +11,7 @@ from wfirma.sync.resources.interests import InterestsResource
 from wfirma.sync.resources.invoice_descriptions import InvoiceDescriptionsResource
 from wfirma.sync.resources.invoices import InvoicesResource
 from wfirma.sync.resources.ledger_accountant_years import LedgerAccountantYearsResource
+from wfirma.sync.resources.ledger_operation_schemas import LedgerOperationSchemasResource
 from wfirma.sync.resources.payments import PaymentsResource
 from wfirma.sync.resources.tags import TagsResource
 from wfirma.sync.resources.warehouse_documents_pw import WarehouseDocumentPWResource
@@ -27,6 +28,7 @@ __all__ = [
     "InvoicesResource",
     "InvoiceDescriptionsResource",
     "LedgerAccountantYearsResource",
+    "LedgerOperationSchemasResource",
     "PaymentsResource",
     "TagsResource",
     "WarehouseDocumentPWResource",

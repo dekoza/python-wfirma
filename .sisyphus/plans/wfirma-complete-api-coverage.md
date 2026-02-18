@@ -586,7 +586,7 @@ Max Concurrent: 15 (Wave 2)
 
 ---
 
-- [ ] 6. Implement declaration_countries resource (find, get)
+- [x] 6. Implement declaration_countries resource (find, get)
 
   **What to do**:
   - Create `DeclarationCountriesResource` with `find()` → `list[dict]` and `get(declaration_country_id: int)` → `dict`
@@ -618,7 +618,7 @@ Max Concurrent: 15 (Wave 2)
 
 ---
 
-- [ ] 7. Implement expenses resource (find, get)
+- [x] 7. Implement expenses resource (find, get)
 
   **What to do**:
   - Create `ExpensesResource` with `find()` and `get(expense_id: int)`
@@ -639,7 +639,7 @@ Max Concurrent: 15 (Wave 2)
 
 ---
 
-- [ ] 8. Implement interests resource (find)
+- [x] 8. Implement interests resource (find)
 
   **What to do**:
   - Create `InterestsResource` with only `find()` → `list[dict]`
@@ -658,7 +658,7 @@ Max Concurrent: 15 (Wave 2)
 
 ---
 
-- [ ] 9. Implement invoice_descriptions resource (find, get)
+- [x] 9. Implement invoice_descriptions resource (find, get)
 
   **What to do**:
   - Create `InvoiceDescriptionsResource` with `find()` and `get(invoice_description_id: int)`
@@ -675,7 +675,7 @@ Max Concurrent: 15 (Wave 2)
 
 ---
 
-- [ ] 10. Implement ledger_accountant_years resource (find, get)
+- [x] 10. Implement ledger_accountant_years resource (find, get)
 
   **What to do**:
   - Create `LedgerAccountantYearsResource` with `find()` and `get(ledger_accountant_year_id: int)`
@@ -693,7 +693,7 @@ Max Concurrent: 15 (Wave 2)
 
 ---
 
-- [ ] 11. Implement ledger_operation_schemas resource (find, get)
+- [x] 11. Implement ledger_operation_schemas resource (find, get)
 
   **What to do**:
   - Create `LedgerOperationSchemasResource` with `find()` and `get(schema_id: int)`

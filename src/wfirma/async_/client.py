@@ -327,6 +327,21 @@ class WFirmaClient:
             self._resources["interests"] = resource
         return resource
 
+    @property
+    def ledger_operation_schemas(self) -> Any:
+        """Convenience accessor for ledger operation schemas endpoints.
+
+        Returns:
+            LedgerOperationSchemasResource instance bound to this client.
+        """
+        # Local import to avoid circular dependency between client and resources.
+        from wfirma.async_.resources.ledger_operation_schemas import LedgerOperationSchemasResource
+
+        resource = self._resources.get("ledger_operation_schemas")
+        if resource is None:
+            resource = LedgerOperationSchemasResource(self)
+            self._resources["ledger_operation_schemas"] = resource
+        return resource
 
     async def __aenter__(self) -> WFirmaClient:
         """Enter the async context manager."""
