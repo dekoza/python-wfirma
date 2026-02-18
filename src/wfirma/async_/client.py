@@ -249,6 +249,85 @@ class WFirmaClient:
             self._resources["company_packs"] = resource
         return resource
 
+    @property
+    def expenses(self) -> Any:
+        """Convenience accessor for expenses endpoints.
+
+        Returns:
+            ExpensesResource instance bound to this client.
+        """
+        from wfirma.async_.resources.expenses import ExpensesResource
+
+        resource = self._resources.get("expenses")
+        if resource is None:
+            resource = ExpensesResource(self)
+            self._resources["expenses"] = resource
+        return resource
+
+    @property
+    def invoice_descriptions(self) -> Any:
+        """Convenience accessor for invoice descriptions endpoints.
+
+        Returns:
+            InvoiceDescriptionsResource instance bound to this client.
+        """
+        # Local import to avoid circular dependency between client and resources.
+        from wfirma.async_.resources.invoice_descriptions import InvoiceDescriptionsResource
+
+        resource = self._resources.get("invoice_descriptions")
+        if resource is None:
+            resource = InvoiceDescriptionsResource(self)
+            self._resources["invoice_descriptions"] = resource
+        return resource
+
+    @property
+    def declaration_countries(self) -> Any:
+        """Convenience accessor for declaration countries endpoints.
+
+        Returns:
+            DeclarationCountriesResource instance bound to this client.
+        """
+        from wfirma.async_.resources.declaration_countries import DeclarationCountriesResource
+
+        resource = self._resources.get("declaration_countries")
+        if resource is None:
+            resource = DeclarationCountriesResource(self)
+            self._resources["declaration_countries"] = resource
+        return resource
+
+    @property
+    def ledger_accountant_years(self) -> Any:
+        """Convenience accessor for ledger accountant years endpoints.
+
+        Returns:
+            LedgerAccountantYearsResource instance bound to this client.
+        """
+        # Local import to avoid circular dependency between client and resources.
+        from wfirma.async_.resources.ledger_accountant_years import LedgerAccountantYearsResource
+
+        resource = self._resources.get("ledger_accountant_years")
+        if resource is None:
+            resource = LedgerAccountantYearsResource(self)
+            self._resources["ledger_accountant_years"] = resource
+        return resource
+
+    @property
+    def interests(self) -> Any:
+        """Convenience accessor for interests endpoints.
+
+        Returns:
+            InterestsResource instance bound to this client.
+        """
+        # Local import to avoid circular dependency between client and resources.
+        from wfirma.async_.resources.interests import InterestsResource
+
+        resource = self._resources.get("interests")
+        if resource is None:
+            resource = InterestsResource(self)
+            self._resources["interests"] = resource
+        return resource
+
+
     async def __aenter__(self) -> WFirmaClient:
         """Enter the async context manager."""
         return self
