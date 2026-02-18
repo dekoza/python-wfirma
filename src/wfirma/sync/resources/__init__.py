@@ -12,8 +12,11 @@ from wfirma.sync.resources.invoice_descriptions import InvoiceDescriptionsResour
 from wfirma.sync.resources.invoices import InvoicesResource
 from wfirma.sync.resources.ledger_accountant_years import LedgerAccountantYearsResource
 from wfirma.sync.resources.ledger_operation_schemas import LedgerOperationSchemasResource
+from wfirma.sync.resources.payment_cashboxes import PaymentCashboxesResource
 from wfirma.sync.resources.payments import PaymentsResource
 from wfirma.sync.resources.tags import TagsResource
+from wfirma.sync.resources.translation_languages import TranslationLanguagesResource
+from wfirma.sync.resources.vat_codes import VatCodesResource
 from wfirma.sync.resources.warehouse_documents_pw import WarehouseDocumentPWResource
 
 __all__ = [
@@ -29,7 +32,10 @@ __all__ = [
     "InvoiceDescriptionsResource",
     "LedgerAccountantYearsResource",
     "LedgerOperationSchemasResource",
+    "PaymentCashboxesResource",
     "PaymentsResource",
     "TagsResource",
+    "TranslationLanguagesResource",
+    "VatCodesResource",
     "WarehouseDocumentPWResource",
 ]

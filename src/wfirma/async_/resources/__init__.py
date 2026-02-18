@@ -12,9 +12,13 @@ from wfirma.async_.resources.invoice_descriptions import InvoiceDescriptionsReso
 from wfirma.async_.resources.invoices import InvoicesResource
 from wfirma.async_.resources.ledger_accountant_years import LedgerAccountantYearsResource
 from wfirma.async_.resources.ledger_operation_schemas import LedgerOperationSchemasResource
+from wfirma.async_.resources.payment_cashboxes import PaymentCashboxesResource
 from wfirma.async_.resources.payments import PaymentsResource
 from wfirma.async_.resources.tags import TagsResource
+from wfirma.async_.resources.translation_languages import TranslationLanguagesResource
+from wfirma.async_.resources.vat_codes import VatCodesResource
 from wfirma.async_.resources.warehouse_documents_pw import WarehouseDocumentPWResource
+from wfirma.async_.resources.warehouses import WarehousesResource
 
 __all__ = [
     "CompanyAccountsResource",
@@ -29,7 +33,11 @@ __all__ = [
     "InvoiceDescriptionsResource",
     "LedgerAccountantYearsResource",
     "LedgerOperationSchemasResource",
+    "PaymentCashboxesResource",
     "PaymentsResource",
     "TagsResource",
+    "TranslationLanguagesResource",
+    "VatCodesResource",
     "WarehouseDocumentPWResource",
+    "WarehousesResource",
 ]

@@ -218,6 +218,38 @@ class WFirmaClient:
         return resource
 
     @property
+    def translation_languages(self) -> Any:
+        """Convenience accessor for translation languages endpoints.
+
+        Returns:
+            TranslationLanguagesResource instance bound to this client.
+        """
+        # Local import to avoid circular dependency between client and resources.
+        from wfirma.async_.resources.translation_languages import TranslationLanguagesResource
+
+        resource = self._resources.get("translation_languages")
+        if resource is None:
+            resource = TranslationLanguagesResource(self)
+            self._resources["translation_languages"] = resource
+        return resource
+
+    @property
+    def vat_codes(self) -> Any:
+        """Convenience accessor for VAT codes endpoints.
+
+        Returns:
+            VatCodesResource instance bound to this client.
+        """
+        # Local import to avoid circular dependency between client and resources.
+        from wfirma.async_.resources.vat_codes import VatCodesResource
+
+        resource = self._resources.get("vat_codes")
+        if resource is None:
+            resource = VatCodesResource(self)
+            self._resources["vat_codes"] = resource
+        return resource
+
+    @property
     def company_accounts(self) -> Any:
         """Convenience accessor for company accounts endpoints.
 
@@ -341,6 +373,21 @@ class WFirmaClient:
         if resource is None:
             resource = LedgerOperationSchemasResource(self)
             self._resources["ledger_operation_schemas"] = resource
+        return resource
+
+    @property
+    def payment_cashboxes(self) -> Any:
+        """Convenience accessor for payment_cashboxes endpoints.
+
+        Returns:
+            PaymentCashboxesResource instance bound to this client.
+        """
+        from wfirma.async_.resources.payment_cashboxes import PaymentCashboxesResource
+
+        resource = self._resources.get("payment_cashboxes")
+        if resource is None:
+            resource = PaymentCashboxesResource(self)
+            self._resources["payment_cashboxes"] = resource
         return resource
 
     async def __aenter__(self) -> WFirmaClient:
