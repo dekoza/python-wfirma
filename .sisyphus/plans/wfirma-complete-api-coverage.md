@@ -446,7 +446,7 @@ Max Concurrent: 15 (Wave 2)
 >
 > **EVERY executor MUST**: Read `docs/api_spec.json` to find the exact container_key and object_key for their resource before implementing `_extract_*` methods.
 
-- [ ] 4. Implement company_accounts resource (find, get)
+- [x] 4. Implement company_accounts resource (find, get)
 
   **What to do**:
   - Create sync resource class `CompanyAccountsResource` with `find()` → `list[dict]` and `get(company_account_id: int)` → `dict`

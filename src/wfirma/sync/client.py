@@ -212,6 +212,22 @@ class WFirmaClient:
             self._resources["tags"] = resource
         return resource
 
+    @property
+    def company_accounts(self) -> Any:
+        """Convenience accessor for company accounts endpoints.
+
+        Returns:
+            CompanyAccountsResource instance bound to this client.
+        """
+        # Local import to avoid circular dependency between client and resources.
+        from wfirma.sync.resources.company_accounts import CompanyAccountsResource
+
+        resource = self._resources.get("company_accounts")
+        if resource is None:
+            resource = CompanyAccountsResource(self)
+            self._resources["company_accounts"] = resource
+        return resource
+
     def __enter__(self) -> WFirmaClient:
         """Enter the context manager."""
         return self
@@ -592,7 +608,6 @@ class WFirmaClient:
         params["outputFormat"] = "json"
         return self.patch(path, json=data, params=params)
 
-
     def delete(
         self,
         path: str,
@@ -641,7 +656,6 @@ class WFirmaClient:
         params = params.copy() if params else {}
         params["outputFormat"] = "json"
         return self.delete(path, params=params)
-
 
     def get_binary(
         self,
@@ -704,6 +718,7 @@ class WFirmaClient:
             raise ConnectionError(f"Network error: {err}") from err
 
         return self._handle_binary_response(response)
+
 
 __all__ = [
     "WFirmaClient",

@@ -312,3 +312,74 @@ Saved to: `.sisyphus/evidence/task-3-invoice-methods-complete.txt`
 ### Next Steps
 Task 3 (Invoice endpoints) is now complete. Ready to move to Wave 2 (Tasks 4-18: read-only resources).
 
+
+## Task 4: company_accounts Resource (COMPLETE - 2026-02-18)
+
+### Implementation Summary
+Implemented `CompanyAccountsResource` (sync + async) with read-only `find()` and `get()` methods following the exact Tags resource pattern. All 10 tests (6 resource + 4 client property) pass with 100% coverage.
+
+**Key deviation avoided**: Async client property initially missing `@property` decorator (line 220 in async_/client.py). This caused test_returns_resource to fail initially - the property was returning a descriptor object instead of the resource instance. Fixed by adding the decorator.
+
+### Container/Object Keys Confirmed (from docs/api_spec.json)
+- Container: `company_accounts`
+- Object: `company_account` (singular)
+- Endpoints:
+  - `GET /company_accounts/find` → list endpoint
+  - `GET /company_accounts/get/{companyAccountId}` → single endpoint
+
+### File Structure (6 new files + 4 modifications)
+1. ✅ `src/wfirma/sync/resources/company_accounts.py` (19 statements, 100% coverage)
+2. ✅ `src/wfirma/async_/resources/company_accounts.py` (19 statements, 100% coverage)
+3. ✅ `tests/sync/resources/test_sync_company_accounts_resource.py` (3 tests)
+4. ✅ `tests/async_/resources/test_async_company_accounts_resource.py` (3 async tests)
+5. ✅ `tests/sync/test_client_company_accounts_property.py` (2 tests)
+6. ✅ `tests/async_/test_client_company_accounts_property.py` (2 tests)
+7. ✅ Modified: `src/wfirma/sync/client.py` (added company_accounts property after tags)
+8. ✅ Modified: `src/wfirma/async_/client.py` (added company_accounts property with @property decorator)
+9. ✅ Modified: `src/wfirma/sync/resources/__init__.py` (added import + export)
+10. ✅ Modified: `src/wfirma/async_/resources/__init__.py` (added import + export)
+
+### Resource Implementation Pattern (copied from Tags)
+Both sync and async resources:
+- `find()` → `extract_object_list_payloads(data, "company_accounts", "company_account")` → returns `list[dict[str, Any]]`
+- `get(company_account_id)` → `extract_single_object_payload(data, "company_accounts", "company_account")` → returns `dict[str, Any]`
+- Static helper `_extract_company_account_payload()` for payload extraction
+- No write operations (API is read-only for company_accounts)
+
+### Client Property Pattern
+Lazy initialization with caching via `self._resources` dict:
+```python
+@property
+def company_accounts(self) -> Any:
+    resource = self._resources.get("company_accounts")
+    if resource is None:
+        from wfirma.{sync|async_}.resources.company_accounts import CompanyAccountsResource
+        resource = CompanyAccountsResource(self)
+        self._resources["company_accounts"] = resource
+    return resource
+```
+
+**Critical**: Must include `@property` decorator on async client property too!
+
+### Test Results
+- ✅ 10/10 tests pass (3 sync resource + 3 async resource + 2 sync property + 2 async property)
+- ✅ 100% coverage on both resource files
+- ✅ Zero mypy errors
+- ✅ Zero ruff lint errors
+- Evidence: `.sisyphus/evidence/task-4-company-accounts-complete.txt`
+
+### Verification Checklist
+- ✅ All 10 tests pass
+- ✅ `from wfirma.sync.resources import CompanyAccountsResource` works
+- ✅ `from wfirma.async_.resources import CompanyAccountsResource` works
+- ✅ Client property is cached (test verifies `first is second`)
+- ✅ Empty result handling works (find with `{}` returns `[]`)
+- ✅ 0 ruff errors, 0 mypy errors
+- ✅ Evidence saved in `.sisyphus/evidence/task-4-company-accounts-complete.txt`
+
+### Lessons Learned
+1. **@property decorator is mandatory** for properties in async clients too (not just descriptors)
+2. **Container/Object keys must be singular** in extract_* functions ("company_account" not "company_accounts")
+3. **Empty list handling**: When container dict is empty `{}`, `extract_object_list_payloads()` correctly returns empty list
+4. **Caching validation**: Test `assert first is second` verifies object identity, not just equality
+5. **Test structure**: Resource tests (mock HTTP) separate from property tests (mock client state)
