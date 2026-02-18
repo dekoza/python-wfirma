@@ -710,7 +710,7 @@ Max Concurrent: 15 (Wave 2)
 
 ---
 
-- [ ] 12. Implement payment_cashboxes resource (find, get)
+- [x] 12. Implement payment_cashboxes resource (find, get)
 
   **What to do**:
   - Create `PaymentCashboxesResource` with `find()` and `get(payment_cashbox_id: int)`
@@ -727,7 +727,7 @@ Max Concurrent: 15 (Wave 2)
 
 ---
 
-- [ ] 13. Implement translation_languages resource (find, get)
+- [x] 13. Implement translation_languages resource (find, get)
 
   **What to do**:
   - Create `TranslationLanguagesResource` with `find()` and `get(translation_language_id: int)`
@@ -788,7 +788,7 @@ Max Concurrent: 15 (Wave 2)
 
 ---
 
-- [ ] 16. Implement vat_codes resource (find, get)
+- [x] 16. Implement vat_codes resource (find, get)
 
   **What to do**:
   - Create `VatCodesResource` with `find()` and `get(vat_code_id: int)`
@@ -805,7 +805,7 @@ Max Concurrent: 15 (Wave 2)
 
 ---
 
-- [ ] 17. Implement vehicle_run_rates resource (find)
+- [x] 17. Implement vehicle_run_rates resource (find)
 
   **What to do**:
   - Create `VehicleRunRatesResource` with only `find()` → `list[dict]`
@@ -822,7 +822,7 @@ Max Concurrent: 15 (Wave 2)
 
 ---
 
-- [ ] 18. Implement warehouses resource (find, get)
+- [x] 18. Implement warehouses resource (find, get)
 
   **What to do**:
   - Create `WarehousesResource` with `find()` and `get(warehouse_id: int)`

@@ -695,3 +695,110 @@ def translation_languages(self) -> Any:
 **Solution**: Direct file read/write with string replacement (Edit tool) to insert between tags and vat_codes properties  
 **Note**: sed/bash script insertion failed due to complex multi-line insertion with indentation; direct string replacement proved most reliable
 
+## Task 12: PaymentCashboxesResource (Read-Only API Resource)
+
+**Completion Date**: 2026-02-18 14:35:00 UTC  
+**Commit**: 6a05910 — "feat: add read-only PaymentCashboxesResource with find/get methods"
+
+### Implementation Pattern (Tags Pattern Replication)
+- **Pattern**: Exact mirror of Tags resource — read-only with `find()` and `get()` methods
+- **Resource class**: 19 statements in both sync and async implementations
+- **Return types**: Raw `dict[str, Any]` (no Pydantic models)
+- **No add/edit/delete**: This is read-only API access
+
+### File Structure
+```
+src/wfirma/sync/resources/payment_cashboxes.py       (19 statements)
+src/wfirma/async_/resources/payment_cashboxes.py     (19 statements)
+tests/sync/resources/test_sync_payment_cashboxes_resource.py           (3 tests)
+tests/async_/resources/test_async_payment_cashboxes_resource.py        (3 tests)
+tests/sync/test_client_payment_cashboxes_property.py                   (2 tests)
+tests/async_/test_client_payment_cashboxes_property.py                 (2 tests)
+```
+
+### API Endpoints
+- `GET /payment_cashboxes/find` → returns list of payment cashbox dicts
+- `GET /payment_cashboxes/get/{paymentCashboxId}` → returns single payment cashbox dict
+- Container key: `"payment_cashboxes"` (plural)
+- Object key: `"payment_cashbox"` (singular)
+
+### Client Integration
+- **Lazy Initialization**: Both sync and async clients have `payment_cashboxes` property
+- **Caching**: Resources cached in `self._resources` dict (verified via identity check in tests)
+- **Property Signature**: Returns `Any` type (matches existing resource properties)
+- **Local Import**: Must import within property to avoid circular dependency
+
+### Implementation Details
+```python
+# Resource methods
+def find(self) -> list[dict[str, Any]]:
+    """Get all payment cashboxes."""
+    # Uses extract_object_list_payloads() from _payloads module
+    
+def get(self, payment_cashbox_id: int) -> dict[str, Any]:
+    """Get single payment cashbox by ID."""
+    # Uses extract_single_object_payload() from _payloads module
+```
+
+### Test Coverage (10 total)
+**Sync Resource Tests**:
+- `test_get_calls_expected_endpoint_and_returns_payload`: Verifies GET request and dict return
+- `test_find_calls_expected_endpoint_and_returns_list`: Verifies FIND request returns list
+- `test_find_handles_empty_result`: Verifies empty container `{}` returns `[]`
+
+**Async Resource Tests** (async mirrors):
+- Same 3 tests with `@pytest.mark.asyncio` and `await` calls
+
+**Sync Client Property Tests**:
+- `test_returns_resource_instance`: Verifies property returns PaymentCashboxesResource
+- `test_is_cached`: Verifies identity check (`assert first is second`)
+
+**Async Client Property Tests** (async mirrors):
+- Same 2 property tests for async client
+
+### Key Challenges & Solutions
+
+**Challenge 1: Client File Editing (Multiple Failures)**  
+**Problem**: Edit tool indentation issues when inserting payment_cashboxes property between properties  
+**Solution**: 
+1. First attempts with Edit tool caused malformed indentation (lines off by 1-4 spaces)
+2. Reverted both client files multiple times
+3. Final solution: Direct Python line-based insertion finding `__enter__` and `__aenter__` methods
+4. Used: `lines.insert(insert_index, new_property)` with pre-formatted multiline string
+
+**Challenge 2: Async Test Client Cleanup**  
+**Problem**: Async tests used `await client.aclose()` but method is `close()` (not aclose)  
+**Solution**: Reviewed other async resource tests, found they use `await client.close()`  
+**Applied**: Changed all 3 async test cleanup calls from `aclose()` to `close()`
+
+**Challenge 3: Package Exports (Alphabetical Order)**  
+**Problem**: Must add PaymentCashboxesResource to `__all__` lists in alphabetical order  
+**Solution**: Added between LedgerOperationSchemasResource and PaymentsResource in both sync/async `__init__.py`
+
+### Verification Results
+```
+✅ Tests: 10/10 PASS (100% success)
+✅ mypy: Success (0 errors)
+✅ ruff: All checks passed
+✅ Code coverage: 100% for payment_cashboxes resources
+✅ Syntax: Valid in both sync and async clients
+```
+
+### Key Learnings
+1. **Payload Helpers**: Use `extract_object_list_payloads()` for find() and `extract_single_object_payload()` for get()
+2. **Empty Handling**: Empty container `{}` must be handled — find() returns `[]`, get() raises 404
+3. **Direct Line Insertion**: When Edit tool has indentation issues, direct Python line manipulation is more reliable
+4. **Test Cleanup**: Async tests use `await client.close()`, NOT `aclose()` or unadorned `close()`
+5. **Alphabetical Exports**: New resources must be added to `__all__` in alphabetical order
+
+### Implementation Time
+- Resource implementation: ~5 minutes
+- Tests (10 files): Already created in previous session
+- Client properties: ~30 minutes (due to indentation challenges)
+- Final verification: ~5 minutes
+- **Total**: ~40 minutes (including troubleshooting)
+
+### Commits
+- **Main commit**: 6a05910 — "feat: add read-only PaymentCashboxesResource with find/get methods"
+  - 10 files changed, 601 insertions
+  - Sync/async resources, tests, and client integration
