@@ -355,6 +355,16 @@ class WFirmaClient:
         # Unknown error code
         raise APIError(f"API error: {code}")
 
+    def _handle_binary_response(self, response: httpx.Response) -> bytes:
+        if response.status_code == 429:
+            raise RateLimitError("Rate limit exceeded (HTTP 429).")
+        if response.status_code >= 500:
+            if response.status_code == 503:
+                raise ServiceUnavailableError(f"Service unavailable (HTTP {response.status_code}).")
+            raise ServerError(f"Server error (HTTP {response.status_code}).")
+
+        return response.content
+
     async def get(
         self,
         path: str,
@@ -523,6 +533,75 @@ class WFirmaClient:
         # Otherwise return the JSON representation (shouldn't happen normally)
         return str(result)
 
+    async def patch(
+        self,
+        path: str,
+        *,
+        json: dict[str, Any] | None = None,
+        content: str | bytes | None = None,
+        content_type: str = "application/json",
+        params: dict[str, str] | None = None,
+    ) -> dict[str, Any]:
+        """Send a PATCH request to the API.
+
+        Args:
+            path: The API endpoint path.
+            json: JSON data to send (mutually exclusive with content).
+            content: Raw content to send (mutually exclusive with json).
+            content_type: Content type for raw content.
+            params: Optional query parameters.
+
+        Returns:
+            Parsed response data.
+        """
+        url = self._build_url(path)
+        headers = await self._get_auth_headers()
+        params = self._add_default_params(params)
+
+        if content is not None:
+            headers["Content-Type"] = content_type
+
+        try:
+            if json is not None:
+                response = await self._http_client.patch(
+                    url, headers=headers, json=json, params=params
+                )
+            else:
+                response = await self._http_client.patch(
+                    url, headers=headers, content=content, params=params
+                )
+        except httpx.TimeoutException as err:
+            raise TimeoutError("Request timed out.") from err
+        except httpx.ConnectError as err:
+            raise ConnectionError("Failed to connect to the server.") from err
+        except httpx.RequestError as err:
+            raise ConnectionError(f"Network error: {err}") from err
+
+        return self._handle_response(response)
+
+    async def patch_json(
+        self,
+        path: str,
+        *,
+        data: dict[str, Any],
+        params: dict[str, str] | None = None,
+    ) -> dict[str, Any]:
+        """Send a PATCH request with JSON data.
+
+        Args:
+            path: The API endpoint path.
+            data: JSON data to send.
+            params: Optional query parameters.
+
+        Returns:
+            Parsed JSON response data.
+        """
+        params = params.copy() if params else {}
+        params["inputFormat"] = "json"
+        params["outputFormat"] = "json"
+        return await self.patch(path, json=data, params=params)
+
+
     async def delete(
         self,
         path: str,
@@ -572,6 +651,68 @@ class WFirmaClient:
         params["outputFormat"] = "json"
         return await self.delete(path, params=params)
 
+
+    async def get_binary(
+        self,
+        path: str,
+        *,
+        params: dict[str, str] | None = None,
+    ) -> bytes:
+        """Send a GET request and return raw bytes.
+
+        Args:
+            path: The API endpoint path.
+            params: Optional query parameters.
+
+        Returns:
+            Raw response bytes.
+        """
+        url = self._build_url(path)
+        headers = await self._get_auth_headers()
+        params = self._add_default_params(params)
+
+        try:
+            response = await self._http_client.get(url, headers=headers, params=params)
+        except httpx.TimeoutException as err:
+            raise TimeoutError("Request timed out.") from err
+        except httpx.ConnectError as err:
+            raise ConnectionError("Failed to connect to the server.") from err
+        except httpx.RequestError as err:
+            raise ConnectionError(f"Network error: {err}") from err
+
+        return self._handle_binary_response(response)
+
+    async def post_binary(
+        self,
+        path: str,
+        *,
+        data: dict[str, Any] | None = None,
+        params: dict[str, str] | None = None,
+    ) -> bytes:
+        """Send a POST request and return raw bytes.
+
+        Args:
+            path: The API endpoint path.
+            data: JSON data to send.
+            params: Optional query parameters.
+
+        Returns:
+            Raw response bytes.
+        """
+        url = self._build_url(path)
+        headers = await self._get_auth_headers()
+        params = self._add_default_params(params)
+
+        try:
+            response = await self._http_client.post(url, headers=headers, json=data, params=params)
+        except httpx.TimeoutException as err:
+            raise TimeoutError("Request timed out.") from err
+        except httpx.ConnectError as err:
+            raise ConnectionError("Failed to connect to the server.") from err
+        except httpx.RequestError as err:
+            raise ConnectionError(f"Network error: {err}") from err
+
+        return self._handle_binary_response(response)
 
 __all__ = [
     "WFirmaClient",

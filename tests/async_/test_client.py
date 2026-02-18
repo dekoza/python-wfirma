@@ -235,6 +235,186 @@ class TestWFirmaClientHTTPMethods:
         assert "company_id=999" in str(request.url)
 
 
+    @pytest.mark.asyncio
+    @respx.mock
+    async def test_get_binary_returns_bytes(self) -> None:
+        binary_content = b"PDF content here"
+        respx.get("https://api2.wfirma.pl/invoices/download/123").mock(
+            return_value=httpx.Response(200, content=binary_content)
+        )
+
+        result = await self.client.get_binary("/invoices/download/123")
+
+        assert isinstance(result, bytes)
+        assert result == binary_content
+
+    @pytest.mark.asyncio
+    @respx.mock
+    async def test_post_binary_returns_bytes(self) -> None:
+        binary_content = b"PDF file data"
+        respx.post("https://api2.wfirma.pl/documents/generate").mock(
+            return_value=httpx.Response(200, content=binary_content)
+        )
+
+        result = await self.client.post_binary(
+            "/documents/generate",
+            data={"document_id": "123"},
+        )
+
+        assert isinstance(result, bytes)
+        assert result == binary_content
+
+    @pytest.mark.asyncio
+    @respx.mock
+    async def test_get_binary_raises_on_429(self) -> None:
+        respx.get("https://api2.wfirma.pl/invoices/download/123").mock(
+            return_value=httpx.Response(429)
+        )
+
+        with pytest.raises(RateLimitError):
+            await self.client.get_binary("/invoices/download/123")
+
+    @pytest.mark.asyncio
+    @respx.mock
+    async def test_get_binary_raises_on_503(self) -> None:
+        respx.get("https://api2.wfirma.pl/invoices/download/123").mock(
+            return_value=httpx.Response(503)
+        )
+
+        with pytest.raises(ServiceUnavailableError):
+            await self.client.get_binary("/invoices/download/123")
+
+    @pytest.mark.asyncio
+    @respx.mock
+    async def test_get_binary_raises_on_500(self) -> None:
+        respx.get("https://api2.wfirma.pl/invoices/download/123").mock(
+            return_value=httpx.Response(500)
+        )
+
+        with pytest.raises(ServerError):
+            await self.client.get_binary("/invoices/download/123")
+
+    @pytest.mark.asyncio
+    @respx.mock
+    async def test_post_binary_raises_on_429(self) -> None:
+        respx.post("https://api2.wfirma.pl/documents/generate").mock(
+            return_value=httpx.Response(429)
+        )
+
+        with pytest.raises(RateLimitError):
+            await self.client.post_binary("/documents/generate", data={"doc_id": "1"})
+
+    @pytest.mark.asyncio
+    @respx.mock
+    async def test_post_binary_raises_on_503(self) -> None:
+        respx.post("https://api2.wfirma.pl/documents/generate").mock(
+            return_value=httpx.Response(503)
+        )
+
+        with pytest.raises(ServiceUnavailableError):
+            await self.client.post_binary("/documents/generate", data={"doc_id": "1"})
+
+    @pytest.mark.asyncio
+    @respx.mock
+    async def test_post_binary_raises_on_500(self) -> None:
+        respx.post("https://api2.wfirma.pl/documents/generate").mock(
+            return_value=httpx.Response(500)
+        )
+
+        with pytest.raises(ServerError):
+            await self.client.post_binary("/documents/generate", data={"doc_id": "1"})
+
+
+    @pytest.mark.asyncio
+    @respx.mock
+    async def test_get_binary_returns_bytes(self) -> None:
+        binary_content = b"PDF content here"
+        respx.get("https://api2.wfirma.pl/invoices/download/123").mock(
+            return_value=httpx.Response(200, content=binary_content)
+        )
+
+        result = await self.client.get_binary("/invoices/download/123")
+
+        assert isinstance(result, bytes)
+        assert result == binary_content
+
+    @pytest.mark.asyncio
+    @respx.mock
+    async def test_post_binary_returns_bytes(self) -> None:
+        binary_content = b"PDF file data"
+        respx.post("https://api2.wfirma.pl/documents/generate").mock(
+            return_value=httpx.Response(200, content=binary_content)
+        )
+
+        result = await self.client.post_binary(
+            "/documents/generate",
+            data={"document_id": "123"},
+        )
+
+        assert isinstance(result, bytes)
+        assert result == binary_content
+
+    @pytest.mark.asyncio
+    @respx.mock
+    async def test_get_binary_raises_on_429(self) -> None:
+        respx.get("https://api2.wfirma.pl/invoices/download/123").mock(
+            return_value=httpx.Response(429)
+        )
+
+        with pytest.raises(RateLimitError):
+            await self.client.get_binary("/invoices/download/123")
+
+    @pytest.mark.asyncio
+    @respx.mock
+    async def test_get_binary_raises_on_503(self) -> None:
+        respx.get("https://api2.wfirma.pl/invoices/download/123").mock(
+            return_value=httpx.Response(503)
+        )
+
+        with pytest.raises(ServiceUnavailableError):
+            await self.client.get_binary("/invoices/download/123")
+
+    @pytest.mark.asyncio
+    @respx.mock
+    async def test_get_binary_raises_on_500(self) -> None:
+        respx.get("https://api2.wfirma.pl/invoices/download/123").mock(
+            return_value=httpx.Response(500)
+        )
+
+        with pytest.raises(ServerError):
+            await self.client.get_binary("/invoices/download/123")
+
+    @pytest.mark.asyncio
+    @respx.mock
+    async def test_post_binary_raises_on_429(self) -> None:
+        respx.post("https://api2.wfirma.pl/documents/generate").mock(
+            return_value=httpx.Response(429)
+        )
+
+        with pytest.raises(RateLimitError):
+            await self.client.post_binary("/documents/generate", data={"doc_id": "1"})
+
+    @pytest.mark.asyncio
+    @respx.mock
+    async def test_post_binary_raises_on_503(self) -> None:
+        respx.post("https://api2.wfirma.pl/documents/generate").mock(
+            return_value=httpx.Response(503)
+        )
+
+        with pytest.raises(ServiceUnavailableError):
+            await self.client.post_binary("/documents/generate", data={"doc_id": "1"})
+
+    @pytest.mark.asyncio
+    @respx.mock
+    async def test_post_binary_raises_on_500(self) -> None:
+        respx.post("https://api2.wfirma.pl/documents/generate").mock(
+            return_value=httpx.Response(500)
+        )
+
+        with pytest.raises(ServerError):
+            await self.client.post_binary("/documents/generate", data={"doc_id": "1"})
+
+
 class TestWFirmaClientErrorHandling:
     # AICOMPLETE: Error handling tests - ready for review
 
