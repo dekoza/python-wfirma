@@ -87,6 +87,78 @@ class InvoicesResource:
         self._client.delete_json(f"/invoices/delete/{invoice_id}")
         return True
 
+    def download(
+        self,
+        invoice_id: int,
+        *,
+        parameters: dict[str, Any] | None = None,
+    ) -> bytes:
+        """Download invoice as PDF.
+
+        Endpoint: POST /invoices/download/{invoiceId}
+
+        Args:
+            invoice_id: Invoice identifier.
+            parameters: Optional download parameters (page, duplicate, etc.).
+
+        Returns:
+            PDF file content as bytes.
+        """
+        payload: dict[str, Any] | None = None
+        if parameters:
+            payload = {"invoices": [{"parameters": parameters}]}
+
+        return self._client.post_binary(f"/invoices/download/{invoice_id}", data=payload)
+
+    def send(
+        self,
+        invoice_id: int,
+        *,
+        parameters: dict[str, Any] | None = None,
+    ) -> dict[str, Any]:
+        """Send invoice via email.
+
+        Endpoint: POST /invoices/send/{invoiceId}
+
+        Args:
+            invoice_id: Invoice identifier.
+            parameters: Optional send parameters (email, subject, body, etc.).
+
+        Returns:
+            API response as dict.
+        """
+        payload: dict[str, Any] = {}
+        if parameters:
+            payload = {"invoices": [{"parameters": parameters}]}
+
+        return self._client.post_json(f"/invoices/send/{invoice_id}", data=payload)
+
+    def fiscalize(self, invoice_id: int) -> dict[str, Any]:
+        """Mark invoice as fiscalized.
+
+        Endpoint: GET /invoices/fiscalize/{invoiceId}
+
+        Args:
+            invoice_id: Invoice identifier.
+
+        Returns:
+            API response as dict.
+        """
+        return self._client.get_json(f"/invoices/fiscalize/{invoice_id}")
+
+    def unfiscalize(self, invoice_id: int) -> dict[str, Any]:
+        """Remove fiscalization from invoice.
+
+        Endpoint: GET /invoices/unfiscalize/{invoiceId}
+
+        Args:
+            invoice_id: Invoice identifier.
+
+        Returns:
+            API response as dict.
+        """
+        return self._client.get_json(f"/invoices/unfiscalize/{invoice_id}")
+
     @staticmethod
     def _extract_invoice_payload(data: dict[str, Any]) -> dict[str, Any]:
         """Extract Invoice payload from a wFirma JSON response."""

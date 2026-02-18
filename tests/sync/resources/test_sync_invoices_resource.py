@@ -254,3 +254,203 @@ class TestInvoicesResourceDelete:
 
         assert route.called
         assert result is True
+
+
+class TestInvoicesResourceDownload:
+    """Tests for InvoicesResource.download() method."""
+
+    def test_download_calls_expected_endpoint_and_returns_bytes(self) -> None:
+        auth = APIKeyAuth(access_key="ak", secret_key="sk", app_key="app")
+        client = WFirmaClient(auth=auth, company_id=123)
+        resource = InvoicesResource(client)
+
+        pdf_content = b"%PDF-1.4\n%fake pdf content"
+
+        with respx.mock:
+            route = respx.post(
+                "https://api2.wfirma.pl/invoices/download/456",
+                params={"company_id": "123"},
+            ).mock(
+                return_value=httpx.Response(
+                    200,
+                    content=pdf_content,
+                    headers={"Content-Type": "application/pdf"},
+                )
+            )
+
+            result = resource.download(invoice_id=456)
+
+        client.close()
+
+        assert route.called
+        assert isinstance(result, bytes)
+        assert result == pdf_content
+
+    def test_download_with_parameters(self) -> None:
+        auth = APIKeyAuth(access_key="ak", secret_key="sk", app_key="app")
+        client = WFirmaClient(auth=auth, company_id=123)
+        resource = InvoicesResource(client)
+
+        pdf_content = b"%PDF-1.4\n%fake pdf content"
+
+        with respx.mock:
+            route = respx.post(
+                "https://api2.wfirma.pl/invoices/download/456",
+                params={"company_id": "123"},
+            ).mock(
+                return_value=httpx.Response(
+                    200,
+                    content=pdf_content,
+                    headers={"Content-Type": "application/pdf"},
+                )
+            )
+
+            result = resource.download(
+                invoice_id=456,
+                parameters={"page": "all", "duplicate": "1"},
+            )
+
+        client.close()
+
+        assert route.called
+        assert result == pdf_content
+
+
+class TestInvoicesResourceSend:
+    """Tests for InvoicesResource.send() method."""
+
+    def test_send_calls_expected_endpoint_and_returns_dict(self) -> None:
+        auth = APIKeyAuth(access_key="ak", secret_key="sk", app_key="app")
+        client = WFirmaClient(auth=auth, company_id=123)
+        resource = InvoicesResource(client)
+
+        with respx.mock:
+            route = respx.post(
+                "https://api2.wfirma.pl/invoices/send/456",
+                params={
+                    "inputFormat": "json",
+                    "outputFormat": "json",
+                    "company_id": "123",
+                },
+            ).mock(
+                return_value=httpx.Response(
+                    200,
+                    json={
+                        "status": {"code": "OK"},
+                        "invoices": {"0": {"invoice": {"id": 456}}},
+                    },
+                )
+            )
+
+            result = resource.send(invoice_id=456)
+
+        client.close()
+
+        assert route.called
+        assert isinstance(result, dict)
+        assert result["status"]["code"] == "OK"
+
+    def test_send_with_parameters(self) -> None:
+        auth = APIKeyAuth(access_key="ak", secret_key="sk", app_key="app")
+        client = WFirmaClient(auth=auth, company_id=123)
+        resource = InvoicesResource(client)
+
+        with respx.mock:
+            route = respx.post(
+                "https://api2.wfirma.pl/invoices/send/456",
+                params={
+                    "inputFormat": "json",
+                    "outputFormat": "json",
+                    "company_id": "123",
+                },
+            ).mock(
+                return_value=httpx.Response(
+                    200,
+                    json={
+                        "status": {"code": "OK"},
+                        "invoices": {"0": {"invoice": {"id": 456}}},
+                    },
+                )
+            )
+
+            result = resource.send(
+                invoice_id=456,
+                parameters={
+                    "email": "test@example.com",
+                    "subject": "Invoice",
+                    "body": "Please find attached",
+                },
+            )
+
+        client.close()
+
+        assert route.called
+        assert result["status"]["code"] == "OK"
+
+
+class TestInvoicesResourceFiscalize:
+    """Tests for InvoicesResource.fiscalize() method."""
+
+    def test_fiscalize_calls_expected_endpoint_and_returns_dict(self) -> None:
+        auth = APIKeyAuth(access_key="ak", secret_key="sk", app_key="app")
+        client = WFirmaClient(auth=auth, company_id=123)
+        resource = InvoicesResource(client)
+
+        with respx.mock:
+            route = respx.get(
+                "https://api2.wfirma.pl/invoices/fiscalize/456",
+                params={
+                    "outputFormat": "json",
+                    "company_id": "123",
+                },
+            ).mock(
+                return_value=httpx.Response(
+                    200,
+                    json={
+                        "status": {"code": "OK"},
+                        "invoices": {"0": {"invoice": {"id": 456, "fiscalized": "1"}}},
+                    },
+                )
+            )
+
+            result = resource.fiscalize(invoice_id=456)
+
+        client.close()
+
+        assert route.called
+        assert isinstance(result, dict)
+        assert result["status"]["code"] == "OK"
+
+
+class TestInvoicesResourceUnfiscalize:
+    """Tests for InvoicesResource.unfiscalize() method."""
+
+    def test_unfiscalize_calls_expected_endpoint_and_returns_dict(self) -> None:
+        auth = APIKeyAuth(access_key="ak", secret_key="sk", app_key="app")
+        client = WFirmaClient(auth=auth, company_id=123)
+        resource = InvoicesResource(client)
+
+        with respx.mock:
+            route = respx.get(
+                "https://api2.wfirma.pl/invoices/unfiscalize/456",
+                params={
+                    "outputFormat": "json",
+                    "company_id": "123",
+                },
+            ).mock(
+                return_value=httpx.Response(
+                    200,
+                    json={
+                        "status": {"code": "OK"},
+                        "invoices": {"0": {"invoice": {"id": 456, "fiscalized": "0"}}},
+                    },
+                )
+            )
+
+            result = resource.unfiscalize(invoice_id=456)
+
+        client.close()
+
+        assert route.called
+        assert isinstance(result, dict)
+        assert result["status"]["code"] == "OK"

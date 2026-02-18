@@ -357,7 +357,7 @@ Max Concurrent: 15 (Wave 2)
 
 ---
 
-- [ ] 3. Add missing Invoice endpoints (download, send, fiscalize, unfiscalize)
+- [x] 3. Add missing Invoice endpoints (download, send, fiscalize, unfiscalize)
 
   **What to do**:
   - Add `download(invoice_id: int) -> bytes` to `InvoicesResource` (sync + async) — uses `post_binary()` from Task 2
