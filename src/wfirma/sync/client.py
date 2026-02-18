@@ -245,6 +245,38 @@ class WFirmaClient:
         return resource
 
     @property
+    def vehicle_run_rates(self) -> Any:
+        """Convenience accessor for vehicle run rates endpoints.
+
+        Returns:
+            VehicleRunRatesResource instance bound to this client.
+        """
+        # Local import to avoid circular dependency between client and resources.
+        from wfirma.sync.resources.vehicle_run_rates import VehicleRunRatesResource
+
+        resource = self._resources.get("vehicle_run_rates")
+        if resource is None:
+            resource = VehicleRunRatesResource(self)
+            self._resources["vehicle_run_rates"] = resource
+        return resource
+
+    @property
+    def warehouses(self) -> Any:
+        """Convenience accessor for warehouses endpoints.
+
+        Returns:
+            WarehousesResource instance bound to this client.
+        """
+        # Local import to avoid circular dependency between client and resources.
+        from wfirma.sync.resources.warehouses import WarehousesResource
+
+        resource = self._resources.get("warehouses")
+        if resource is None:
+            resource = WarehousesResource(self)
+            self._resources["warehouses"] = resource
+        return resource
+
+    @property
     def company_accounts(self) -> Any:
         """Convenience accessor for company accounts endpoints.
 
