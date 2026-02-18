@@ -234,6 +234,86 @@ class TestWFirmaClientHTTPMethods:
         request = route.calls.last.request
         assert "company_id=999" in str(request.url)
 
+    @respx.mock
+    def test_get_binary_returns_bytes(self) -> None:
+        binary_content = b"PDF content here"
+        respx.get("https://api2.wfirma.pl/invoices/download/123").mock(
+            return_value=httpx.Response(200, content=binary_content)
+        )
+
+        result = self.client.get_binary("/invoices/download/123")
+
+        assert isinstance(result, bytes)
+        assert result == binary_content
+
+    @respx.mock
+    def test_post_binary_returns_bytes(self) -> None:
+        binary_content = b"PDF file data"
+        respx.post("https://api2.wfirma.pl/documents/generate").mock(
+            return_value=httpx.Response(200, content=binary_content)
+        )
+
+        result = self.client.post_binary(
+            "/documents/generate",
+            data={"document_id": "123"},
+        )
+
+        assert isinstance(result, bytes)
+        assert result == binary_content
+
+    @respx.mock
+    def test_get_binary_raises_on_429(self) -> None:
+        respx.get("https://api2.wfirma.pl/invoices/download/123").mock(
+            return_value=httpx.Response(429)
+        )
+
+        with pytest.raises(RateLimitError):
+            self.client.get_binary("/invoices/download/123")
+
+    @respx.mock
+    def test_get_binary_raises_on_503(self) -> None:
+        respx.get("https://api2.wfirma.pl/invoices/download/123").mock(
+            return_value=httpx.Response(503)
+        )
+
+        with pytest.raises(ServiceUnavailableError):
+            self.client.get_binary("/invoices/download/123")
+
+    @respx.mock
+    def test_get_binary_raises_on_500(self) -> None:
+        respx.get("https://api2.wfirma.pl/invoices/download/123").mock(
+            return_value=httpx.Response(500)
+        )
+
+        with pytest.raises(ServerError):
+            self.client.get_binary("/invoices/download/123")
+
+    @respx.mock
+    def test_post_binary_raises_on_429(self) -> None:
+        respx.post("https://api2.wfirma.pl/documents/generate").mock(
+            return_value=httpx.Response(429)
+        )
+
+        with pytest.raises(RateLimitError):
+            self.client.post_binary("/documents/generate", data={"doc_id": "1"})
+
+    @respx.mock
+    def test_post_binary_raises_on_503(self) -> None:
+        respx.post("https://api2.wfirma.pl/documents/generate").mock(
+            return_value=httpx.Response(503)
+        )
+
+        with pytest.raises(ServiceUnavailableError):
+            self.client.post_binary("/documents/generate", data={"doc_id": "1"})
+
+    @respx.mock
+    def test_post_binary_raises_on_500(self) -> None:
+        respx.post("https://api2.wfirma.pl/documents/generate").mock(
+            return_value=httpx.Response(500)
+        )
+
+        with pytest.raises(ServerError):
+            self.client.post_binary("/documents/generate", data={"doc_id": "1"})
 
     @respx.mock
     def test_get_binary_returns_bytes(self) -> None:
@@ -316,87 +396,110 @@ class TestWFirmaClientHTTPMethods:
         with pytest.raises(ServerError):
             self.client.post_binary("/documents/generate", data={"doc_id": "1"})
 
+    @respx.mock
+    def test_patch_request_sends_json_body(self) -> None:
+        route = respx.patch("https://api2.wfirma.pl/webhooks/edit/123").mock(
+            return_value=httpx.Response(
+                200,
+                json={
+                    "webhooks": {"0": {"webhook": {"id": "123", "name": "Updated"}}},
+                    "status": {"code": "OK"},
+                },
+            )
+        )
+
+        data = {
+            "webhooks": {
+                "0": {
+                    "webhook": {
+                        "name": "Updated",
+                        "url": "https://example.com/webhook",
+                    }
+                }
+            }
+        }
+        self.client.patch("/webhooks/edit/123", json=data)
+
+        assert route.called
+        request = route.calls.last.request
+        assert "webhooks" in request.content.decode()
 
     @respx.mock
-    def test_get_binary_returns_bytes(self) -> None:
-        binary_content = b"PDF content here"
-        respx.get("https://api2.wfirma.pl/invoices/download/123").mock(
-            return_value=httpx.Response(200, content=binary_content)
+    def test_patch_request_sends_xml_body(self) -> None:
+        route = respx.patch("https://api2.wfirma.pl/webhooks/edit/123").mock(
+            return_value=httpx.Response(
+                200,
+                text="""<?xml version="1.0" encoding="UTF-8"?>
+                <api>
+                    <webhooks>
+                        <webhook><id>123</id></webhook>
+                    </webhooks>
+                    <status><code>OK</code></status>
+                </api>""",
+            )
         )
 
-        result = self.client.get_binary("/invoices/download/123")
+        xml_data = """<?xml version="1.0" encoding="UTF-8"?>
+        <api>
+            <webhooks>
+                <webhook><name>Updated</name></webhook>
+            </webhooks>
+        </api>"""
+        self.client.patch("/webhooks/edit/123", content=xml_data, content_type="application/xml")
 
-        assert isinstance(result, bytes)
-        assert result == binary_content
+        assert route.called
+        request = route.calls.last.request
+        assert b"<webhook>" in request.content
 
     @respx.mock
-    def test_post_binary_returns_bytes(self) -> None:
-        binary_content = b"PDF file data"
-        respx.post("https://api2.wfirma.pl/documents/generate").mock(
-            return_value=httpx.Response(200, content=binary_content)
+    def test_patch_json_sets_format_params(self) -> None:
+        route = respx.patch("https://api2.wfirma.pl/webhooks/edit/123").mock(
+            return_value=httpx.Response(
+                200,
+                json={
+                    "webhooks": {"0": {"webhook": {"id": "123"}}},
+                    "status": {"code": "OK"},
+                },
+            )
         )
 
-        result = self.client.post_binary(
-            "/documents/generate",
-            data={"document_id": "123"},
+        self.client.patch_json(
+            "/webhooks/edit/123",
+            data={"webhooks": {"0": {"webhook": {"name": "Updated"}}}},
         )
 
-        assert isinstance(result, bytes)
-        assert result == binary_content
+        assert route.called
+        request = route.calls.last.request
+        assert "inputFormat=json" in str(request.url)
+        assert "outputFormat=json" in str(request.url)
 
     @respx.mock
-    def test_get_binary_raises_on_429(self) -> None:
-        respx.get("https://api2.wfirma.pl/invoices/download/123").mock(
-            return_value=httpx.Response(429)
+    def test_patch_xml_sends_request(self) -> None:
+        route = respx.patch("https://api2.wfirma.pl/webhooks/edit/123").mock(
+            return_value=httpx.Response(
+                200,
+                text="""<?xml version="1.0" encoding="UTF-8"?>
+                <api>
+                    <webhooks>
+                        <webhook><id>123</id></webhook>
+                    </webhooks>
+                    <status><code>OK</code></status>
+                </api>""",
+            )
         )
 
-        with pytest.raises(RateLimitError):
-            self.client.get_binary("/invoices/download/123")
-
-    @respx.mock
-    def test_get_binary_raises_on_503(self) -> None:
-        respx.get("https://api2.wfirma.pl/invoices/download/123").mock(
-            return_value=httpx.Response(503)
+        xml_data = """<?xml version="1.0" encoding="UTF-8"?>
+        <api>
+            <webhooks>
+                <webhook><name>Updated</name></webhook>
+            </webhooks>
+        </api>"""
+        result = self.client.patch(
+            "/webhooks/edit/123", content=xml_data, content_type="application/xml"
         )
 
-        with pytest.raises(ServiceUnavailableError):
-            self.client.get_binary("/invoices/download/123")
-
-    @respx.mock
-    def test_get_binary_raises_on_500(self) -> None:
-        respx.get("https://api2.wfirma.pl/invoices/download/123").mock(
-            return_value=httpx.Response(500)
-        )
-
-        with pytest.raises(ServerError):
-            self.client.get_binary("/invoices/download/123")
-
-    @respx.mock
-    def test_post_binary_raises_on_429(self) -> None:
-        respx.post("https://api2.wfirma.pl/documents/generate").mock(
-            return_value=httpx.Response(429)
-        )
-
-        with pytest.raises(RateLimitError):
-            self.client.post_binary("/documents/generate", data={"doc_id": "1"})
-
-    @respx.mock
-    def test_post_binary_raises_on_503(self) -> None:
-        respx.post("https://api2.wfirma.pl/documents/generate").mock(
-            return_value=httpx.Response(503)
-        )
-
-        with pytest.raises(ServiceUnavailableError):
-            self.client.post_binary("/documents/generate", data={"doc_id": "1"})
-
-    @respx.mock
-    def test_post_binary_raises_on_500(self) -> None:
-        respx.post("https://api2.wfirma.pl/documents/generate").mock(
-            return_value=httpx.Response(500)
-        )
-
-        with pytest.raises(ServerError):
-            self.client.post_binary("/documents/generate", data={"doc_id": "1"})
+        assert route.called
+        assert result["status"]["code"] == "OK"
 
 
 class TestWFirmaClientErrorHandling:
