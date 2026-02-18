@@ -383,3 +383,27 @@ def company_accounts(self) -> Any:
 3. **Empty list handling**: When container dict is empty `{}`, `extract_object_list_payloads()` correctly returns empty list
 4. **Caching validation**: Test `assert first is second` verifies object identity, not just equality
 5. **Test structure**: Resource tests (mock HTTP) separate from property tests (mock client state)
+
+## Tasks 6-10 Integration Completion
+
+Successfully completed the client integration for Tasks 6-10 resources:
+
+### Completed Work:
+1. **sync/client.py**: Added 5 properties (declaration_countries, expenses, interests, invoice_descriptions, ledger_accountant_years) in alphabetical order
+2. **async_/client.py**: Verified already contains all 5 properties
+3. **sync/resources/__init__.py**: Added imports and exports for all 5 resources
+4. **async_/resources/__init__.py**: Added imports and exports for all 5 resources
+
+### Properties Pattern:
+- All properties use `@property` decorator
+- Lazy initialization with `self._resources` cache
+- Local imports to avoid circular dependencies
+- Consistent docstrings following existing pattern
+
+### Testing Results:
+- All 48 tests pass (20 property tests + 28 resource tests)
+- Property tests: 10 sync + 10 async (2 each: lazy init + caching)
+- Resource tests: 14 sync + 14 async (varying counts per resource)
+
+### Key Pattern Observed:
+The resources/__init__.py exports are in alphabetical order, which improves code organization.
