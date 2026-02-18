@@ -528,7 +528,7 @@ Max Concurrent: 15 (Wave 2)
 
 ---
 
-- [ ] 5. Implement company_packs resource (get)
+- [x] 5. Implement company_packs resource (get)
 
   **What to do**:
   - Create `CompanyPacksResource` with only `get(company_pack_id: int)` → `dict`

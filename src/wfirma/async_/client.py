@@ -233,6 +233,22 @@ class WFirmaClient:
             self._resources["company_accounts"] = resource
         return resource
 
+    @property
+    def company_packs(self) -> Any:
+        """Convenience accessor for company packs endpoints.
+
+        Returns:
+            CompanyPacksResource instance bound to this client.
+        """
+        # Local import to avoid circular dependency between client and resources.
+        from wfirma.async_.resources.company_packs import CompanyPacksResource
+
+        resource = self._resources.get("company_packs")
+        if resource is None:
+            resource = CompanyPacksResource(self)
+            self._resources["company_packs"] = resource
+        return resource
+
     async def __aenter__(self) -> WFirmaClient:
         """Enter the async context manager."""
         return self
