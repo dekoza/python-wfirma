@@ -1074,6 +1074,169 @@ def translation_languages(self) -> Any:
 - tests/async_/test_client_translation_languages_property.py: 2/2 ✓
 ```
 
+## Task 5: TermsResource Implementation (CRUD) | 2026-02-19T14:30:00Z
+
+**Status:** ✅ COMPLETED | 20/20 tests pass | 100% coverage | 0 mypy errors | 0 ruff errors
+
+### Summary
+Implemented `TermsResource` for both sync and async clients with **full CRUD operations** (add, find, get, edit, delete). This is the FIRST CRUD resource beyond Invoices, following the exact Tags resource pattern but with all 5 operations.
+
+### Key Implementation Details
+
+#### Endpoint Specification
+- **Container/Object Keys** (verified from `docs/api_spec.json`):
+  - Container: `"terms"` (plural)
+  - Object: `"term"` (singular)
+  
+#### CRUD Endpoints
+- `POST /terms/add` — Create new term (payload: `{"terms": [{"term": {...}}]}`)
+- `GET /terms/find` — List all terms (optional params)
+- `GET /terms/get/{id}` — Get single term
+- `POST /terms/edit/{id}` — Edit term (payload: `{"terms": [{"term": {...}}]}`) **[CRITICAL: Uses POST, not PUT]**
+- `DELETE /terms/delete/{id}` — Delete term
+
+#### Method Signatures
+```python
+def add(self, term: dict[str, Any]) -> dict[str, Any]
+def find(self, params: dict[str, Any] | None = None) -> list[dict[str, Any]]
+def get(self, term_id: int) -> dict[str, Any]
+def edit(self, term_id: int, term: dict[str, Any]) -> dict[str, Any]
+def delete(self, term_id: int) -> dict[str, Any]
+```
+
+#### Critical API Pattern Discovery
+- **Edit Endpoint Uses POST**: Despite the endpoint path showing `/terms/notes/{id}` in spec (documented typo), the actual endpoint is `/terms/edit/{id}` and uses POST HTTP method (not PUT)
+- **WFirmaClient has no put_json()**: Only `post_json()`, `get_json()`, `delete_json()`, `patch_json()` — edit must use `post_json()` for compliance
+- **Payload Wrapping**: Both add and edit wrap data as `{"terms": [{"term": {...}}]}`
+
+### Files Created (8 total)
+1. ✅ `src/wfirma/sync/resources/terms.py` (33 statements, 100% coverage)
+   - All 5 CRUD methods with proper payload extraction
+   - Static helper `_extract_term_payload()`
+   
+2. ✅ `src/wfirma/async_/resources/terms.py` (33 statements, 100% coverage)
+   - Async mirrors with `async def` and `await`
+   
+3. ✅ `tests/sync/resources/test_sync_terms_resource.py` (8 tests)
+   - add, find, find with params, find empty result
+   - get, edit (with POST verification), delete
+   
+4. ✅ `tests/async_/resources/test_async_terms_resource.py` (8 async mirrors)
+
+5. ✅ `tests/sync/test_client_terms_property.py` (2 tests)
+   - Property returns resource instance
+   - Caching works (identity check)
+   
+6. ✅ `tests/async_/test_client_terms_property.py` (2 async mirrors)
+
+### Files Modified (4 total)
+1. ✅ `src/wfirma/sync/client.py` — Added `@property def terms()` after tags
+2. ✅ `src/wfirma/async_/client.py` — Added `@property def terms()` after tags
+3. ✅ `src/wfirma/sync/resources/__init__.py` — Added alphabetical import/export (between TagsResource and TaxregistersResource)
+4. ✅ `src/wfirma/async_/resources/__init__.py` — Added alphabetical import/export
+
+### Test Coverage (20 Tests Total - All PASS ✓)
+
+**Sync Resource Tests (8)**:
+- ✅ `test_add_calls_expected_endpoint_and_returns_dict`: add() POST payload wrapping
+- ✅ `test_find_calls_expected_endpoint_and_returns_list`: find() returns list
+- ✅ `test_find_with_params`: find(params) passes query parameters
+- ✅ `test_find_returns_empty_list_when_container_is_empty`: Empty container → []
+- ✅ `test_get_calls_expected_endpoint_and_returns_dict`: get() returns dict
+- ✅ `test_edit_calls_expected_endpoint_and_returns_dict`: edit() uses POST
+- ✅ `test_delete_calls_expected_endpoint_and_returns_dict`: delete() returns dict
+- ✅ `test_edit_uses_post_method`: Explicit verification POST method (not PUT)
+
+**Async Resource Tests (8)**:
+- ✅ Async mirrors with `@pytest.mark.asyncio` and `await` keywords
+
+**Sync Client Property Tests (2)**:
+- ✅ `test_client_terms_property_returns_resource`: Returns TermsResource instance
+- ✅ `test_client_terms_property_is_cached`: Caching via `self._resources` dict
+
+**Async Client Property Tests (2)**:
+- ✅ Async mirrors of sync property tests
+
+### CRUD Pattern Established (Sync Example)
+
+```python
+def add(self, term: dict[str, Any]) -> dict[str, Any]:
+    """Create new term."""
+    data = self._client.post_json("/terms/add", data={"terms": [{"term": term}]})
+    return self._extract_term_payload(data)
+
+def find(self, params: dict[str, Any] | None = None) -> list[dict[str, Any]]:
+    """List all terms."""
+    data = self._client.get_json("/terms/find", params=params)
+    payloads = extract_object_list_payloads(data=data, container_key="terms", object_key="term")
+    return [dict(payload) for payload in payloads]
+
+def get(self, term_id: int) -> dict[str, Any]:
+    """Get single term by ID."""
+    data = self._client.get_json(f"/terms/get/{term_id}")
+    return self._extract_term_payload(data)
+
+def edit(self, term_id: int, term: dict[str, Any]) -> dict[str, Any]:
+    """Edit existing term (uses POST, not PUT)."""
+    data = self._client.post_json(f"/terms/edit/{term_id}", data={"terms": [{"term": term}]})
+    return self._extract_term_payload(data)
+
+def delete(self, term_id: int) -> dict[str, Any]:
+    """Delete term."""
+    data = self._client.delete_json(f"/terms/delete/{term_id}")
+    return self._extract_term_payload(data)
+```
+
+### Critical Fix: Async Test Import Error
+- **Problem**: Initial async test run failed with `IndentationError` in `src/wfirma/async_/resources/notes.py` (lines 60-61 had extra spaces)
+- **Solution**: Fixed indentation in `notes.py` find() method
+- **Result**: All 10 async tests pass after fix
+
+### Verification Results
+```
+✅ Tests: 20/20 PASS (100% success)
+   - 8 sync resource tests PASS
+   - 8 async resource tests PASS
+   - 2 sync client property tests PASS
+   - 2 async client property tests PASS
+
+✅ Type Checking: Success (0 errors)
+   mypy src/wfirma/sync/resources/terms.py src/wfirma/async_/resources/terms.py
+
+✅ Linting: All checks passed
+   ruff check on all 6 created files + 4 modified files
+
+✅ Code Coverage: 100% on both resource files (33 statements each)
+```
+
+### Key Learnings
+
+1. **Edit Uses POST**: wFirma API convention for edit endpoints uses POST (not PUT), confirmed by missing `put_json()` in WFirmaClient
+2. **CRUD Pattern Consistency**: All CRUD operations use payload wrapping (`{"container": [{"object": {...}}]}`)
+3. **Container/Object Keys Required**: Even for CRUD operations, payload helpers need explicit container/object key parameters
+4. **Async Test Markers**: All async tests use `@pytest.mark.asyncio` decorator (not module-level pytestmark)
+5. **Client Property Caching**: Lazy initialization via `self._resources` dict prevents circular imports and enables test verification
+6. **Find with Optional Params**: Parameters passed directly to `get_json(..., params=params)` without wrapping
+7. **Empty Result Handling**: `extract_object_list_payloads()` gracefully returns `[]` when container is `{}`
+
+### Files Modified/Created Summary
+- **8 files created**: 2 resources (sync/async) + 4 test files + 2 client property test files
+- **4 files modified**: 2 clients + 2 init files
+- **Total coverage**: 100% on resource implementations
+- **Total tests**: 20 tests, all passing
+- **Type checking**: 0 mypy errors
+- **Linting**: 0 ruff errors
+
+### Next Pattern for Future CRUD Resources
+TermsResource establishes the complete CRUD pattern:
+1. **add()** — POST to `/resource/add`, wrap payload, extract single object
+2. **find()** — GET to `/resource/find`, optional params, extract object list, return empty list if container empty
+3. **get()** — GET to `/resource/get/{id}`, extract single object
+4. **edit()** — POST to `/resource/edit/{id}` (not PUT!), wrap payload, extract single object
+5. **delete()** — DELETE to `/resource/delete/{id}`, extract response dict
+
+All async methods mirror sync with `async def` and `await self._client.*`.
+
 ## Task 5: InvoiceDeliveriesResource Implementation (CRUD Pattern) | 2026-02-19T??:??:??Z
 
 **Status:** ✅ COMPLETED | 22/22 tests pass | 100% coverage | 0 mypy errors | 0 ruff errors

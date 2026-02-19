@@ -213,6 +213,22 @@ class WFirmaClient:
         return resource
 
     @property
+    def series(self) -> Any:
+        """Convenience accessor for series-related endpoints.
+
+        Returns:
+            SeriesResource instance bound to this client.
+        """
+        # Local import to avoid circular dependency between client and resources.
+        from wfirma.sync.resources.series import SeriesResource
+
+        resource = self._resources.get("series")
+        if resource is None:
+            resource = SeriesResource(self)
+            self._resources["series"] = resource
+        return resource
+
+    @property
     def tags(self) -> Any:
         """Convenience accessor for tag-related endpoints.
 
@@ -229,6 +245,22 @@ class WFirmaClient:
         return resource
 
     @property
+    def terms(self) -> Any:
+        """Convenience accessor for term-related endpoints.
+
+        Returns:
+            TermsResource instance bound to this client.
+        """
+        # Local import to avoid circular dependency between client and resources.
+        from wfirma.sync.resources.terms import TermsResource
+
+        resource = self._resources.get("terms")
+        if resource is None:
+            resource = TermsResource(self)
+            self._resources["terms"] = resource
+        return resource
+
+    @property
     def taxregisters(self) -> Any:
         """Convenience accessor for taxregister endpoints.
 
@@ -242,6 +274,22 @@ class WFirmaClient:
         if resource is None:
             resource = TaxregistersResource(self)
             self._resources["taxregisters"] = resource
+        return resource
+
+    @property
+    def term_groups(self) -> Any:
+        """Convenience accessor for term group endpoints.
+
+        Returns:
+            TermGroupsResource instance bound to this client.
+        """
+        # Local import to avoid circular dependency between client and resources.
+        from wfirma.sync.resources.term_groups import TermGroupsResource
+
+        resource = self._resources.get("term_groups")
+        if resource is None:
+            resource = TermGroupsResource(self)
+            self._resources["term_groups"] = resource
         return resource
 
     @property
@@ -902,6 +950,72 @@ class WFirmaClient:
         params["inputFormat"] = "json"
         params["outputFormat"] = "json"
         return self.patch(path, json=data, params=params)
+
+    def put(
+        self,
+        path: str,
+        *,
+        json: dict[str, Any] | None = None,
+        content: str | bytes | None = None,
+        content_type: str = "application/json",
+        params: dict[str, str] | None = None,
+    ) -> dict[str, Any]:
+        """Send a PUT request to the API.
+
+        Args:
+            path: The API endpoint path.
+            json: JSON data to send (mutually exclusive with content).
+            content: Raw content to send (mutually exclusive with json).
+            content_type: Content type for raw content.
+            params: Optional query parameters.
+
+        Returns:
+            Parsed response data.
+        """
+        url = self._build_url(path)
+        headers = self._get_auth_headers()
+        params = self._add_default_params(params)
+
+        if content is not None:
+            headers["Content-Type"] = content_type
+
+        try:
+            if json is not None:
+                response = self._http_client.put(url, headers=headers, json=json, params=params)
+            else:
+                response = self._http_client.put(
+                    url, headers=headers, content=content, params=params
+                )
+        except httpx.TimeoutException as err:
+            raise TimeoutError("Request timed out.") from err
+        except httpx.ConnectError as err:
+            raise ConnectionError("Failed to connect to the server.") from err
+        except httpx.RequestError as err:
+            raise ConnectionError(f"Network error: {err}") from err
+
+        return self._handle_response(response)
+
+    def put_json(
+        self,
+        path: str,
+        *,
+        data: dict[str, Any],
+        params: dict[str, str] | None = None,
+    ) -> dict[str, Any]:
+        """Send a PUT request with JSON data.
+
+        Args:
+            path: The API endpoint path.
+            data: JSON data to send.
+            params: Optional query parameters.
+
+        Returns:
+            Parsed JSON response data.
+        """
+        params = params.copy() if params else {}
+        params["inputFormat"] = "json"
+        params["outputFormat"] = "json"
+        return self.put(path, json=data, params=params)
 
     def delete(
         self,

@@ -2029,6 +2029,7 @@ dev = [
     { name = "ipython" },
     { name = "pre-commit" },
     { name = "pre-commit-hooks" },
+    { name = "pytest-cov" },
     { name = "ruff" },
 ]
 
@@ -2072,6 +2073,7 @@ dev = [
     { name = "ipython", specifier = ">=9.9.0" },
     { name = "pre-commit", specifier = ">=4.5.1" },
     { name = "pre-commit-hooks", specifier = ">=6.0.0" },
+    { name = "pytest-cov", specifier = ">=7.0.0,<8.0.0" },
     { name = "ruff", specifier = ">=0.14.13" },
 ]
 
