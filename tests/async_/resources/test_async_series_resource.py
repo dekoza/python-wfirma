@@ -47,9 +47,7 @@ async def test_find_calls_expected_endpoint(async_client: WFirmaClient) -> None:
     series1 = {"id": 1, "name": "Series 1", "template": "FV [numer]/[rok]"}
     series2 = {"id": 2, "name": "Series 2", "template": "FA [numer]/[rok]"}
 
-    respx.get(
-        "/series/find", params={"company_id": "123", "outputFormat": "json", "inputFormat": "json"}
-    ).mock(
+    respx.get("/series/find", params={"company_id": "123", "outputFormat": "json"}).mock(
         return_value=httpx.Response(
             200,
             json={
@@ -73,9 +71,7 @@ async def test_find_calls_expected_endpoint(async_client: WFirmaClient) -> None:
 @pytest.mark.asyncio
 async def test_find_returns_empty_list_when_container_is_empty(async_client: WFirmaClient) -> None:
     """Verify find() returns empty list when container is empty."""
-    respx.get(
-        "/series/find", params={"company_id": "123", "outputFormat": "json", "inputFormat": "json"}
-    ).mock(
+    respx.get("/series/find", params={"company_id": "123", "outputFormat": "json"}).mock(
         return_value=httpx.Response(
             200,
             json={"status": {"code": "OK"}, "series": {}},
@@ -95,7 +91,7 @@ async def test_get_calls_expected_endpoint(async_client: WFirmaClient) -> None:
 
     respx.get(
         "/series/get/123",
-        params={"company_id": "123", "outputFormat": "json", "inputFormat": "json"},
+        params={"company_id": "123", "outputFormat": "json"},
     ).mock(
         return_value=httpx.Response(
             200,
@@ -146,7 +142,7 @@ async def test_delete_calls_expected_endpoint_with_correct_path(async_client: WF
 
     respx.delete(
         "/series/del/123",
-        params={"company_id": "123", "outputFormat": "json", "inputFormat": "json"},
+        params={"company_id": "123", "outputFormat": "json"},
     ).mock(
         return_value=httpx.Response(
             200,
@@ -166,9 +162,7 @@ async def test_delete_calls_expected_endpoint_with_correct_path(async_client: WF
 @pytest.mark.asyncio
 async def test_series_resource_returns_dict_not_raw_response(async_client: WFirmaClient) -> None:
     """Verify that resource methods return extracted dict, not raw response."""
-    respx.get(
-        "/series/get/1", params={"company_id": "123", "outputFormat": "json", "inputFormat": "json"}
-    ).mock(
+    respx.get("/series/get/1", params={"company_id": "123", "outputFormat": "json"}).mock(
         return_value=httpx.Response(
             200,
             json={

@@ -186,6 +186,22 @@ class WFirmaClient:
         return resource
 
     @property
+    def notes(self) -> Any:
+        """Convenience accessor for note-related endpoints.
+
+        Returns:
+            NotesResource instance bound to this client.
+        """
+        # Local import to avoid circular dependency between client and resources.
+        from wfirma.async_.resources.notes import NotesResource
+
+        resource = self._resources.get("notes")
+        if resource is None:
+            resource = NotesResource(self)
+            self._resources["notes"] = resource
+        return resource
+
+    @property
     def payments(self) -> Any:
         """Convenience accessor for payment-related endpoints.
 
@@ -544,6 +560,21 @@ class WFirmaClient:
         if resource is None:
             resource = PaymentCashboxesResource(self)
             self._resources["payment_cashboxes"] = resource
+        return resource
+
+    @property
+    def series(self) -> Any:
+        """Convenience accessor for series-related endpoints.
+
+        Returns:
+            SeriesResource instance bound to this client.
+        """
+        from wfirma.async_.resources.series import SeriesResource
+
+        resource = self._resources.get("series")
+        if resource is None:
+            resource = SeriesResource(self)
+            self._resources["series"] = resource
         return resource
 
     async def __aenter__(self) -> WFirmaClient:

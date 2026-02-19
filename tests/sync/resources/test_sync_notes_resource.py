@@ -1,5 +1,6 @@
 """Tests for sync NotesResource."""
 
+import json
 import pytest
 import respx
 import httpx
@@ -74,7 +75,7 @@ class TestNotesResourceAdd:
             resource.add({"object_name": "invoice", "text": "Test"})
 
             assert route.called
-            request_data = route.calls.last.request.json()
+            request_data = json.loads(route.calls.last.request.content)
             assert "note" in request_data
             assert request_data["note"]["object_name"] == "invoice"
 
@@ -92,7 +93,6 @@ class TestNotesResourceFind:
             respx.get(
                 "https://api2.wfirma.pl/notes/find",
                 params={
-                    "inputFormat": "json",
                     "outputFormat": "json",
                     "company_id": "123",
                 },
@@ -126,7 +126,6 @@ class TestNotesResourceFind:
             respx.get(
                 "https://api2.wfirma.pl/notes/find",
                 params={
-                    "inputFormat": "json",
                     "outputFormat": "json",
                     "company_id": "123",
                 },
@@ -166,7 +165,6 @@ class TestNotesResourceGet:
             respx.get(
                 "https://api2.wfirma.pl/notes/get/123",
                 params={
-                    "inputFormat": "json",
                     "outputFormat": "json",
                     "company_id": "123",
                 },
@@ -271,7 +269,7 @@ class TestNotesResourceEdit:
             resource.edit(123, {"text": "Updated"})
 
             assert route.called
-            request_data = route.calls.last.request.json()
+            request_data = json.loads(route.calls.last.request.content)
             assert "note" in request_data
             assert request_data["note"]["text"] == "Updated"
 
@@ -289,7 +287,6 @@ class TestNotesResourceDelete:
             respx.delete(
                 "https://api2.wfirma.pl/notes/delete/123",
                 params={
-                    "inputFormat": "json",
                     "outputFormat": "json",
                     "company_id": "123",
                 },

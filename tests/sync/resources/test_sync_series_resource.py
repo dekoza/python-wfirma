@@ -112,7 +112,7 @@ def test_edit_calls_expected_endpoint_with_correct_path(client: WFirmaClient) ->
 
     respx.put(
         "/series/edit/123",
-        params={"company_id": "123", "outputFormat": "json"},
+        params={"company_id": "123", "outputFormat": "json", "inputFormat": "json"},
     ).mock(
         return_value=httpx.Response(
             200,

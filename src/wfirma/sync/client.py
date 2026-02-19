@@ -181,6 +181,22 @@ class WFirmaClient:
         return resource
 
     @property
+    def notes(self) -> Any:
+        """Convenience accessor for note-related endpoints.
+
+        Returns:
+            NotesResource instance bound to this client.
+        """
+        # Local import to avoid circular dependency between client and resources.
+        from wfirma.sync.resources.notes import NotesResource
+
+        resource = self._resources.get("notes")
+        if resource is None:
+            resource = NotesResource(self)
+            self._resources["notes"] = resource
+        return resource
+
+    @property
     def payments(self) -> Any:
         """Convenience accessor for payment-related endpoints.
 
