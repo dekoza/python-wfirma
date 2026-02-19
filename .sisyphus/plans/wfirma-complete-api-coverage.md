@@ -936,7 +936,7 @@ Max Concurrent: 15 (Wave 2)
 
 ---
 
-- [ ] 23. Implement invoice_deliveries resource (add, find, get, delete)
+- [x] 23. Implement invoice_deliveries resource (add, find, get, delete)
 
   **What to do**:
   - Create `InvoiceDeliveriesResource` with `add()`, `find()`, `get()`, `delete()` (no edit)
