@@ -802,3 +802,203 @@ def get(self, payment_cashbox_id: int) -> dict[str, Any]:
 - **Main commit**: 6a05910 — "feat: add read-only PaymentCashboxesResource with find/get methods"
   - 10 files changed, 601 insertions
   - Sync/async resources, tests, and client integration
+
+
+## Task 14: UserCompaniesResource Implementation (User-Scoped API)
+
+**Date**: 2026-02-18 14:56  
+**Task ID**: Task 14 - UserCompaniesResource Implementation  
+**Status**: ✅ COMPLETE (12/12 tests passing)
+
+### Problem Statement
+Implement `UserCompaniesResource` for **user-scoped endpoints** (do NOT use `company_id` parameter). The wFirma API automatically filters companies to only those associated with the authenticated user.
+
+Endpoints:
+- `GET /user_companies/find` → Returns all user-accessible companies
+- `GET /user_companies/get/{userCompanyId}` → Returns specific company
+
+**Critical Constraint**: These endpoints must **NOT include company_id parameter** even when `client.company_id` is set.
+
+### Challenge: Client Default Parameter Injection
+
+**Problem Discovered**:
+The WFirmaClient automatically injects `company_id` into ALL GET requests via `_add_default_params()` method:
+```python
+def _add_default_params(self, params: dict[str, str] | None) -> dict[str, str]:
+    result = params.copy() if params else {}
+    if self.company_id is not None:
+        result["company_id"] = str(self.company_id)
+    return result
+```
+
+Initial attempt to pass `params={}` didn't work because `_add_default_params()` still injected company_id into the empty dict.
+
+### Solution: user_scoped Parameter
+
+**Implementation**:
+1. Added `user_scoped: bool = False` parameter to `get()` and `get_json()` methods in both sync and async clients
+2. Modified parameter injection logic:
+   ```python
+   params = self._add_default_params(params) if not user_scoped else (params.copy() if params else {})
+   ```
+3. Resources pass `user_scoped=True` when calling get_json():
+   ```python
+   # For user-scoped endpoints, skip company_id injection
+   data = self._client.get_json("/user_companies/find", user_scoped=True)
+   data = self._client.get_json(f"/user_companies/get/{user_company_id}", user_scoped=True)
+   ```
+
+### Key Implementation Details
+
+**Resource Methods**:
+- `find() -> list[dict[str, Any]]`: Returns all user companies (empty list if none)
+- `get(user_company_id: int) -> dict[str, Any]`: Returns specific company by ID
+
+**Payload Handling**:
+- Container key: `"user_companies"` (plural)
+- Object key: `"user_company"` (singular)
+- Response shape: `{"user_companies": {"0": {"user_company": {...}}}}`
+
+**Client Property**:
+- Added `user_companies` property to both sync and async clients
+- Inserted alphabetically between `translation_languages` and `vat_codes`
+- Uses standard caching pattern via `_resources` dict
+
+### Files Modified
+
+**Core Implementation**:
+1. `src/wfirma/sync/client.py` - Added user_scoped param to get() and get_json()
+2. `src/wfirma/async_/client.py` - Added user_scoped param to async get() and get_json()
+3. `src/wfirma/sync/resources/user_companies.py` - Sync resource with find() and get()
+4. `src/wfirma/async_/resources/user_companies.py` - Async mirror
+
+**Integration**:
+5. Client property added to both sync and async clients
+6. Exports updated in `src/wfirma/sync/resources/__init__.py` (line 19)
+7. Exports updated in `src/wfirma/async_/resources/__init__.py` (line 19)
+
+**Tests** (All Passing):
+8. `tests/sync/resources/test_sync_user_companies_resource.py` - 4 tests (get, get no company_id, find, find_empty)
+9. `tests/async_/resources/test_async_user_companies_resource.py` - 4 async mirrors
+10. `tests/sync/test_client_user_companies_property.py` - 2 tests (returns_resource, is_cached)
+11. `tests/async_/test_client_user_companies_property.py` - 2 async mirrors
+
+### Verification Results
+
+```
+✅ Tests: 12/12 PASS (100% success)
+   - 4 sync resource tests PASS
+   - 4 async resource tests PASS
+   - 2 sync client property tests PASS
+   - 2 async client property tests PASS
+
+✅ Type Checking: Success (0 errors)
+   mypy src/wfirma/sync/client.py src/wfirma/async_/client.py 
+        src/wfirma/sync/resources/user_companies.py 
+        src/wfirma/async_/resources/user_companies.py
+
+✅ Linting: All checks passed
+   ruff check (same 4 files)
+
+✅ Integration: Client properties correctly return cached resource instances
+```
+
+### Key Design Patterns Identified
+
+1. **User-Scoped Endpoints Pattern**: When an endpoint doesn't accept company_id:
+   - Add optional parameter to skip default param injection
+   - Set to True only in resource methods for those endpoints
+   - Document in method docstring
+
+2. **Payload Extraction**: 
+   - `extract_object_list_payloads()` for list responses
+   - `extract_single_object_payload()` for single object responses
+   - Both return dict views that must be converted with `dict(payload)`
+
+3. **Client Property Caching**:
+   - Standard pattern: check cache → create if missing → cache → return
+   - Uses string keys in `_resources` dict
+   - Alphabetical insertion preserves readability
+
+4. **Test Structure**:
+   - Resource tests verify payload extraction and endpoint calls
+   - Client property tests verify caching and instance type
+   - Always check that request params don't include unwanted company_id
+
+### Lessons Learned
+
+1. **Default Parameter Injection is Global**: When implementing special endpoints that need different behavior, must provide opt-out mechanism
+2. **Docstring Updates are Critical**: Any new parameter must be documented in public method docstrings
+3. **Safe File Patching**: When Edit tool has indentation issues, Python string replacement (with multiline patterns) is more reliable
+4. **Alphabetical Ordering Matters**: Properties and exports must stay alphabetically sorted for maintainability
+5. **Async Mirroring**: All implementation patterns must be exactly replicated in async mirror (no shortcuts)
+
+### Implementation Metrics
+- **Files Created/Modified**: 4 core files + 2 init files
+- **Tests Created**: 4 test files (12 total test cases)
+- **Lines Added**: ~200 lines (implementation + tests)
+- **Complexity**: Moderate (required client-level parameter modification)
+- **Time to Implement**: ~30 minutes (including debugging parameter injection issue)
+
+### Testing Assertions
+
+Key test assertions verify user-scoped behavior:
+```python
+# Verify company_id is NOT in request params
+call_params = route.calls[0].request.url.params
+assert "company_id" not in call_params
+```
+
+This assertion runs in 6 tests (both sync and async, for both find and get methods).
+
+## Task 15: Implement UsersResource (GET-only) | 2026-02-18T15:01:00Z
+
+**Status:** ✅ COMPLETED | 6/6 tests pass | 100% coverage | 0 mypy errors | 0 ruff errors
+
+**Changes:**
+- Created `UsersResource` for both sync and async with ONLY `get(user_id: int)` method
+- Returns User Pydantic model (NOT raw dict) via `User.model_validate(payload)`
+- API endpoint: GET `/users/get/{userCompanyId}` → response structure: `{"users": {"0": {"user": {...}}}}`
+- Response extraction: `extract_single_object_payload(data, container_key="users", object_key="user")`
+- Added `users` property to both sync and async WFirmaClient (lazy-initialized, cached)
+- Updated __init__.py exports in alphabetical order (users comes after user_companies, before vat_codes)
+
+**Files Created (6):**
+1. `src/wfirma/sync/resources/users.py` (12 statements, 100% coverage)
+2. `src/wfirma/async_/resources/users.py` (12 statements, 100% coverage)
+3. `tests/sync/resources/test_sync_users_resource.py` (1 test: get returns User model)
+4. `tests/async_/resources/test_async_users_resource.py` (1 test: async mirror)
+5. `tests/sync/test_client_users_property.py` (2 tests: returns_resource, is_cached)
+6. `tests/async_/test_client_users_property.py` (2 tests: async mirrors)
+
+**Files Modified (4):**
+1. `src/wfirma/sync/client.py` — Added `@property users` before payment_cashboxes
+2. `src/wfirma/async_/client.py` — Added `@property users` before payment_cashboxes
+3. `src/wfirma/sync/resources/__init__.py` — Added import + export in alphabetical order
+4. `src/wfirma/async_/resources/init__.py` — Added import + export in alphabetical order
+
+**Key Learnings:**
+- TDD workflow: RED (write failing tests) → GREEN (implement) → REFACTOR (clean imports)
+- Container/object keys verified from API spec: `users`/`user`
+- Async client properties use `@property` decorator (same as sync, not `async def`)
+- Client properties cached in `self._resources` dict with lazy initialization
+- Always remove unused imports (`from typing import Any` not needed for type hints with `from __future__`)
+- Import organization: stdlib → local imports → from wfirma
+- Pattern matches CompanyResource for model-returning resources
+
+**Verification:**
+```bash
+uv run pytest tests/sync/resources/test_sync_users_resource.py \
+  tests/async_/resources/test_async_users_resource.py \
+  tests/sync/test_client_users_property.py \
+  tests/async_/test_client_users_property.py -v
+# ✅ 6 passed
+
+uv run mypy src/wfirma/sync/resources/users.py src/wfirma/async_/resources/users.py
+# ✅ Success: no issues found in 2 source files
+
+uv run ruff check src/wfirma/sync/resources/users.py src/wfirma/async_/resources/users.py
+# ✅ All checks passed!
+```
+
+**Next Task:** Task 16 - Implement additional resources or refactor existing patterns.

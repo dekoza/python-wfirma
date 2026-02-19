@@ -744,7 +744,7 @@ Max Concurrent: 15 (Wave 2)
 
 ---
 
-- [ ] 14. Implement user_companies resource (find, get)
+- [x] 14. Implement user_companies resource (find, get)
 
   **What to do**:
   - Create `UserCompaniesResource` with `find()` and `get(user_company_id: int)`
@@ -769,7 +769,7 @@ Max Concurrent: 15 (Wave 2)
 
 ---
 
-- [ ] 15. Implement users resource (get)
+- [x] 15. Implement users resource (get)
 
   **What to do**:
   - Create `UsersResource` with only `get(user_id: int)` → `User` model
