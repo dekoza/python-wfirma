@@ -22,6 +22,7 @@ from wfirma.async_.resources.payments import PaymentsResource
 from wfirma.async_.resources.series import SeriesResource
 from wfirma.async_.resources.tags import TagsResource
 from wfirma.async_.resources.taxregisters import TaxregistersResource
+from wfirma.async_.resources.webhooks import WebhooksResource
 from wfirma.async_.resources.term_groups import TermGroupsResource
 from wfirma.async_.resources.terms import TermsResource
 from wfirma.async_.resources.translation_languages import TranslationLanguagesResource
@@ -62,6 +63,7 @@ __all__ = [
     "UsersResource",
     "VatCodesResource",
     "VehiclesResource",
+    "WebhooksResource",
     "WarehouseDocumentPWResource",
     "WarehousesResource",
 ]

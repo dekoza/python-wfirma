@@ -1076,7 +1076,7 @@ Max Concurrent: 15 (Wave 2)
 >
 > Follow `src/wfirma/sync/resources/warehouse_documents_pw.py` EXACTLY — copy and change the URL prefix.
 
-- [ ] 29. Implement warehouse_document_p_z resource
+- [x] 29. Implement warehouse_document_p_z resource
 
   **What to do**:
   - Copy `warehouse_documents_pw.py` pattern, change URL prefix to `warehouse_document_p_z`
@@ -1096,7 +1096,7 @@ Max Concurrent: 15 (Wave 2)
 
 ---
 
-- [ ] 30. Implement warehouse_document_r resource
+- [x] 30. Implement warehouse_document_r resource
 
   **What to do**:
   - Same pattern as Task 29 with URL prefix `warehouse_document_r`
@@ -1107,7 +1107,7 @@ Max Concurrent: 15 (Wave 2)
 
 ---
 
-- [ ] 31. Implement warehouse_document_r_w resource
+- [x] 31. Implement warehouse_document_r_w resource
 
   **What to do**:
   - Same pattern with URL prefix `warehouse_document_r_w`
@@ -1118,7 +1118,7 @@ Max Concurrent: 15 (Wave 2)
 
 ---
 
-- [ ] 32. Implement warehouse_document_w_z resource
+- [x] 32. Implement warehouse_document_w_z resource
 
   **What to do**:
   - Same pattern with URL prefix `warehouse_document_w_z`
@@ -1129,7 +1129,7 @@ Max Concurrent: 15 (Wave 2)
 
 ---
 
-- [ ] 33. Implement warehouse_document_z_d resource
+- [x] 33. Implement warehouse_document_z_d resource
 
   **What to do**:
   - Same pattern with URL prefix `warehouse_document_z_d`
@@ -1140,7 +1140,7 @@ Max Concurrent: 15 (Wave 2)
 
 ---
 
-- [ ] 34. Implement warehouse_document_z_p_d resource
+- [x] 34. Implement warehouse_document_z_p_d resource
 
   **What to do**:
   - Same pattern with URL prefix `warehouse_document_z_p_d`
@@ -1151,7 +1151,7 @@ Max Concurrent: 15 (Wave 2)
 
 ---
 
-- [ ] 35. Implement warehouse_document_z_p_m resource
+- [x] 35. Implement warehouse_document_z_p_m resource
 
   **What to do**:
   - Same pattern with URL prefix `warehouse_document_z_p_m`

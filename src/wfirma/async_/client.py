@@ -362,6 +362,22 @@ class WFirmaClient:
         return resource
 
     @property
+    def webhooks(self) -> Any:
+        """Convenience accessor for webhook-related endpoints.
+
+        Returns:
+            WebhooksResource instance bound to this client.
+        """
+        # Local import to avoid circular dependency between client and resources.
+        from wfirma.async_.resources.webhooks import WebhooksResource
+
+        resource = self._resources.get("webhooks")
+        if resource is None:
+            resource = WebhooksResource(self)
+            self._resources["webhooks"] = resource
+        return resource
+
+    @property
     def terms(self) -> Any:
         """Convenience accessor for term-related endpoints.
 
