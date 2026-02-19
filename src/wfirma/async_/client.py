@@ -234,6 +234,22 @@ class WFirmaClient:
         return resource
 
     @property
+    def user_companies(self) -> Any:
+        """Convenience accessor for user companies endpoints.
+
+        Returns:
+            UserCompaniesResource instance bound to this client.
+        """
+        # Local import to avoid circular dependency between client and resources.
+        from wfirma.async_.resources.user_companies import UserCompaniesResource
+
+        resource = self._resources.get("user_companies")
+        if resource is None:
+            resource = UserCompaniesResource(self)
+            self._resources["user_companies"] = resource
+        return resource
+
+    @property
     def vat_codes(self) -> Any:
         """Convenience accessor for VAT codes endpoints.
 
@@ -408,6 +424,22 @@ class WFirmaClient:
         return resource
 
     @property
+    def users(self) -> Any:
+        """Convenience accessor for users endpoints.
+
+        Returns:
+            UsersResource instance bound to this client.
+        """
+        # Local import to avoid circular dependency between client and resources.
+        from wfirma.async_.resources.users import UsersResource
+
+        resource = self._resources.get("users")
+        if resource is None:
+            resource = UsersResource(self)
+            self._resources["users"] = resource
+        return resource
+
+    @property
     def payment_cashboxes(self) -> Any:
         """Convenience accessor for payment_cashboxes endpoints.
 
@@ -575,19 +607,25 @@ class WFirmaClient:
         path: str,
         *,
         params: dict[str, str] | None = None,
+        user_scoped: bool = False,
     ) -> dict[str, Any]:
         """Send a GET request to the API.
 
         Args:
             path: The API endpoint path (e.g., "/users/get/123").
             params: Optional query parameters.
+            user_scoped: If True, skip automatic company_id injection (for user-scoped endpoints).
 
         Returns:
             Parsed response data.
         """
         url = self._build_url(path)
         headers = await self._get_auth_headers()
-        params = self._add_default_params(params)
+        params = (
+            self._add_default_params(params)
+            if not user_scoped
+            else (params.copy() if params else {})
+        )
 
         try:
             response = await self._http_client.get(url, headers=headers, params=params)
@@ -651,19 +689,21 @@ class WFirmaClient:
         path: str,
         *,
         params: dict[str, str] | None = None,
+        user_scoped: bool = False,
     ) -> dict[str, Any]:
         """Send a GET request expecting JSON response.
 
         Args:
             path: The API endpoint path.
             params: Optional query parameters.
+            user_scoped: If True, skip automatic company_id injection (for user-scoped endpoints).
 
         Returns:
             Parsed JSON response data.
         """
         params = params.copy() if params else {}
         params["outputFormat"] = "json"
-        return await self.get(path, params=params)
+        return await self.get(path, params=params, user_scoped=user_scoped)
 
     async def get_xml(
         self,

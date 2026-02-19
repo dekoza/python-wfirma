@@ -16,6 +16,8 @@ from wfirma.async_.resources.payment_cashboxes import PaymentCashboxesResource
 from wfirma.async_.resources.payments import PaymentsResource
 from wfirma.async_.resources.tags import TagsResource
 from wfirma.async_.resources.translation_languages import TranslationLanguagesResource
+from wfirma.async_.resources.user_companies import UserCompaniesResource
+from wfirma.async_.resources.users import UsersResource
 from wfirma.async_.resources.vat_codes import VatCodesResource
 from wfirma.async_.resources.warehouse_documents_pw import WarehouseDocumentPWResource
 from wfirma.async_.resources.warehouses import WarehousesResource
@@ -37,6 +39,8 @@ __all__ = [
     "PaymentsResource",
     "TagsResource",
     "TranslationLanguagesResource",
+    "UserCompaniesResource",
+    "UsersResource",
     "VatCodesResource",
     "WarehouseDocumentPWResource",
     "WarehousesResource",

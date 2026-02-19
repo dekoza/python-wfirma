@@ -16,6 +16,8 @@ from wfirma.sync.resources.payment_cashboxes import PaymentCashboxesResource
 from wfirma.sync.resources.payments import PaymentsResource
 from wfirma.sync.resources.tags import TagsResource
 from wfirma.sync.resources.translation_languages import TranslationLanguagesResource
+from wfirma.sync.resources.user_companies import UserCompaniesResource
+from wfirma.sync.resources.users import UsersResource
 from wfirma.sync.resources.vat_codes import VatCodesResource
 from wfirma.sync.resources.warehouse_documents_pw import WarehouseDocumentPWResource
 
@@ -36,6 +38,8 @@ __all__ = [
     "PaymentsResource",
     "TagsResource",
     "TranslationLanguagesResource",
+    "UserCompaniesResource",
+    "UsersResource",
     "VatCodesResource",
     "WarehouseDocumentPWResource",
 ]
