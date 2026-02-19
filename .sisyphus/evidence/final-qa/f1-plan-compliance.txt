@@ -1,0 +1,104 @@
+Must Have [4/5] | Must NOT Have [7/8] | Tasks [36/36] | VERDICT: REJECT
+
+Plan: .sisyphus/plans/wfirma-complete-api-coverage.md (read end-to-end, 1281 lines)
+
+Must Have audit (lines 75-81):
+1) Both sync and async implementations for every resource: PASS
+   - Verified 33/33 task resources exist in both:
+     - src/wfirma/sync/resources/*.py
+     - src/wfirma/async_/resources/*.py
+   - File existence check output: TOTAL_RESOURCES 33, ISSUES 0.
+
+2) Tests for every resource method: PASS
+   - Full suite run: uv run pytest --cache-clear -v
+   - Result: 1180 passed, 0 failed.
+   - New resource test files present in both sync and async trees.
+
+3) Tests for client property registration: FAIL
+   - Property tests exist for many resources, but no explicit property tests found for:
+     - warehouse_documents_pz
+     - warehouse_documents_rw
+     - warehouse_documents_wz
+     - warehouse_documents_zd
+     - warehouse_documents_zpd
+     - warehouse_documents_zpm
+   - Search result: no matches in tests for these property names.
+
+4) Pydantic models where appropriate: PASS (implementation-aligned)
+   - Typed model usage confirmed in new resources where implemented:
+     - users -> User.model_validate(...)
+     - warehouse_document_* -> WarehouseDocument.model_validate(...)
+   - Other resources intentionally return dict payloads per plan task guidance.
+
+5) Correct endpoint paths (known typos fixed): PASS
+   - Correct paths present: /notes/edit/, /series/edit/, /series/del/, /term_groups/edit/, /terms/edit/.
+   - Vehicles delete uses GET endpoint (/vehicles/delete/{id}) in sync and async resources.
+   - Webhooks edit uses PATCH endpoint (/webhooks/edit/{id}) in sync and async resources.
+
+Must NOT Have audit (lines 82-91):
+1) No abstract base classes or mixins: PASS
+   - No matches for ABC/abstractmethod in sync/async resource trees.
+   - No matches for Mixin in sync/async resource trees.
+
+2) No modifications to existing 7 resources except invoices extras: PASS
+   - Public method signatures for baseline resources match expected patterns.
+   - Invoices includes allowed additions: download, send, fiscalize, unfiscalize.
+
+3) No retry logic, pagination helpers, rate limiting: PASS
+   - No retry/backoff logic found in resource/client implementation paths.
+   - 'retry_after' appears in exception data structure only.
+
+4) No custom validators on Pydantic models: FAIL
+   - Found @field_validator in src/wfirma/models/common.py:264.
+
+5) No stubs for unsupported operations: PASS
+   - No NotImplementedError/TODO stubs in sync/async resources.
+
+6) No __all__ changes to resource __init__.py: PASS (guardrail not violated by forbidden pattern)
+   - NOTE: Export completeness is currently broken for full import verification (see deliverables/verification failure below).
+
+7) No refactoring of _payloads.py: PASS
+   - File remains present and functional; payload extraction tests pass.
+
+8) No inline imports except in client.py properties: PASS
+   - Indented imports found only in:
+     - src/wfirma/sync/client.py
+     - src/wfirma/async_/client.py
+
+Tasks completion status:
+- Plan task checkboxes 1..36: 36/36 marked [x].
+
+Verification commands (lines 1246-1271):
+1) uv run pytest --cache-clear -v: PASS
+   - 1180 passed, 0 failed.
+
+2) uv run pytest --cov=wfirma --cov-report=term-missing: PASS
+   - 1180 passed, coverage TOTAL 93% (>90%).
+
+3) uv run ruff check src tests: FAIL
+   - 34 lint errors reported.
+
+4) uv run mypy src: PASS
+   - Success: no issues found in 110 source files.
+
+5) Import verification command from line 1260: FAIL
+   - ImportError: cannot import name 'VehicleRunRatesResource' from wfirma.sync.resources
+   - Indicates missing exports in resource package __init__.py files.
+
+6) Client properties command from lines 1263-1271: PASS
+   - All listed sync properties present.
+   - Additional async mirror check: all listed async properties present.
+
+Evidence directory check:
+- .sisyphus/evidence exists and contains evidence files.
+- Existing final QA files:
+  - .sisyphus/evidence/final-qa/f2-code-quality.txt
+  - .sisyphus/evidence/final-qa/f3-test-coverage.txt
+  - .sisyphus/evidence/final-qa/f1-plan-compliance.txt (this report)
+
+Deliverables vs plan:
+- Resource implementation coverage: largely present (sync+async and tests).
+- Verification quality gates are not all green (ruff fails, import command fails).
+- Therefore plan compliance is not complete.
+
+Final verdict: REJECT
