@@ -22,16 +22,24 @@ from wfirma.async_.resources.payments import PaymentsResource
 from wfirma.async_.resources.series import SeriesResource
 from wfirma.async_.resources.tags import TagsResource
 from wfirma.async_.resources.taxregisters import TaxregistersResource
-from wfirma.async_.resources.webhooks import WebhooksResource
 from wfirma.async_.resources.term_groups import TermGroupsResource
 from wfirma.async_.resources.terms import TermsResource
 from wfirma.async_.resources.translation_languages import TranslationLanguagesResource
 from wfirma.async_.resources.user_companies import UserCompaniesResource
 from wfirma.async_.resources.users import UsersResource
 from wfirma.async_.resources.vat_codes import VatCodesResource
+from wfirma.async_.resources.vehicle_run_rates import VehicleRunRatesResource
 from wfirma.async_.resources.vehicles import VehiclesResource
+from wfirma.async_.resources.warehouse_documents_p_z import WarehouseDocumentPZResource
 from wfirma.async_.resources.warehouse_documents_pw import WarehouseDocumentPWResource
+from wfirma.async_.resources.warehouse_documents_r import WarehouseDocumentRResource
+from wfirma.async_.resources.warehouse_documents_r_w import WarehouseDocumentRWResource
+from wfirma.async_.resources.warehouse_documents_w_z import WarehouseDocumentWZResource
+from wfirma.async_.resources.warehouse_documents_z_d import WarehouseDocumentZDResource
+from wfirma.async_.resources.warehouse_documents_z_p_d import WarehouseDocumentZPDResource
+from wfirma.async_.resources.warehouse_documents_z_p_m import WarehouseDocumentZPMResource
 from wfirma.async_.resources.warehouses import WarehousesResource
+from wfirma.async_.resources.webhooks import WebhooksResource
 
 __all__ = [
     "CompanyAccountsResource",
@@ -62,8 +70,16 @@ __all__ = [
     "UserCompaniesResource",
     "UsersResource",
     "VatCodesResource",
+    "VehicleRunRatesResource",
     "VehiclesResource",
-    "WebhooksResource",
     "WarehouseDocumentPWResource",
+    "WarehouseDocumentPZResource",
+    "WarehouseDocumentRResource",
+    "WarehouseDocumentRWResource",
+    "WarehouseDocumentWZResource",
+    "WarehouseDocumentZDResource",
+    "WarehouseDocumentZPDResource",
+    "WarehouseDocumentZPMResource",
     "WarehousesResource",
+    "WebhooksResource",
 ]
