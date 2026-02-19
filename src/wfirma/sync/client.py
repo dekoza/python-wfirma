@@ -165,6 +165,22 @@ class WFirmaClient:
         return resource
 
     @property
+    def invoice_deliveries(self) -> Any:
+        """Convenience accessor for invoice delivery-related endpoints.
+
+        Returns:
+            InvoiceDeliveriesResource instance bound to this client.
+        """
+        # Local import to avoid circular dependency between client and resources.
+        from wfirma.sync.resources.invoice_deliveries import InvoiceDeliveriesResource
+
+        resource = self._resources.get("invoice_deliveries")
+        if resource is None:
+            resource = InvoiceDeliveriesResource(self)
+            self._resources["invoice_deliveries"] = resource
+        return resource
+
+    @property
     def payments(self) -> Any:
         """Convenience accessor for payment-related endpoints.
 

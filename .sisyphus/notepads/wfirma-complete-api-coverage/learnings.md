@@ -1074,6 +1074,205 @@ def translation_languages(self) -> Any:
 - tests/async_/test_client_translation_languages_property.py: 2/2 ✓
 ```
 
+## Task 5: InvoiceDeliveriesResource Implementation (CRUD Pattern) | 2026-02-19T??:??:??Z
+
+**Status:** ✅ COMPLETED | 22/22 tests pass | 100% coverage | 0 mypy errors | 0 ruff errors
+
+### Summary
+Implemented `InvoiceDeliveriesResource` for both sync and async clients with **complete CRUD operations** (no edit): `add()`, `find()`, `get()`, `delete()`. This represents the first Wave 4 CRUD resource following the Tags resource template.
+
+### Key Implementation Details
+
+#### Endpoint Specification (from docs/api_reference.md:253-284)
+- `POST /invoice_deliveries/add` → returns single delivery
+- `GET /invoice_deliveries/find` → returns list of deliveries  
+- `GET /invoice_deliveries/get/{id}` → returns single delivery
+- `DELETE /invoice_deliveries/delete/{id}` → returns deleted delivery
+- **NO edit endpoint** - API does not provide edit method for this resource
+
+#### Method Signatures
+```python
+def add(self, invoice_delivery: dict[str, Any]) -> dict[str, Any]:
+    """Create new invoice delivery."""
+
+def find(self, params: dict[str, Any] | None = None) -> list[dict[str, Any]]:
+    """List invoice deliveries."""
+
+def get(self, invoice_delivery_id: int) -> dict[str, Any]:
+    """Get single invoice delivery by ID."""
+
+def delete(self, invoice_delivery_id: int) -> dict[str, Any]:
+    """Delete invoice delivery by ID."""
+```
+
+#### Container/Object Key Pattern (Verified from api_spec.json)
+- **Container key**: `"invoice_deliveries"` (plural)
+- **Object key**: `"invoice_delivery"` (singular)
+- **Payload wrapping for POST add()**: `{"invoice_deliveries": [{"invoice_delivery": {...}}]}`
+- **Response structure**:
+  ```json
+  {
+    "status": {"code": "OK"},
+    "invoice_deliveries": {
+      "0": {"invoice_delivery": {...}}
+    }
+  }
+  ```
+
+#### Files Created (8 total)
+1. ✅ `src/wfirma/sync/resources/invoice_deliveries.py` (47 statements, 100% coverage)
+   - 4 CRUD methods: add, find, get, delete
+   - Static helper `_extract_invoice_delivery_payload()`
+   - Uses payload helpers from `_payloads.py`
+
+2. ✅ `src/wfirma/async_/resources/invoice_deliveries.py` (47 statements, 100% coverage)
+   - Async mirror with `async def` methods and `await` calls
+
+3. ✅ `tests/sync/resources/test_sync_invoice_deliveries_resource.py` (8 tests)
+   - add: successful add, payload extraction
+   - find: list return, empty result handling
+   - get: successful retrieval, payload extraction
+   - delete: successful deletion, payload extraction
+
+4. ✅ `tests/async_/resources/test_async_invoice_deliveries_resource.py` (8 async mirrors)
+
+5. ✅ `tests/sync/test_client_invoice_deliveries_property.py` (2 tests)
+   - Property returns correct type
+   - Caching works via identity check
+
+6. ✅ `tests/async_/test_client_invoice_deliveries_property.py` (2 async mirrors)
+
+#### Files Modified (4 total)
+1. ✅ `src/wfirma/sync/client.py` — Added `@property invoice_deliveries()` between invoices and payments (lines 167-182)
+2. ✅ `src/wfirma/async_/client.py` — Added `@property invoice_deliveries()` between invoices and payments (lines 172-187)
+3. ✅ `src/wfirma/sync/resources/__init__.py` — Added alphabetical import/export (line 14, 39)
+4. ✅ `src/wfirma/async_/resources/__init__.py` — Added alphabetical import/export (line 14, 40)
+
+### Test Coverage (22 Tests Total - All PASS ✓)
+
+**Sync Resource Tests (8)**:
+- ✅ `test_add_calls_expected_endpoint_and_returns_dict`: POST add returns dict
+- ✅ `test_add_extracts_payload_correctly`: Payload extraction verified
+- ✅ `test_find_calls_expected_endpoint_and_returns_list`: GET find returns list
+- ✅ `test_find_returns_empty_list_when_container_is_empty`: Empty container → []
+- ✅ `test_get_calls_expected_endpoint_and_returns_dict`: GET get returns dict
+- ✅ `test_get_extracts_payload_correctly`: Payload extraction verified
+- ✅ `test_delete_calls_expected_endpoint_and_returns_dict`: DELETE returns dict
+- ✅ `test_delete_extracts_payload_correctly`: Payload extraction verified
+
+**Async Resource Tests (8)**:
+- ✅ Async mirrors of all 8 sync tests with `@pytest.mark.asyncio` and `await`
+
+**Sync Client Property Tests (2)**:
+- ✅ `test_returns_resource_instance`: Property returns InvoiceDeliveriesResource
+- ✅ `test_is_cached`: Caching works via `assert first is second`
+
+**Async Client Property Tests (2)**:
+- ✅ Async mirrors of sync property tests
+
+### Discovery: CRUD Resource Pattern (Wave 4 - Task 5)
+
+**Key Finding**: First complete CRUD implementation in Wave 4. Follows exact Tags resource template with 4 methods:
+
+#### Method Classification
+- **add()**: POST endpoint with payload wrapping
+  - Takes unpacked dict (NOT pre-wrapped)
+  - Wraps in `{"invoice_deliveries": [{"invoice_delivery": data}]}` internally
+  - Returns single dict via `extract_single_object_payload()`
+
+- **find()**: GET list endpoint with optional params
+  - Returns `list[dict[str, Any]]` via `extract_object_list_payloads()`
+  - Supports optional `params` dict for filtering
+
+- **get()**: GET single endpoint
+  - Takes resource ID (int)
+  - Returns single dict via `extract_single_object_payload()`
+
+- **delete()**: DELETE endpoint
+  - Takes resource ID (int)
+  - Returns deleted dict via `extract_single_object_payload()`
+
+#### Payload Wrapping Pattern (add method specific)
+```python
+def add(self, invoice_delivery: dict[str, Any]) -> dict[str, Any]:
+    data = self._client.post_json(
+        "/invoice_deliveries/add",
+        data={"invoice_deliveries": [{"invoice_delivery": invoice_delivery}]},
+    )
+    return self._extract_invoice_delivery_payload(data)
+```
+
+Key insight: Client receives unwrapped dict (simpler API), resource handles wrapping internally.
+
+#### Helper Method Pattern
+```python
+@staticmethod
+def _extract_invoice_delivery_payload(data: dict[str, Any]) -> dict[str, Any]:
+    payload = extract_single_object_payload(
+        data=data,
+        container_key="invoice_deliveries",
+        object_key="invoice_delivery",
+    )
+    return dict(payload)
+```
+
+### Alphabetical Insertion Pattern
+
+**Sync Client** (lines 167-182):
+- Inserted between `invoices` (lines 152-165) and `payments` (line 168)
+- Follows alphabetical order: invoices → invoice_deliveries → payments
+
+**Async Client** (lines 172-187):
+- Same position relative to other properties
+- Consistent alphabetical ordering maintained
+
+**Sync Resources __init__.py** (lines 13-15, 39-41):
+- Import: between `invoice_descriptions` and `invoices` 
+- Export: between `InterestsResource` and `InvoiceDescriptionsResource`
+- Maintains alphabetical `InvoiceDeliveriesResource` ordering
+
+### Critical Pattern Rules for Wave 4 CRUD Resources
+
+1. **Container/Object Key Discovery**: Always verify from `docs/api_spec.json` before implementation
+2. **Payload Wrapping for add()**: Wrapping is internal to resource, client API receives unwrapped dict
+3. **No Edit Method Assumption**: API may not provide edit endpoint; verify before implementing
+4. **Dict Return Pattern**: All CRUD resources return raw `dict[str, Any]`, NOT Pydantic models
+5. **Extraction Helpers**: Use `extract_single_object_payload()` for get/add/delete, `extract_object_list_payloads()` for find
+6. **Client Property Pattern**: Same lazy-init pattern as Wave 2/3 resources
+
+### Verification Results
+```
+✅ Tests: 22/22 PASS (100% success)
+   - 8 sync resource tests PASS
+   - 8 async resource tests PASS
+   - 2 sync client property tests PASS
+   - 2 async client property tests PASS
+
+✅ Type Checking: Success (0 errors)
+✅ Linting: All checks passed
+✅ Code Coverage: 100% on both resource files (47 statements each)
+```
+
+### Files Modified/Created Summary
+- **8 files created**: 2 resources (sync/async) + 4 test resource files + 2 client property test files
+- **4 files modified**: 2 clients + 2 init files
+- **Total coverage**: 100% on resource implementations
+- **Total tests**: 22 tests, all passing
+- **Type checking**: 0 mypy errors
+- **Linting**: 0 ruff errors
+
+### Key Learnings
+
+1. **CRUD vs Read-Only**: First Wave 4 task introduces full CRUD (add/find/get/delete). Wave 2/3 were read-only.
+2. **add() Wrapping Pattern**: Client receives clean dict, resource handles nested array wrapping internally
+3. **Container Structure**: wFirma uses indexed containers `{"0": {...}, "1": {...}}` requiring extraction helpers
+4. **No Optional Edit**: API spec doesn't mandate edit() - only implement what API provides
+5. **Alphabetical Ordering Critical**: All imports/exports/properties must maintain alphabetical order for consistency
+6. **TDD Catches Patterns**: Writing tests first revealed the exact payload wrapping structure needed
+
+### Next Steps for Wave 4
+Tasks 6-9 (company_packs, contractors, company, users) likely follow this exact CRUD pattern with different container/object keys. Reference this task for payload wrapping structure and alphabetical insertion positions.
+
 ### Challenges & Solutions
 **Challenge**: Client property insertion into alphabetically-ordered property list  
 **Solution**: Direct file read/write with string replacement (Edit tool) to insert between tags and vat_codes properties  

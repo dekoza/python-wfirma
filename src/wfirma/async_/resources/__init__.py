@@ -10,6 +10,7 @@ from wfirma.async_.resources.declaration_countries import DeclarationCountriesRe
 from wfirma.async_.resources.expenses import ExpensesResource
 from wfirma.async_.resources.goods import GoodsResource
 from wfirma.async_.resources.interests import InterestsResource
+from wfirma.async_.resources.invoice_deliveries import InvoiceDeliveriesResource
 from wfirma.async_.resources.invoice_descriptions import InvoiceDescriptionsResource
 from wfirma.async_.resources.invoices import InvoicesResource
 from wfirma.async_.resources.ledger_accountant_years import LedgerAccountantYearsResource
@@ -36,8 +37,9 @@ __all__ = [
     "ExpensesResource",
     "GoodsResource",
     "InterestsResource",
-    "InvoicesResource",
+    "InvoiceDeliveriesResource",
     "InvoiceDescriptionsResource",
+    "InvoicesResource",
     "LedgerAccountantYearsResource",
     "LedgerOperationSchemasResource",
     "PaymentCashboxesResource",
