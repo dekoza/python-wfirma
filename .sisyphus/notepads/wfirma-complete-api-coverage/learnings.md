@@ -2610,3 +2610,107 @@ Wave 5 Task 25 (NotesResource) is production-ready with:
 - Test output: 24/24 PASS (coverage: 100%)
 - Type check: `Success: no issues found in 4 source files`
 - Lint check: `All checks passed!`
+
+## Task 28: VehiclesResource Implementation (CRUD with GET delete) | 2026-02-19 16:40
+
+**Context**: Implemented full CRUD VehiclesResource with non-standard GET delete endpoint.
+
+**API Quirk Documented**:
+- `/vehicles/delete/{vehicleId}` uses **GET method** (not DELETE) per wFirma API specification
+- This is unusual but documented in `docs/api_reference.md:841`
+- Implementation uses `self._client.get_json()` NOT `self._client.delete_json()`
+- Added clear docstring comment explaining the GET method quirk
+
+**Implementation Details**:
+- Pattern: Followed `tags.py` (full CRUD) structure exactly
+- Payload wrapping: `{"vehicles": {"vehicle": data}}` for add/edit
+- Extraction: Used `extract_object_list_payloads()` for find(), `extract_single_object_payload()` for single items
+- Container key: `"vehicles"`, object key: `"vehicle"`
+- Delete response: Returns raw response dict (not boolean like tags)
+
+**Files Created** (8):
+1. `src/wfirma/sync/resources/vehicles.py` (35 lines, 5 methods)
+2. `src/wfirma/async_/resources/vehicles.py` (35 lines, 5 methods)
+3. `tests/sync/resources/test_sync_vehicles_resource.py` (6 test classes)
+4. `tests/async_/resources/test_async_vehicles_resource.py` (6 test classes)
+5. `tests/sync/test_client_vehicles_property.py` (2 tests)
+6. `tests/async_/test_client_vehicles_property.py` (2 tests)
+
+**Files Modified** (4):
+1. `src/wfirma/sync/resources/__init__.py` (added VehiclesResource)
+2. `src/wfirma/async_/resources/__init__.py` (added VehiclesResource)
+3. `src/wfirma/sync/client.py` (added `vehicles` property after `vehicle_run_rates`)
+4. `src/wfirma/async_/client.py` (added `vehicles` property after `vehicle_run_rates`)
+
+**Test Verification**:
+- All 16 tests passed (6 resource + 6 async resource + 2 client + 2 async client)
+- DELETE test explicitly verifies `route.calls.last.request.method == "GET"`
+- Coverage: 97% on both sync/async resources (only missing __all__ export line)
+
+**Code Quality**:
+- `uv run mypy`: Success, no issues
+- `uv run ruff check`: All checks passed
+- Pattern consistency: Matches all other full CRUD resources
+
+**Key Learning**:
+When API endpoints use non-standard HTTP methods (GET for delete), document with:
+1. Clear docstring comment in method
+2. Explicit test assertion on request method
+3. Use correct client method (`get_json()` not `delete_json()`)
+
+**Next Resources** (remaining non-standard patterns):
+- Check for similar quirks in remaining endpoints
+
+
+## Task 22: DocumentsResource Implementation (add, find, get, download, delete) | 2026-02-19T17:04:58+01:00
+
+### Implementation Summary
+- Created DocumentsResource with 5 methods: add, find, get, download, delete
+- Followed CRUD-without-edit pattern from invoice_deliveries.py
+- Implemented binary download using get_binary() returning bytes
+- Used raw dict[str, Any] for all methods except download (bytes)
+- Container key: "documents", Object key: "document"
+
+### Key Patterns Applied
+1. **CRUD without edit**: Documents API has no edit endpoint, followed invoice_deliveries pattern
+2. **Binary download method**: 
+   - Uses `get_binary(f"/documents/download/{document_id}")` returning bytes directly
+   - Different from invoices: GET endpoint instead of POST
+   - No JSON parsing for download response
+3. **Payload extraction**:
+   - find(): extract_object_list_payloads() with "documents" container
+   - add/get/delete(): extract_single_object_payload() with "document" object key
+4. **Client property registration**:
+   - Sync: @functools.cached_property with inline import
+   - Async: @property with manual _cache dict
+   - Alphabetically inserted between declaration_countries and expenses
+
+### Test Coverage
+- 26 tests total (all passing)
+  - 11 sync resource tests (6 test classes)
+  - 11 async resource tests (6 test classes)
+  - 2 sync property tests
+  - 2 async property tests
+- mypy: No type errors
+- ruff: No linting errors
+
+### Files Created (8)
+1. src/wfirma/sync/resources/documents.py
+2. src/wfirma/async_/resources/documents.py
+3. tests/sync/resources/test_sync_documents_resource.py
+4. tests/async_/resources/test_async_documents_resource.py
+5. tests/sync/test_client_documents_property.py
+6. tests/async_/test_client_documents_property.py
+
+### Files Modified (4)
+7. src/wfirma/sync/client.py (added documents property)
+8. src/wfirma/async_/client.py (added documents property)
+9. src/wfirma/sync/resources/__init__.py (export DocumentsResource)
+10. src/wfirma/async_/resources/__init__.py (export DocumentsResource)
+
+### Key Learnings
+- Documents download endpoint uses GET /documents/download/{id} (invoices use POST /invoices/download)
+- Binary methods must return bytes directly, no dict wrapping
+- CRUD-without-edit is a common pattern for simpler resources
+- Property test files should follow naming: test_client_{resource}_property.py
+
