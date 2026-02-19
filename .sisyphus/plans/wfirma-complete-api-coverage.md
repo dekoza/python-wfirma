@@ -841,7 +841,7 @@ Max Concurrent: 15 (Wave 2)
 
 ### Wave 3: Parameterized-Path Read-Only Resources
 
-- [ ] 19. Implement declaration_body_jpkvat resource (get by year/month)
+- [x] 19. Implement declaration_body_jpkvat resource (get by year/month)
 
   **What to do**:
   - Create `DeclarationBodyJpkvatResource` with `get(year: int, month: int)` → `dict`
@@ -874,7 +874,7 @@ Max Concurrent: 15 (Wave 2)
 
 ---
 
-- [ ] 20. Implement declaration_body_pit resource (get by type/year)
+- [x] 20. Implement declaration_body_pit resource (get by type/year)
 
   **What to do**:
   - Create `DeclarationBodyPitResource` with `get(pit_type: str, year: int)` → `dict`
@@ -892,7 +892,7 @@ Max Concurrent: 15 (Wave 2)
 
 ---
 
-- [ ] 21. Implement taxregisters resource (get by year/month)
+- [x] 21. Implement taxregisters resource (get by year/month)
 
   **What to do**:
   - Create `TaxregistersResource` with `get(year: int, month: int)` → `dict`
