@@ -955,7 +955,7 @@ Max Concurrent: 15 (Wave 2)
 
 ---
 
-- [ ] 24. Implement notes resource (add, find, get, edit, delete)
+- [x] 24. Implement notes resource (add, find, get, edit, delete)
 
   **What to do**:
   - Create `NotesResource` with full CRUD
@@ -978,7 +978,7 @@ Max Concurrent: 15 (Wave 2)
 
 ---
 
-- [ ] 25. Implement series resource (add, find, get, edit, delete)
+- [x] 25. Implement series resource (add, find, get, edit, delete)
 
   **What to do**:
   - Create `SeriesResource` with full CRUD
@@ -1002,7 +1002,7 @@ Max Concurrent: 15 (Wave 2)
 
 ---
 
-- [ ] 26. Implement term_groups resource (add, find, get, edit, delete)
+- [x] 26. Implement term_groups resource (add, find, get, edit, delete)
 
   **What to do**:
   - Create `TermGroupsResource` with full CRUD
@@ -1020,7 +1020,7 @@ Max Concurrent: 15 (Wave 2)
 
 ---
 
-- [ ] 27. Implement terms resource (add, find, get, edit, delete)
+- [x] 27. Implement terms resource (add, find, get, edit, delete)
 
   **What to do**:
   - Create `TermsResource` with full CRUD
