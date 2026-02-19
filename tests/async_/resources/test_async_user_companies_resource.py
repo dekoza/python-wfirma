@@ -84,7 +84,7 @@ class TestUserCompaniesResourceGet:
                     )
                 )
 
-                result = await resource.get(999)
+                await resource.get(999)
 
                 assert route.called
                 call_params = route.calls[0].request.url.params

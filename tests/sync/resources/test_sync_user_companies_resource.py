@@ -84,7 +84,7 @@ class TestUserCompaniesResourceGet:
                 )
             )
 
-            result = resource.get(999)
+            resource.get(999)
 
             assert route.called
             # Verify company_id is NOT in params
