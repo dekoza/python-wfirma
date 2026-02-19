@@ -373,6 +373,22 @@ class WFirmaClient:
         return resource
 
     @property
+    def vehicles(self) -> Any:
+        """Convenience accessor for vehicles endpoints.
+
+        Returns:
+            VehiclesResource instance bound to this client.
+        """
+        # Local import to avoid circular dependency between client and resources.
+        from wfirma.sync.resources.vehicles import VehiclesResource
+
+        resource = self._resources.get("vehicles")
+        if resource is None:
+            resource = VehiclesResource(self)
+            self._resources["vehicles"] = resource
+        return resource
+
+    @property
     def warehouses(self) -> Any:
         """Convenience accessor for warehouses endpoints.
 
@@ -418,6 +434,22 @@ class WFirmaClient:
         if resource is None:
             resource = CompanyPacksResource(self)
             self._resources["company_packs"] = resource
+        return resource
+
+    @property
+    def documents(self) -> Any:
+        """Convenience accessor for documents endpoints.
+
+        Returns:
+            DocumentsResource instance bound to this client.
+        """
+        # Local import to avoid circular dependency between client and resources.
+        from wfirma.sync.resources.documents import DocumentsResource
+
+        resource = self._resources.get("documents")
+        if resource is None:
+            resource = DocumentsResource(self)
+            self._resources["documents"] = resource
         return resource
 
     @property

@@ -7,6 +7,7 @@ from wfirma.async_.resources.contractors import ContractorResource
 from wfirma.async_.resources.declaration_body_jpkvat import DeclarationBodyJpkvatResource
 from wfirma.async_.resources.declaration_body_pit import DeclarationBodyPitResource
 from wfirma.async_.resources.declaration_countries import DeclarationCountriesResource
+from wfirma.async_.resources.documents import DocumentsResource
 from wfirma.async_.resources.expenses import ExpensesResource
 from wfirma.async_.resources.goods import GoodsResource
 from wfirma.async_.resources.interests import InterestsResource
@@ -27,6 +28,7 @@ from wfirma.async_.resources.translation_languages import TranslationLanguagesRe
 from wfirma.async_.resources.user_companies import UserCompaniesResource
 from wfirma.async_.resources.users import UsersResource
 from wfirma.async_.resources.vat_codes import VatCodesResource
+from wfirma.async_.resources.vehicles import VehiclesResource
 from wfirma.async_.resources.warehouse_documents_pw import WarehouseDocumentPWResource
 from wfirma.async_.resources.warehouses import WarehousesResource
 
@@ -38,6 +40,7 @@ __all__ = [
     "DeclarationBodyJpkvatResource",
     "DeclarationBodyPitResource",
     "DeclarationCountriesResource",
+    "DocumentsResource",
     "ExpensesResource",
     "GoodsResource",
     "InterestsResource",
@@ -58,6 +61,7 @@ __all__ = [
     "UserCompaniesResource",
     "UsersResource",
     "VatCodesResource",
+    "VehiclesResource",
     "WarehouseDocumentPWResource",
     "WarehousesResource",
 ]
