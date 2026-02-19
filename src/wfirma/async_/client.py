@@ -234,6 +234,21 @@ class WFirmaClient:
         return resource
 
     @property
+    def taxregisters(self) -> Any:
+        """Convenience accessor for taxregisters endpoints.
+
+        Returns:
+            TaxregistersResource instance bound to this client.
+        """
+        from wfirma.async_.resources.taxregisters import TaxregistersResource
+
+        resource = self._resources.get("taxregisters")
+        if resource is None:
+            resource = TaxregistersResource(self)
+            self._resources["taxregisters"] = resource
+        return resource
+
+    @property
     def user_companies(self) -> Any:
         """Convenience accessor for user companies endpoints.
 
@@ -373,6 +388,21 @@ class WFirmaClient:
         if resource is None:
             resource = DeclarationCountriesResource(self)
             self._resources["declaration_countries"] = resource
+        return resource
+
+    @property
+    def declaration_body_jpkvat(self) -> Any:
+        """Convenience accessor for declaration body jpkvat endpoints.
+
+        Returns:
+            DeclarationBodyJpkvatResource instance bound to this client.
+        """
+        from wfirma.async_.resources.declaration_body_jpkvat import DeclarationBodyJpkvatResource
+
+        resource = self._resources.get("declaration_body_jpkvat")
+        if resource is None:
+            resource = DeclarationBodyJpkvatResource(self)
+            self._resources["declaration_body_jpkvat"] = resource
         return resource
 
     @property
