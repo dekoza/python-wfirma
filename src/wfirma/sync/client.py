@@ -229,6 +229,118 @@ class WFirmaClient:
         return resource
 
     @property
+    def warehouse_documents_pz(self) -> Any:
+        """Convenience accessor for PZ warehouse document endpoints.
+
+        Returns:
+            WarehouseDocumentPZResource instance bound to this client.
+        """
+        # Local import to avoid circular dependency between client and resources.
+        from wfirma.sync.resources.warehouse_documents_p_z import WarehouseDocumentPZResource
+
+        resource = self._resources.get("warehouse_documents_pz")
+        if resource is None:
+            resource = WarehouseDocumentPZResource(self)
+            self._resources["warehouse_documents_pz"] = resource
+        return resource
+
+    @property
+    def warehouse_documents_r(self) -> Any:
+        """Convenience accessor for R warehouse document endpoints.
+
+        Returns:
+            WarehouseDocumentRResource instance bound to this client.
+        """
+        # Local import to avoid circular dependency between client and resources.
+        from wfirma.sync.resources.warehouse_documents_r import WarehouseDocumentRResource
+
+        resource = self._resources.get("warehouse_documents_r")
+        if resource is None:
+            resource = WarehouseDocumentRResource(self)
+            self._resources["warehouse_documents_r"] = resource
+        return resource
+
+    @property
+    def warehouse_documents_rw(self) -> Any:
+        """Convenience accessor for RW warehouse document endpoints.
+
+        Returns:
+            WarehouseDocumentRWResource instance bound to this client.
+        """
+        # Local import to avoid circular dependency between client and resources.
+        from wfirma.sync.resources.warehouse_documents_r_w import WarehouseDocumentRWResource
+
+        resource = self._resources.get("warehouse_documents_rw")
+        if resource is None:
+            resource = WarehouseDocumentRWResource(self)
+            self._resources["warehouse_documents_rw"] = resource
+        return resource
+
+    @property
+    def warehouse_documents_wz(self) -> Any:
+        """Convenience accessor for WZ warehouse document endpoints.
+
+        Returns:
+            WarehouseDocumentWZResource instance bound to this client.
+        """
+        # Local import to avoid circular dependency between client and resources.
+        from wfirma.sync.resources.warehouse_documents_w_z import WarehouseDocumentWZResource
+
+        resource = self._resources.get("warehouse_documents_wz")
+        if resource is None:
+            resource = WarehouseDocumentWZResource(self)
+            self._resources["warehouse_documents_wz"] = resource
+        return resource
+
+    @property
+    def warehouse_documents_zd(self) -> Any:
+        """Convenience accessor for ZD warehouse document endpoints.
+
+        Returns:
+            WarehouseDocumentZDResource instance bound to this client.
+        """
+        # Local import to avoid circular dependency between client and resources.
+        from wfirma.sync.resources.warehouse_documents_z_d import WarehouseDocumentZDResource
+
+        resource = self._resources.get("warehouse_documents_zd")
+        if resource is None:
+            resource = WarehouseDocumentZDResource(self)
+            self._resources["warehouse_documents_zd"] = resource
+        return resource
+
+    @property
+    def warehouse_documents_zpd(self) -> Any:
+        """Convenience accessor for ZPD warehouse document endpoints.
+
+        Returns:
+            WarehouseDocumentZPDResource instance bound to this client.
+        """
+        # Local import to avoid circular dependency between client and resources.
+        from wfirma.sync.resources.warehouse_documents_z_p_d import WarehouseDocumentZPDResource
+
+        resource = self._resources.get("warehouse_documents_zpd")
+        if resource is None:
+            resource = WarehouseDocumentZPDResource(self)
+            self._resources["warehouse_documents_zpd"] = resource
+        return resource
+
+    @property
+    def warehouse_documents_zpm(self) -> Any:
+        """Convenience accessor for ZPM warehouse document endpoints.
+
+        Returns:
+            WarehouseDocumentZPMResource instance bound to this client.
+        """
+        # Local import to avoid circular dependency between client and resources.
+        from wfirma.sync.resources.warehouse_documents_z_p_m import WarehouseDocumentZPMResource
+
+        resource = self._resources.get("warehouse_documents_zpm")
+        if resource is None:
+            resource = WarehouseDocumentZPMResource(self)
+            self._resources["warehouse_documents_zpm"] = resource
+        return resource
+
+    @property
     def series(self) -> Any:
         """Convenience accessor for series-related endpoints.
 

@@ -62,6 +62,7 @@ class WarehouseDocumentType(str, Enum):
     - WZ: Wydanie Zewnętrzne (External issue to customer)
     - ZD: Zwrot do Dostawcy (Return to supplier)
     - ZPD: Zwrot Przyjętych Dostaw (Return of received deliveries)
+    - ZPM: Zwrot Przyjętych Materiałów (Return of received materials)
 
     Attributes:
         PW: Internal receipt (Przyjęcie Wewnętrzne).
@@ -71,6 +72,7 @@ class WarehouseDocumentType(str, Enum):
         WZ: External issue (Wydanie Zewnętrzne).
         ZD: Return to supplier (Zwrot do Dostawcy).
         ZPD: Return of received deliveries (Zwrot Przyjętych Dostaw).
+        ZPM: Return of received materials (Zwrot Przyjętych Materiałów).
     """
 
     PW = "p_w"
@@ -80,6 +82,7 @@ class WarehouseDocumentType(str, Enum):
     WZ = "w_z"
     ZD = "z_d"
     ZPD = "z_p_d"
+    ZPM = "z_p_m"
 
 
 class WarehouseDocumentContent(
