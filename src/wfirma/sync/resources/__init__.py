@@ -4,6 +4,8 @@ from wfirma.sync.resources.company import CompanyResource
 from wfirma.sync.resources.company_accounts import CompanyAccountsResource
 from wfirma.sync.resources.company_packs import CompanyPacksResource
 from wfirma.sync.resources.contractors import ContractorResource
+from wfirma.sync.resources.declaration_body_jpkvat import DeclarationBodyJpkvatResource
+from wfirma.sync.resources.declaration_body_pit import DeclarationBodyPitResource
 from wfirma.sync.resources.declaration_countries import DeclarationCountriesResource
 from wfirma.sync.resources.expenses import ExpensesResource
 from wfirma.sync.resources.goods import GoodsResource
@@ -15,6 +17,7 @@ from wfirma.sync.resources.ledger_operation_schemas import LedgerOperationSchema
 from wfirma.sync.resources.payment_cashboxes import PaymentCashboxesResource
 from wfirma.sync.resources.payments import PaymentsResource
 from wfirma.sync.resources.tags import TagsResource
+from wfirma.sync.resources.taxregisters import TaxregistersResource
 from wfirma.sync.resources.translation_languages import TranslationLanguagesResource
 from wfirma.sync.resources.user_companies import UserCompaniesResource
 from wfirma.sync.resources.users import UsersResource
@@ -26,6 +29,8 @@ __all__ = [
     "CompanyPacksResource",
     "CompanyResource",
     "ContractorResource",
+    "DeclarationBodyJpkvatResource",
+    "DeclarationBodyPitResource",
     "DeclarationCountriesResource",
     "ExpensesResource",
     "GoodsResource",
@@ -37,6 +42,7 @@ __all__ = [
     "PaymentCashboxesResource",
     "PaymentsResource",
     "TagsResource",
+    "TaxregistersResource",
     "TranslationLanguagesResource",
     "UserCompaniesResource",
     "UsersResource",

@@ -4,6 +4,8 @@ from wfirma.async_.resources.company import CompanyResource
 from wfirma.async_.resources.company_accounts import CompanyAccountsResource
 from wfirma.async_.resources.company_packs import CompanyPacksResource
 from wfirma.async_.resources.contractors import ContractorResource
+from wfirma.async_.resources.declaration_body_jpkvat import DeclarationBodyJpkvatResource
+from wfirma.async_.resources.declaration_body_pit import DeclarationBodyPitResource
 from wfirma.async_.resources.declaration_countries import DeclarationCountriesResource
 from wfirma.async_.resources.expenses import ExpensesResource
 from wfirma.async_.resources.goods import GoodsResource
@@ -15,6 +17,7 @@ from wfirma.async_.resources.ledger_operation_schemas import LedgerOperationSche
 from wfirma.async_.resources.payment_cashboxes import PaymentCashboxesResource
 from wfirma.async_.resources.payments import PaymentsResource
 from wfirma.async_.resources.tags import TagsResource
+from wfirma.async_.resources.taxregisters import TaxregistersResource
 from wfirma.async_.resources.translation_languages import TranslationLanguagesResource
 from wfirma.async_.resources.user_companies import UserCompaniesResource
 from wfirma.async_.resources.users import UsersResource
@@ -27,6 +30,8 @@ __all__ = [
     "CompanyPacksResource",
     "CompanyResource",
     "ContractorResource",
+    "DeclarationBodyJpkvatResource",
+    "DeclarationBodyPitResource",
     "DeclarationCountriesResource",
     "ExpensesResource",
     "GoodsResource",
@@ -38,6 +43,7 @@ __all__ = [
     "PaymentCashboxesResource",
     "PaymentsResource",
     "TagsResource",
+    "TaxregistersResource",
     "TranslationLanguagesResource",
     "UserCompaniesResource",
     "UsersResource",

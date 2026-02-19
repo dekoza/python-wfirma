@@ -213,6 +213,22 @@ class WFirmaClient:
         return resource
 
     @property
+    def taxregisters(self) -> Any:
+        """Convenience accessor for taxregister endpoints.
+
+        Returns:
+            TaxregistersResource instance bound to this client.
+        """
+        # Local import to avoid circular dependency between client and resources.
+        from wfirma.sync.resources.taxregisters import TaxregistersResource
+
+        resource = self._resources.get("taxregisters")
+        if resource is None:
+            resource = TaxregistersResource(self)
+            self._resources["taxregisters"] = resource
+        return resource
+
+    @property
     def translation_languages(self) -> Any:
         """Convenience accessor for translation languages endpoints.
 
@@ -338,6 +354,38 @@ class WFirmaClient:
         if resource is None:
             resource = DeclarationCountriesResource(self)
             self._resources["declaration_countries"] = resource
+        return resource
+
+    @property
+    def declaration_body_jpkvat(self) -> Any:
+        """Convenience accessor for declaration body jpkvat endpoints.
+
+        Returns:
+            DeclarationBodyJpkvatResource instance bound to this client.
+        """
+        # Local import to avoid circular dependency between client and resources.
+        from wfirma.sync.resources.declaration_body_jpkvat import DeclarationBodyJpkvatResource
+
+        resource = self._resources.get("declaration_body_jpkvat")
+        if resource is None:
+            resource = DeclarationBodyJpkvatResource(self)
+            self._resources["declaration_body_jpkvat"] = resource
+        return resource
+
+    @property
+    def declaration_body_pit(self) -> Any:
+        """Convenience accessor for declaration body PIT endpoints.
+
+        Returns:
+            DeclarationBodyPitResource instance bound to this client.
+        """
+        # Local import to avoid circular dependency between client and resources.
+        from wfirma.sync.resources.declaration_body_pit import DeclarationBodyPitResource
+
+        resource = self._resources.get("declaration_body_pit")
+        if resource is None:
+            resource = DeclarationBodyPitResource(self)
+            self._resources["declaration_body_pit"] = resource
         return resource
 
     @property

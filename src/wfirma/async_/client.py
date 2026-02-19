@@ -376,6 +376,21 @@ class WFirmaClient:
         return resource
 
     @property
+    def declaration_body_pit(self) -> Any:
+        """Convenience accessor for declaration body PIT endpoints.
+
+        Returns:
+            DeclarationBodyPitResource instance bound to this client.
+        """
+        from wfirma.async_.resources.declaration_body_pit import DeclarationBodyPitResource
+
+        resource = self._resources.get("declaration_body_pit")
+        if resource is None:
+            resource = DeclarationBodyPitResource(self)
+            self._resources["declaration_body_pit"] = resource
+        return resource
+
+    @property
     def ledger_accountant_years(self) -> Any:
         """Convenience accessor for ledger accountant years endpoints.
 

@@ -312,6 +312,390 @@ Saved to: `.sisyphus/evidence/task-3-invoice-methods-complete.txt`
 ### Next Steps
 Task 3 (Invoice endpoints) is now complete. Ready to move to Wave 2 (Tasks 4-18: read-only resources).
 
+## Task 20: DeclarationBodyPitResource Implementation | 2026-02-19T11:17:00Z
+
+**Status:** ✅ COMPLETED | 14/14 tests pass | 100% coverage | 0 mypy errors | 0 ruff errors
+
+### Summary
+Implemented `DeclarationBodyPitResource` for both sync and async clients with **read-only parameterized `get(pit_type: str, year: int)` method**. This is the SECOND TASK in Wave 3 (parameterized-path read-only resources) — following the established pattern from Task 19 (DeclarationBodyJpkvatResource) but with different parameter types.
+
+### Key Implementation Details
+
+#### Endpoint Specification
+- **Endpoint**: `GET /declaration_body_pit/get/{type}/{year}`
+- **Parameters**: `pit_type` (str: "pit11", "pit38", "pit28s", "pit_ub", etc.) and `year` (int)
+- **Response Container/Object Keys**: `"declaration_body_pit"` (container) / `"declaration_body_pit"` (object - same singular form)
+- **Parameters**: `pit_type` and `year` as path parameters (NOT query parameters)
+
+#### Method Signature
+```python
+def get(self, pit_type: str, year: int) -> dict[str, Any]:
+    """Get declaration body PIT by type and year.
+    
+    Endpoint: GET /declaration_body_pit/get/{pit_type}/{year}
+    """
+    data = self._client.get_json(f"/declaration_body_pit/get/{pit_type}/{year}")
+    return self._extract_declaration_body_pit_payload(data)
+```
+
+#### Files Created (8 total)
+1. ✅ `src/wfirma/sync/resources/declaration_body_pit.py` (15 statements, 100% coverage)
+   - `get(pit_type: str, year: int) -> dict[str, Any]` method
+   - Uses `extract_single_object_payload()` from `_payloads.py`
+   - Container/Object keys: `"declaration_body_pit"` / `"declaration_body_pit"`
+2. ✅ `src/wfirma/async_/resources/declaration_body_pit.py` (15 statements, 100% coverage)
+   - Async mirror with `async def get()`
+3. ✅ `tests/sync/resources/test_sync_declaration_body_pit_resource.py` (6 tests)
+   - Tests various pit_type values (pit11, pit38, pit28s, pit_ub)
+   - Tests different years (2024, 2025, 2026)
+   - Tests payload extraction and dict return
+4. ✅ `tests/async_/resources/test_async_declaration_body_pit_resource.py` (6 async mirrors)
+5. ✅ `tests/sync/test_client_declaration_body_pit_property.py` (2 tests)
+   - `test_returns_resource_instance`: Property returns correct type
+   - `test_is_cached`: Caching works (identity check)
+6. ✅ `tests/async_/test_client_declaration_body_pit_property.py` (2 async mirrors)
+
+#### Files Modified (4 total)
+1. ✅ `src/wfirma/sync/client.py` — Added `@property declaration_body_pit()` after `declaration_body_jpkvat`
+2. ✅ `src/wfirma/async_/client.py` — Added `@property declaration_body_pit()` after `declaration_countries` (via Python string insertion)
+3. ✅ `src/wfirma/sync/resources/__init__.py` — Added alphabetical import + export
+4. ✅ `src/wfirma/async_/resources/__init__.py` — Added alphabetical import + export
+
+### Test Coverage (14 Tests Total - All PASS ✓)
+
+**Sync Resource Tests (6)**:
+- ✅ `test_get_pit11_2025`: Verifies pit11 type with year 2025
+- ✅ `test_get_pit38_2026`: Verifies pit38 type with year 2026
+- ✅ `test_get_pit28s_2024`: Verifies pit28s type with year 2024
+- ✅ `test_get_pit_ub_2025`: Verifies pit_ub type with year 2025
+- ✅ `test_get_extracts_payload_correctly`: Verifies payload extraction
+- ✅ `test_get_returns_dict_not_raw_response`: Verifies dict return (not raw response)
+
+**Async Resource Tests (6)**:
+- ✅ Async mirrors of all 6 sync tests with `@pytest.mark.asyncio` and `await`
+
+**Sync Client Property Tests (2)**:
+- ✅ `test_returns_resource_instance`: Property returns DeclarationBodyPitResource instance
+- ✅ `test_is_cached`: Caching works via identity check `assert first is second`
+
+**Async Client Property Tests (2)**:
+- ✅ Async mirrors of sync property tests
+
+### Discovery: Multi-Parameter Path Pattern (Wave 3 Pattern - Task 20)
+
+**Key Finding**: Task 20 confirms the Wave 3 parameterized path pattern. Unlike Task 19 (year/month both int), Task 20 uses mixed types (pit_type: str, year: int).
+
+#### URL Construction
+```python
+# Task 19 (int parameters only)
+f"/declaration_body_jpkvat/get/{year}/{month}"  # → /declaration_body_jpkvat/get/2025/6
+
+# Task 20 (mixed str + int parameters)
+f"/declaration_body_pit/get/{pit_type}/{year}"  # → /declaration_body_pit/get/pit11/2025
+```
+
+#### Parameter Type Flexibility
+- Path parameters can be ANY type (str, int)
+- f-string interpolation automatically converts to string representation
+- No special handling needed for type differences
+
+#### Method Signature Pattern Across Wave 3
+```python
+# Task 19: IntParameter, IntParameter
+def get(self, year: int, month: int) -> dict[str, Any]:
+
+# Task 20: StrParameter, IntParameter
+def get(self, pit_type: str, year: int) -> dict[str, Any]:
+
+# Task 21: IntParameter, IntParameter (likely)
+def get(self, year: int, month: int) -> dict[str, Any]:
+```
+
+### Container/Object Key Pattern (Verified from Implementation)
+
+Declaration_body_pit API response structure:
+```json
+{
+  "status": {"code": "OK"},
+  "declaration_body_pit": {
+    "0": {
+      "declaration_body_pit": {
+        "id": 1,
+        "year": 2025,
+        "pit_type": "pit11",
+        ...
+      }
+    }
+  }
+}
+```
+
+- **Container key**: `"declaration_body_pit"` (plural form in path becomes singular in response)
+- **Object key**: `"declaration_body_pit"` (same as container - specific to this resource)
+- **Extraction pattern**: Identical to Task 19 — use `extract_single_object_payload()` helper
+
+### Critical Fix: Async Client Property Insertion
+
+**Problem**: Initial async client property insertion failed with indentation issues (spaces vs tabs)
+
+**Solution**: Used Python string replacement instead of Edit tool:
+```python
+# Find exact string match with proper indentation
+old_text = '''        return resource
+
+    @property
+    def ledger_accountant_years(self) -> Any:'''
+
+# Insert with perfect indentation preservation
+new_text = '''        return resource
+
+    @property
+    def declaration_body_pit(self) -> Any:
+        """Convenience accessor for declaration body PIT endpoints.
+
+        Returns:
+            DeclarationBodyPitResource instance bound to this client.
+        """
+        from wfirma.async_.resources.declaration_body_pit import DeclarationBodyPitResource
+
+        resource = self._resources.get("declaration_body_pit")
+        if resource is None:
+            resource = DeclarationBodyPitResource(self)
+            self._resources["declaration_body_pit"] = resource
+        return resource
+
+    @property
+    def ledger_accountant_years(self) -> Any:'''
+```
+
+**Result**: Clean insertion with 0 indentation issues, all async property tests pass.
+
+### Client Property Pattern (Lazy Initialization)
+
+Both sync and async clients use identical pattern:
+```python
+@property
+def declaration_body_pit(self) -> Any:
+    """Convenience accessor for declaration body PIT endpoints.
+
+    Returns:
+        DeclarationBodyPitResource instance bound to this client.
+    """
+    from wfirma.{sync|async_}.resources.declaration_body_pit import DeclarationBodyPitResource
+
+    resource = self._resources.get("declaration_body_pit")
+    if resource is None:
+        resource = DeclarationBodyPitResource(self)
+        self._resources["declaration_body_pit"] = resource
+    return resource
+```
+
+### Verification Results
+```
+✅ Tests: 14/14 PASS (100% success)
+   - 6 sync resource tests PASS
+   - 6 async resource tests PASS
+   - 2 sync client property tests PASS
+   - 2 async client property tests PASS
+
+✅ Type Checking: Success (0 errors)
+✅ Linting: All checks passed
+✅ Code Coverage: 100% on both resource files (15 statements each)
+```
+
+### Key Learnings
+
+1. **Parameter Type Flexibility**: Wave 3 resources can use mixed parameter types (str + int) - no special handling needed
+2. **Async Client Properties Still Sync**: Property decorator returns non-async resource instances, consistent across all tasks
+3. **String Insertion for Python Files**: When indentation issues occur with Edit tool, direct Python string replacement is more reliable
+4. **Container/Object Keys Vary**: Unlike Wave 2 (always singular object key), Task 20 shows object key can match container key exactly
+5. **Pattern Replication**: Once Wave 3 pattern established in Task 19, Task 20 implementation is straightforward - just swap parameter types
+6. **Parameterized Path Consistency**: All Wave 3 tasks follow same URL pattern - parameters directly interpolated, no query string conversion
+
+### Files Modified/Created Summary
+- **8 files created**: 2 resources (sync/async) + 4 test resource files + 2 client property test files
+- **4 files modified**: 2 clients + 2 init files
+- **Total coverage**: 100% on resource implementations
+- **Total tests**: 14 tests, all passing
+- **Type checking**: 0 mypy errors
+- **Linting**: 0 ruff errors
+
+### Next Pattern for Wave 3
+Task 21 (taxregisters) likely follows this exact pattern with year/month parameters (similar to Task 19 but different resource name).
+
+The established parameterized path pattern in Tasks 19-20 makes Task 21 straightforward implementation.
+
+## Task 19: DeclarationBodyPitResource Implementation | 2026-02-19T??:??:??Z
+
+**Status:** ✅ COMPLETED | 10/10 tests pass | 100% coverage | 0 mypy errors | 0 ruff errors
+
+### Summary
+Implemented `DeclarationBodyJpkvatResource` for both sync and async clients with **read-only parameterized `get(year: int, month: int)` method**. This is the FIRST TASK in Wave 3 (parameterized-path read-only resources) — a new pattern combining:
+- Multiple path parameters (NOT single ID)
+- Read-only access (only `get()` method, no find/add/edit/delete)
+- Dict-returning (no Pydantic model)
+
+### Key Implementation Details
+
+#### Endpoint Specification
+- **Endpoint**: `GET /declaration_body_jpkvat/get/{year}/{month}`
+- **API Spec**: Verified from `docs/api_reference.md:103-111`
+- **Response Container/Object Keys**: `"declaration_body_jpkvat"` (plural) / `"jpkvat"` (singular)
+- **Parameters**: `year` and `month` as path parameters (NOT query parameters)
+
+#### Method Signature
+```python
+def get(self, year: int, month: int) -> dict[str, Any]:
+    """Get declaration body jpkvat by year and month.
+    
+    Endpoint: GET /declaration_body_jpkvat/get/{year}/{month}
+    """
+    data = self._client.get_json(f"/declaration_body_jpkvat/get/{year}/{month}")
+    return self._extract_declaration_body_jpkvat_payload(data)
+```
+
+#### Files Created (8 total)
+1. ✅ `src/wfirma/sync/resources/declaration_body_jpkvat.py` (15 statements, 100% coverage)
+   - `get(year: int, month: int) -> dict[str, Any]` method
+   - Static helper `_extract_declaration_body_jpkvat_payload()`
+2. ✅ `src/wfirma/async_/resources/declaration_body_jpkvat.py` (15 statements, 100% coverage)
+   - Async mirror with `async def get()`
+3. ✅ `tests/sync/resources/test_sync_declaration_body_jpkvat_resource.py` (3 tests)
+   - `test_get_calls_expected_endpoint_with_path_parameters`: Verifies URL `/declaration_body_jpkvat/get/2025/6`
+   - `test_get_extracts_payload_correctly`: Verifies payload extraction works
+   - `test_get_returns_dict_not_raw_response`: Verifies returns dict (not raw response)
+4. ✅ `tests/async_/resources/test_async_declaration_body_jpkvat_resource.py` (3 async mirrors)
+5. ✅ `tests/sync/test_client_declaration_body_jpkvat_property.py` (2 tests)
+   - `test_declaration_body_jpkvat_property_returns_resource`: Property returns correct type
+   - `test_declaration_body_jpkvat_property_is_cached`: Caching works (identity check)
+6. ✅ `tests/async_/test_client_declaration_body_jpkvat_property.py` (2 async mirrors)
+
+#### Files Modified (4 total)
+1. ✅ `src/wfirma/sync/client.py` — Added `@property declaration_body_jpkvat()` after `company_accounts`
+2. ✅ `src/wfirma/async_/client.py` — Added `@property declaration_body_jpkvat()` after `declaration_countries`
+3. ✅ `src/wfirma/sync/resources/__init__.py` — Added alphabetical import + export (between DeclarationCountriesResource and ExpensesResource)
+4. ✅ `src/wfirma/async_/resources/__init__.py` — Added alphabetical import + export
+
+### Test Coverage (10 Tests Total - All PASS ✓)
+
+**Sync Resource Tests (3)**:
+- ✅ `test_get_calls_expected_endpoint_with_path_parameters`: Verifies correct URL construction with year/month path params
+- ✅ `test_get_extracts_payload_correctly`: Verifies payload extraction with container/object keys
+- ✅ `test_get_returns_dict_not_raw_response`: Verifies returned dict strips wrappers
+
+**Async Resource Tests (3)**:
+- ✅ Async mirrors of sync tests with `@pytest.mark.asyncio` and `await`
+
+**Sync Client Property Tests (2)**:
+- ✅ `test_declaration_body_jpkvat_property_returns_resource`: Property returns DeclarationBodyJpkvatResource instance
+- ✅ `test_declaration_body_jpkvat_property_is_cached`: Caching works via identity check `assert first is second`
+
+**Async Client Property Tests (2)**:
+- ✅ Async mirrors of sync property tests
+
+### Discovery: Parameterized Path Pattern (NEW - Wave 3 Pattern)
+
+**Key Finding**: This is the **FIRST task implementing multi-parameter path resources** in the Wave 3 pattern. The pattern differs from Wave 2 (single ID) resources:
+
+#### URL Construction
+```python
+# Wave 2 (single ID, standard)
+f"/company_accounts/get/{company_account_id}"  # → /company_accounts/get/123
+
+# Wave 3 (multi-parameter, new pattern)
+f"/declaration_body_jpkvat/get/{year}/{month}"  # → /declaration_body_jpkvat/get/2025/6
+```
+
+#### Parameter Handling
+- Path parameters are **interpolated directly** into URL string (no special handling needed)
+- Default param injection (`company_id`) still works via `_add_default_params()`
+- Query string parameters are NOT used for path parameters (confirmed in tests: URL should be `/get/2025/6`, NOT `/get?year=2025&month=6`)
+
+#### Method Signature Differences
+```python
+# Wave 2 single-ID pattern
+def get(self, company_account_id: int) -> dict[str, Any]:
+    data = self._client.get_json(f"/company_accounts/get/{company_account_id}")
+    return self._extract_company_account_payload(data)
+
+# Wave 3 multi-parameter pattern
+def get(self, year: int, month: int) -> dict[str, Any]:
+    data = self._client.get_json(f"/declaration_body_jpkvat/get/{year}/{month}")
+    return self._extract_declaration_body_jpkvat_payload(data)
+```
+
+### Container/Object Key Pattern (Verified from API Spec)
+
+wFirma API response structure for declaration_body_jpkvat:
+```json
+{
+  "status": {"code": "OK"},
+  "declaration_body_jpkvat": {
+    "0": {
+      "jpkvat": {
+        "id": 1,
+        "year": 2025,
+        "month": 6,
+        ...
+      }
+    }
+  }
+}
+```
+
+- **Container key**: `"declaration_body_jpkvat"` (plural, matches endpoint group)
+- **Object key**: `"jpkvat"` (singular, the actual payload wrapper)
+- **Extraction pattern**: Identical to Tags/Wave 2 resources — use `extract_single_object_payload()` helper
+
+### Client Property Pattern (Lazy Initialization)
+
+Both sync and async clients use identical pattern:
+```python
+@property
+def declaration_body_jpkvat(self) -> Any:
+    resource = self._resources.get("declaration_body_jpkvat")
+    if resource is None:
+        from wfirma.{sync|async_}.resources.declaration_body_jpkvat import DeclarationBodyJpkvatResource
+        resource = DeclarationBodyJpkvatResource(self)
+        self._resources["declaration_body_jpkvat"] = resource
+    return resource
+```
+
+### Verification Results
+```
+✅ Tests: 10/10 PASS (100% success)
+   - 3 sync resource tests PASS
+   - 3 async resource tests PASS
+   - 2 sync client property tests PASS
+   - 2 async client property tests PASS
+
+✅ Type Checking: Success (0 errors)
+✅ Linting: All checks passed
+✅ Code Coverage: 100% on both resource files (15 statements each)
+```
+
+### Key Learnings
+
+1. **Parameterized Paths Are Simple**: Unlike database query builders, path params are just f-string interpolation
+2. **Container/Object Keys Still Needed**: Even parameterized resources use the same indexed container wrapping
+3. **No Query String for Path Params**: Path parameters go in URL path, NOT as query parameters
+4. **Pattern Consistency**: Payload extraction uses same helpers as Wave 2 (read-only dict resources)
+5. **TDD Works for All Patterns**: Failing tests caught the difference between multi-param and single-param patterns early
+6. **First of a Kind Pattern**: This task establishes the template for Tasks 20-21 (other parameterized resources)
+
+### Files Modified/Created Summary
+- **8 files created**: 2 resources (sync/async) + 4 test files + 2 property test files
+- **4 files modified**: 2 client files + 2 init files
+- **Total coverage**: 100% on resource implementations
+- **Total tests**: 10 tests, all passing
+
+### Next Pattern for Wave 3
+Tasks 20-21 (declaration_body_pit, taxregisters) follow this exact pattern with different path parameters:
+- Task 20: `get(pit_type: str, year: int)` → `/declaration_body_pit/get/{type}/{year}`
+- Task 21: `get(year: int, month: int)` → `/taxregisters/get/{year}/{month}` (same as Task 19 param order)
+
+The established pattern in Task 19 makes Tasks 20-21 straightforward implementations.
+
 
 ## Task 4: company_accounts Resource (COMPLETE - 2026-02-18)
 
@@ -1002,3 +1386,118 @@ uv run ruff check src/wfirma/sync/resources/users.py src/wfirma/async_/resources
 ```
 
 **Next Task:** Task 16 - Implement additional resources or refactor existing patterns.
+
+## Task 21: TaxregistersResource Implementation | 2026-02-19T??:??:??Z
+
+**Status:** ✅ COMPLETED | 16/16 tests pass | 100% coverage | 0 mypy errors | 0 ruff errors
+
+### Summary
+Implemented `TaxregistersResource` for both sync and async clients with **read-only parameterized `get(year: int, month: int)` method**. This resource follows the parameterized path pattern established by Tasks 19-20.
+
+### Key Implementation Details
+
+#### Endpoint Specification
+- **Endpoint**: `GET /taxregisters/get/{year}/{month}`
+- **API Spec**: Verified from `docs/api_reference.md:661-668`
+- **Response Container/Object Keys**: `"taxregisters"` (plural) / `"taxregister"` (singular)
+- **Parameters**: `year` and `month` as path parameters (NOT query parameters)
+
+#### Method Signature
+```python
+def get(self, *, year: int, month: int) -> dict[str, Any]:
+    """Get taxregister by year and month.
+    
+    Endpoint: GET /taxregisters/get/{year}/{month}
+    """
+    data = self._client.get_json(f"/taxregisters/get/{year}/{month}")
+    return self._extract_taxregister_payload(data)
+```
+
+#### Files Created (8 total)
+1. ✅ `src/wfirma/sync/resources/taxregisters.py` (15 statements, 100% coverage)
+2. ✅ `src/wfirma/async_/resources/taxregisters.py` (15 statements, 100% coverage)
+3. ✅ `tests/sync/resources/test_sync_taxregisters_resource.py` (6 tests: get basic, different year/month, single entry, preserve fields, minimal payload)
+4. ✅ `tests/async_/resources/test_async_taxregisters_resource.py` (6 async mirrors)
+5. ✅ `tests/sync/test_client_taxregisters_property.py` (2 tests: returns_resource, is_cached)
+6. ✅ `tests/async_/test_client_taxregisters_property.py` (2 async mirrors)
+
+#### Files Modified (4 total)
+1. ✅ `src/wfirma/sync/client.py` — Added `taxregisters` property between tags and translation_languages
+2. ✅ `src/wfirma/async_/client.py` — Added `taxregisters` property with `@property` decorator (via Python script insertion)
+3. ✅ `src/wfirma/sync/resources/__init__.py` — Added alphabetical import + export
+4. ✅ `src/wfirma/async_/resources/__init__.py` — Added alphabetical import + export
+
+### Test Coverage (16 Tests Total)
+
+**Sync Resource Tests (6)**:
+- `test_get_calls_expected_endpoint_and_returns_payload`: Basic GET with 2025/6
+- `test_get_with_different_year_month`: Different year/month 2024/12
+- `test_get_handles_single_entry_payload`: Handles single entry response
+- `test_get_preserves_all_payload_fields`: Preserves all fields in payload
+- `test_get_with_minimal_payload`: Handles minimal payload (year/month only)
+- Coverage: **15/15 statements, 100%**
+
+**Async Resource Tests (6)**:
+- Same 6 tests with `@pytest.mark.asyncio` and `await` keywords
+- Coverage: **15/15 statements, 100%**
+
+**Sync Client Property Tests (2)**:
+- `test_returns_resource_instance`: Verifies property returns TaxregistersResource
+- `test_is_cached`: Verifies identity check (same instance on repeated access)
+
+**Async Client Property Tests (2)**:
+- Same 2 tests for async client
+
+### Verification Results
+
+```
+✅ Tests: 16/16 PASS (100% success)
+   - 6 sync resource tests PASS
+   - 6 async resource tests PASS
+   - 2 sync client property tests PASS
+   - 2 async client property tests PASS
+
+✅ Type Checking: Success (0 errors)
+   mypy src/wfirma/sync/resources/taxregisters.py 
+        src/wfirma/async_/resources/taxregisters.py
+
+✅ Linting: All checks passed
+   ruff check src/wfirma/sync/resources/taxregisters.py 
+             src/wfirma/async_/resources/taxregisters.py
+
+✅ Code Coverage: 100% for both resource implementations
+   - Sync: 15/15 statements covered
+   - Async: 15/15 statements covered
+```
+
+### Key Learnings
+
+1. **Parameterized Path Endpoints**: Year and month go directly in URL path (f-string), not as query params
+2. **Keyword-Only Arguments**: Method signature uses `*, year: int, month: int` to enforce keyword-only parameters for clarity
+3. **Python Script Insertion for Complex Files**: When Edit tool causes indentation issues, Python file manipulation is more reliable than string-based edits
+4. **Alphabetical Resource Ordering**: New resources inserted alphabetically in client properties (between tags and translation_languages) and in __init__.py exports
+5. **Container/Object Key Discovery**: Always verify exact keys from API spec JSON before implementing extraction helpers
+
+### Patterns Matched
+
+- **Read-only dict-returning resource** (Tags pattern)
+- **Parameterized GET method** (Task 19/20 pattern)
+- **Client property caching** (standard throughout codebase)
+- **TDD workflow**: Tests written first, then implementation, then verification
+
+### Integration Notes
+
+- Resource fits into existing client property caching mechanism without modifications
+- No changes needed to base HTTP client or payload extraction helpers
+- Follows exact indentation and naming conventions of existing resources
+- All imports/exports in alphabetical order for maintainability
+
+### Implementation Time
+- Resource implementation: ~5 minutes
+- Tests (16 total): ~10 minutes
+- Client property insertion: ~5 minutes (with script approach)
+- Verification (mypy, ruff, pytest): ~2 minutes
+- **Total**: ~22 minutes
+
+### Next Steps
+Task 21 complete. Ready for integration into main API coverage suite.
