@@ -1,9 +1,10 @@
 """Tests for async NotesResource."""
 
 import json
+
+import httpx
 import pytest
 import respx
-import httpx
 
 from wfirma.async_.auth import APIKeyAuth
 from wfirma.async_.client import WFirmaClient

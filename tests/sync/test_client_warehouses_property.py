@@ -4,8 +4,6 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock
 
-import pytest
-
 from wfirma.sync.client import WFirmaClient
 from wfirma.sync.resources.warehouses import WarehousesResource
 

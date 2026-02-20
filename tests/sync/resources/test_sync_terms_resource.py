@@ -2,9 +2,7 @@
 
 from typing import Any
 
-import httpx
 import pytest
-import respx
 
 from wfirma.sync.resources.terms import TermsResource
 

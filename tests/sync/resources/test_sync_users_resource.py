@@ -7,7 +7,6 @@ returns User Pydantic models.
 from __future__ import annotations
 
 import httpx
-import pytest
 import respx
 
 from wfirma.models.employee import User

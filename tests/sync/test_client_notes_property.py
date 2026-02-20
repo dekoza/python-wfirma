@@ -1,8 +1,6 @@
 """Tests for sync WFirmaClient.notes property."""
 
 import pytest
-import respx
-import httpx
 
 from wfirma.sync.client import WFirmaClient
 from wfirma.sync.resources.notes import NotesResource

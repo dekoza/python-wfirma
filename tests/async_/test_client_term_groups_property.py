@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import pytest
 
+from wfirma.async_.auth import APIKeyAuth
 from wfirma.async_.client import WFirmaClient
 from wfirma.async_.resources.term_groups import TermGroupsResource
-from wfirma.async_.auth import APIKeyAuth
 
 
 class TestClientTermGroupsProperty:

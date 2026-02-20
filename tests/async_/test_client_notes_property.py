@@ -1,8 +1,6 @@
 """Tests for async WFirmaClient.notes property."""
 
 import pytest
-import respx
-import httpx
 
 from wfirma.async_.client import WFirmaClient
 from wfirma.async_.resources.notes import NotesResource

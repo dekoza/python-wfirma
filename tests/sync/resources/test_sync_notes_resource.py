@@ -1,9 +1,9 @@
 """Tests for sync NotesResource."""
 
 import json
-import pytest
-import respx
+
 import httpx
+import respx
 
 from wfirma.sync.auth import APIKeyAuth
 from wfirma.sync.client import WFirmaClient

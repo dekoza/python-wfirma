@@ -2,14 +2,11 @@
 
 from __future__ import annotations
 
-from typing import Any
-
 import httpx
 import pytest
 import respx
 
 from wfirma.async_.client import WFirmaClient
-from wfirma.async_.resources.series import SeriesResource
 
 
 @respx.mock
