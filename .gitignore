@@ -101,3 +101,6 @@ wfirma_output.txt
 *.key
 
 .tmp_*
+
+# This is a library, don't use lockfiles
+*.lock
