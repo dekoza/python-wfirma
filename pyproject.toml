@@ -74,10 +74,9 @@ scraping = [
 ]
 
 [project.urls]
-Homepage = "https://github.com/yourusername/python-wfirma"
-Documentation = "https://python-wfirma.readthedocs.io"
-Repository = "https://github.com/yourusername/python-wfirma"
-Issues = "https://github.com/yourusername/python-wfirma/issues"
+Homepage = "https://github.com/dekoza/python-wfirma"
+Repository = "https://github.com/dekoza/python-wfirma"
+Issues = "https://github.com/dekoza/python-wfirma/issues"
 
 [dependency-groups]
 dev = [

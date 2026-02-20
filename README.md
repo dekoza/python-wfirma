@@ -1,55 +1,38 @@
-# Python wFirma API Library
+# python-wfirma
 
-[![PyPI version](https://badge.fury.io/py/python-wfirma.svg)](https://badge.fury.io/py/python-wfirma)
-[![Python Versions](https://img.shields.io/pypi/pyversions/python-wfirma.svg)](https://pypi.org/project/python-wfirma/)
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Tests](https://github.com/yourusername/python-wfirma/workflows/Tests/badge.svg)](https://github.com/yourusername/python-wfirma/actions)
-[![Coverage](https://codecov.io/gh/yourusername/python-wfirma/branch/main/graph/badge.svg)](https://codecov.io/gh/yourusername/python-wfirma)
+Python client for the [wFirma](https://wfirma.pl/) accounting API. Supports both synchronous and asynchronous usage.
 
-A modern, fully-typed Python library for interacting with the [wFirma](https://www.wfirma.pl/) accounting API. Supports both synchronous and asynchronous operations.
-
-## Features
-
-- 🔄 **Dual Mode**: Full support for both synchronous and asynchronous operations
-- 🎯 **Type-Safe**: Complete type hints for better IDE support and fewer bugs
-- ✅ **Validated**: Automatic request/response validation using Pydantic models
-- 📦 **Format Agnostic**: Seamless handling of both JSON and XML via pydantic-xml
-- 🔐 **OAuth Ready**: Built-in OAuth authentication with automatic token management
-- 🧪 **Well Tested**: Comprehensive test coverage (>90%) following TDD principles
-- 📚 **Documented**: Full API documentation and usage examples
+> **Status**: Alpha (v0.1.0). The API surface may change before 1.0.
 
 ## Installation
 
-Using pip:
 ```bash
 pip install python-wfirma
 ```
 
-Using [uv](https://github.com/astral-sh/uv) (recommended for faster installation):
+Or with [uv](https://github.com/astral-sh/uv):
+
 ```bash
-uv pip install python-wfirma
+uv add python-wfirma
 ```
 
-For development:
-```bash
-uv pip install python-wfirma[dev]
-```
+## Usage
 
-## Quick Start
-
-### Synchronous Usage
+### API Key Authentication
 
 ```python
 from wfirma.sync.auth import APIKeyAuth
 from wfirma.sync.client import WFirmaClient
 
-auth = APIKeyAuth(access_key="your_access_key", secret_key="your_secret_key", app_key="your_app_key")
+auth = APIKeyAuth(
+    access_key="your_access_key",
+    secret_key="your_secret_key",
+    app_key="your_app_key",
+)
 
 with WFirmaClient(auth=auth, company_id=123) as client:
-    # Create a contractor
-    contractor = client.contractors.add(name="Example Company Ltd.", nip="1234567890")
+    contractor = client.contractors.add(name="ACME Sp. z o.o.", nip="1234567890")
 
-    # Create an invoice (raw payload, without the outer "invoices" wrapper)
     invoice = client.invoices.add(
         invoice={
             "contractor_id": contractor.id,
@@ -58,190 +41,131 @@ with WFirmaClient(auth=auth, company_id=123) as client:
         }
     )
 
-    # List invoices
     invoices = client.invoices.find()
-    print(f"Invoices fetched: {len(invoices)}")
 ```
 
-### Asynchronous Usage
+### Async
 
 ```python
 import asyncio
-
 from wfirma.async_.auth import APIKeyAuth
 from wfirma.async_.client import WFirmaClient
 
 
 async def main() -> None:
-    auth = APIKeyAuth(access_key="your_access_key", secret_key="your_secret_key", app_key="your_app_key")
+    auth = APIKeyAuth(
+        access_key="your_access_key",
+        secret_key="your_secret_key",
+        app_key="your_app_key",
+    )
 
     async with WFirmaClient(auth=auth, company_id=123) as client:
-        contractor = await client.contractors.add(name="Example Company Ltd.", nip="1234567890")
-
-        invoice = await client.invoices.add(
-            invoice={
-                "contractor_id": contractor.id,
-                "type": "normal",
-                "paid": "0",
-            }
+        contractor = await client.contractors.add(
+            name="ACME Sp. z o.o.", nip="1234567890"
         )
-
         invoices = await client.invoices.find()
-        print(f"Invoices fetched: {len(invoices)}")
 
 
 asyncio.run(main())
 ```
 
-## Supported Resources
+### OAuth 2.0
 
-- ✅ **Invoices**: Create, read, update, delete, and manage invoices (including proforma and corrections)
-- ✅ **Contractors**: Manage business partners and customers
-- ✅ **Goods**: Product and service catalog management
-- ✅ **Payments**: Track invoice payments
-- ✅ **Warehouse**: Inventory management and stock documents
-- ✅ **Tags**: Manage tags/labels (CRUD)
-- ✅ **Employees**: User and permission management
-- ✅ **Company**: Company information and settings
+```python
+from wfirma.sync.auth import OAuth2Auth
+from wfirma.sync.client import WFirmaClient
+from wfirma.config import Environment
+
+oauth = OAuth2Auth(
+    client_id="your_client_id",
+    client_secret="your_client_secret",
+    redirect_uri="https://yourapp.example.com/callback",
+    environment=Environment.PRODUCTION,
+)
+
+# Step 1: redirect user to authorization URL
+url = oauth.build_authorization_url(scope="invoices-read")
+
+# Step 2: exchange the code from callback
+token = oauth.exchange_code(code="authorization_code_from_callback")
+
+# Step 3: use the client
+with WFirmaClient(auth=oauth, company_id=123) as client:
+    invoices = client.invoices.find()
+```
 
 ## Configuration
 
-The library provides a small configuration layer that can load values from environment variables.
+The library reads credentials from environment variables when using `from_env()` class methods:
 
 ```bash
-# .env file
+# .env
+WFIRMA_APP_KEY=your_app_key
+WFIRMA_APP_SECRET=your_app_secret
 WFIRMA_ENVIRONMENT=sandbox  # or production
 WFIRMA_COMPANY_ID=123
-
-# API Key auth
-WFIRMA_APP_KEY=your_app_key_here
-WFIRMA_ACCESS_KEY=your_access_key_here
-WFIRMA_SECRET_KEY=your_secret_key_here
 ```
 
 ```python
 from wfirma import get_config
 
 config = get_config()
-print(config.environment)
-print(config.company_id)
+print(config.base_url)  # https://sandbox-api2.wfirma.pl
 ```
 
-## Documentation
+## Supported Resources
 
-Full documentation is available at [https://python-wfirma.readthedocs.io](https://python-wfirma.readthedocs.io)
+The client exposes the following wFirma API resources. Each resource provides methods matching the upstream API (typically `add`, `find`, `get`, `edit`, `delete`):
 
-- [Installation Guide](https://python-wfirma.readthedocs.io/en/latest/installation.html)
-- [Authentication Setup](https://python-wfirma.readthedocs.io/en/latest/authentication.html)
-- [Quick Start Tutorial](https://python-wfirma.readthedocs.io/en/latest/quickstart.html)
-- [API Reference](https://python-wfirma.readthedocs.io/en/latest/api/)
-- [Examples](https://github.com/yourusername/python-wfirma/tree/main/examples)
+**Core**: invoices, contractors, goods, payments, expenses, documents
+
+**Company**: company, company_accounts, company_packs
+
+**Declarations**: declaration_countries, declaration_body_jpkvat, declaration_body_pit
+
+**Warehouse**: warehouses, warehouse documents (PW, PZ, R, RW, WZ, ZD, ZPD, ZPM)
+
+**Reference data**: tags, series, terms, term_groups, vat_codes, translation_languages, taxregisters, interests, ledger_accountant_years, ledger_operation_schemas
+
+**Users & misc**: users, user_companies, vehicles, vehicle_run_rates, payment_cashboxes, invoice_deliveries, invoice_descriptions, notes, webhooks
 
 ## Development
 
-### Setup Development Environment
+Requires Python 3.12+. The project uses [uv](https://github.com/astral-sh/uv) for dependency management.
 
 ```bash
-# Clone repository
-git clone https://github.com/yourusername/python-wfirma.git
+git clone https://github.com/dekoza/python-wfirma.git
 cd python-wfirma
-
-# Create virtual environment and install dependencies using uv
-uv venv
-
-# Install development dependencies (pytest, ruff, mypy, etc.)
-uv sync --extra dev
-
-# Optionally install docs / examples extras
-# uv sync --extra dev --extra docs --extra examples
-
-# Install pre-commit hooks
+uv venv && uv sync --extra dev
 uv run pre-commit install
 ```
 
-### Running Tests
+### Tests
 
 ```bash
-# All tests
-uv run pytest --cache-clear
-
-# With coverage
-uv run pytest --cache-clear --cov=wfirma --cov-report=html
-
-# Specific test file
-uv run pytest --cache-clear tests/sync/test_client.py
-
-# Parallel execution
-uv run pytest -n auto
+uv run pytest                                     # all tests
+uv run pytest --cov=wfirma --cov-report=html      # with coverage
+uv run pytest -n auto                             # parallel
 ```
 
-### Using Tox
+### Linting & type-checking
 
 ```bash
-# Run tests across all environments
-uv run tox
-
-# Run specific environment
-uv run tox -e py312
-uv run tox -e lint
-uv run tox -e type
-uv run tox -e docs
-```
-
-### Code Quality
-
-```bash
-# Format code
-uv run ruff format src tests examples
-
-# Lint and fix
-uv run ruff check --fix src tests examples
-
-# Type check
+uv run ruff format src tests
+uv run ruff check --fix src tests
 uv run mypy src
 ```
 
 ## Contributing
 
-Contributions are welcome! Please see [CONTRIBUTING.md](CONTRIBUTING.md) for detailed guidelines.
-
-### For Core Maintainers & AI Agents
-
-Internal implementation documentation is in [`_aidocs/`](_aidocs/) directory. Start with [`_aidocs/README.md`](_aidocs/README.md).
-
-### Quick Start for Contributors
-
-1. Fork the repository
-2. Create a feature branch (`git checkout -b feature/amazing-feature`)
-3. Write tests for your changes (TDD approach)
-4. Implement your changes
-5. Ensure all tests pass (`uv run pytest`)
-6. Commit your changes (`git commit -m 'Add amazing feature'`)
-7. Push to the branch (`git push origin feature/amazing-feature`)
-8. Open a Pull Request
-
-This project follows **Test-Driven Development (TDD)** with comprehensive test coverage (>90%).
+See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## License
 
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## Changelog
-
-See [CHANGELOG.md](CHANGELOG.md) for version history.
-
-## Support
-
-- 📫 [Issue Tracker](https://github.com/yourusername/python-wfirma/issues)
-- 📖 [Documentation](https://python-wfirma.readthedocs.io)
-- 💬 [Discussions](https://github.com/yourusername/python-wfirma/discussions)
-
-## Acknowledgments
-
-- [wFirma API Documentation](https://doc.wfirma.pl/)
-- Built with [httpx](https://www.python-httpx.org/), [Pydantic](https://docs.pydantic.dev/), and [anyio](https://anyio.readthedocs.io/)
+MIT — see [LICENSE](LICENSE).
 
 ---
 
-**Note**: This library is not officially affiliated with wFirma. It is a community-maintained project.
+This library is not affiliated with wFirma. It is an independent project.
+Built on [httpx](https://www.python-httpx.org/), [Pydantic](https://docs.pydantic.dev/), and [authlib](https://docs.authlib.org/).
 

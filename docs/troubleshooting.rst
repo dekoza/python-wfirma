@@ -167,7 +167,7 @@ Getting Help
 
 If you can't resolve your issue:
 
-1. Check the `GitHub Issues <https://github.com/yourusername/python-wfirma/issues>`_
+1. Check the `GitHub Issues <https://github.com/dekoza/python-wfirma/issues>`_
 2. Search existing discussions
 3. Open a new issue with:
 

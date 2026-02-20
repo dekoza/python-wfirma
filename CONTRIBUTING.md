@@ -45,8 +45,8 @@ This project follows a standard code of conduct:
 
 2. **Fork and clone the repository**:
    ```bash
-   git clone https://github.com/yourusername/python-wfirma.git
-   cd python-wfirma
+    git clone https://github.com/dekoza/python-wfirma.git
+    cd python-wfirma
    ```
 
 3. **Create virtual environment and install dependencies**:
@@ -411,10 +411,8 @@ def test_create_invoice_with_full_validation():
 
 ## Questions?
 
-- 📫 Open an issue for questions
-- 💬 Join discussions in GitHub Discussions
-- 📖 Check documentation at [python-wfirma.readthedocs.io](https://python-wfirma.readthedocs.io)
+If something is unclear, open an issue on GitHub.
 
 ---
 
-Thank you for contributing to python-wfirma! 🎉
+Thank you for contributing to python-wfirma!

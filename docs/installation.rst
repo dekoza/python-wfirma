@@ -19,7 +19,7 @@ Development / contributing
 
 This repository uses `uv` (see `uv.lock`). To set up a local development environment::
 
-    git clone https://github.com/yourusername/python-wfirma.git
+    git clone https://github.com/dekoza/python-wfirma.git
     cd python-wfirma
     uv sync
 

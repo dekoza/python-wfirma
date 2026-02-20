@@ -1,7 +1,0 @@
-Phase 4 refactor (auth/token dedup + timestamp mixin)
-- Extracted shared token utilities into src/wfirma/auth/common.py and package init, reused by sync/async auth
-- Converted sync/async OAuthToken to alias shared class (no subclassing) to keep equality semantics; maintained APIKeyAuth in respective modules
-- Added TimestampedFieldsMixin in base models; refactored models (company, contractor, good, invoice, payment, warehouse, employee) to reuse shared created/modified fields
-- Added timestamp mixin tests; adjusted __all__ exports
-- All tests passing via `uv run pytest`
-
