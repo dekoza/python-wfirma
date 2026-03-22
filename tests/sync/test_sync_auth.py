@@ -7,6 +7,7 @@ from __future__ import annotations
 
 from dataclasses import FrozenInstanceError
 from datetime import datetime, timedelta
+from unittest.mock import patch
 from urllib.parse import parse_qs, urlparse
 
 import httpx
@@ -16,7 +17,10 @@ import respx
 from wfirma.auth.common import MemoryTokenStore
 from wfirma.config import Environment
 from wfirma.exceptions import (
+    AuthenticationError,
+    ConnectionError,
     MissingConfigurationError,
+    TimeoutError,
     TokenExpiredError,
     ValidationError,
 )
@@ -282,8 +286,93 @@ class TestOAuth2Auth:
 
         auth.exchange_code("code-123")
 
-        assert self.store.get("company-123").access_token == "a"
+        stored_token = self.store.get("company-123")
+
+        assert stored_token is not None
+        assert stored_token.access_token == "a"
         assert route.called
+
+    def test_exchange_code_wraps_timeout_error(self) -> None:
+        auth = OAuth2Auth(
+            client_id="cid",
+            client_secret="csecret",
+            redirect_uri="https://app.local/callback",
+            environment=Environment.PRODUCTION,
+            token_store=self.store,
+        )
+        request = httpx.Request("POST", auth.token_url)
+
+        with patch.object(
+            type(auth),
+            "_backend",
+            return_value=type(
+                "BackendStub",
+                (),
+                {
+                    "exchange_code": staticmethod(
+                        lambda **_: (_ for _ in ()).throw(
+                            httpx.TimeoutException("timeout", request=request)
+                        )
+                    )
+                },
+            )(),
+        ), pytest.raises(TimeoutError, match="OAuth2 token request timed out"):
+            auth.exchange_code("code-123")
+
+    def test_exchange_code_wraps_request_error(self) -> None:
+        auth = OAuth2Auth(
+            client_id="cid",
+            client_secret="csecret",
+            redirect_uri="https://app.local/callback",
+            environment=Environment.PRODUCTION,
+            token_store=self.store,
+        )
+        request = httpx.Request("POST", auth.token_url)
+
+        with patch.object(
+            type(auth),
+            "_backend",
+            return_value=type(
+                "BackendStub",
+                (),
+                {
+                    "exchange_code": staticmethod(
+                        lambda **_: (_ for _ in ()).throw(
+                            httpx.ConnectError("boom", request=request)
+                        )
+                    )
+                },
+            )(),
+        ), pytest.raises(ConnectionError, match="network error"):
+            auth.exchange_code("code-123")
+
+    def test_refresh_wraps_http_status_error(self) -> None:
+        auth = OAuth2Auth(
+            client_id="cid",
+            client_secret="csecret",
+            redirect_uri="https://app.local/callback",
+            environment=Environment.PRODUCTION,
+            token_store=self.store,
+        )
+        request = httpx.Request("POST", auth.token_url)
+        response = httpx.Response(400, request=request)
+
+        with patch.object(
+            type(auth),
+            "_backend",
+            return_value=type(
+                "BackendStub",
+                (),
+                {
+                    "refresh": staticmethod(
+                        lambda **_: (_ for _ in ()).throw(
+                            httpx.HTTPStatusError("bad request", request=request, response=response)
+                        )
+                    )
+                },
+            )(),
+        ), pytest.raises(AuthenticationError, match="OAuth2 token refresh failed"):
+            auth._refresh("refresh-token")
 
     def test_production_environment_uses_production_base_url(self) -> None:
         auth = OAuth2Auth(

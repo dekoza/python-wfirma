@@ -671,6 +671,29 @@ class TestWFirmaClientErrorHandling:
             self.client.get_xml("/users/get/123")
 
     @respx.mock
+    def test_get_returns_raw_text_when_response_is_not_json_or_xml(self) -> None:
+        respx.get("https://api2.wfirma.pl/users/get/123").mock(
+            return_value=httpx.Response(
+                200,
+                text="plain text payload",
+                headers={"Content-Type": "text/plain"},
+            )
+        )
+
+        result = self.client.get("/users/get/123")
+
+        assert result == {"raw": "plain text payload", "status": {"code": "OK"}}
+
+    @respx.mock
+    def test_raises_bad_request_error_on_http_status_above_422(self) -> None:
+        respx.get("https://api2.wfirma.pl/users/get/123").mock(
+            return_value=httpx.Response(430, text="Custom client error")
+        )
+
+        with pytest.raises(BadRequestError, match=r"Request failed \(HTTP 430\)"):
+            self.client.get("/users/get/123")
+
+    @respx.mock
     def test_raises_timeout_error_on_timeout(self) -> None:
         respx.get("https://api2.wfirma.pl/users/get/123").mock(
             side_effect=httpx.TimeoutException("Connection timed out")

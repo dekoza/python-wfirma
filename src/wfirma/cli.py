@@ -13,7 +13,7 @@ from typing import Any, Protocol, cast
 
 from pydantic import BaseModel
 
-from wfirma.exceptions import MissingConfigurationError, WFirmaException
+from wfirma.exceptions import MissingConfigurationError, ValidationError, WFirmaException
 from wfirma.sync import APIKeyAuth, WFirmaClient
 
 LIST_RESOURCE_MAP = {
@@ -118,7 +118,13 @@ def _print_company(company: Any, *, json_output: bool) -> None:
         print(json.dumps(payload, indent=2, ensure_ascii=False))
         return
 
-    rows = [[str(payload["id"]), str(payload["name"])]]
+    company_name = payload.get("name") or payload.get("altname") or payload.get("company_name")
+    if not isinstance(company_name, str) or not company_name.strip():
+        raise ValueError(
+            f"No usable company name field found for item with id={payload.get('id')!r}."
+        )
+
+    rows = [[str(payload["id"]), company_name]]
     print(_format_table(("ID", "Name"), rows))
 
 
@@ -146,7 +152,10 @@ def build_client_from_env(env: dict[str, str] | None = None) -> WFirmaClient:
         )
 
     company_id_raw = values.get("WFIRMA_COMPANY_ID")
-    company_id = int(company_id_raw) if company_id_raw else None
+    try:
+        company_id = int(company_id_raw) if company_id_raw else None
+    except ValueError as err:
+        raise ValidationError("WFIRMA_COMPANY_ID must be a valid integer.") from err
 
     auth = APIKeyAuth(
         access_key=values["WFIRMA_ACCESS_KEY"],
