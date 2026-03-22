@@ -27,7 +27,7 @@ class TestDeclarationCountriesResourceGet:
 
         with respx.mock:
             route = respx.get(
-                "https://api2.wfirma.pl/declaration_countries/get/456",
+                "https://sandbox-api2.wfirma.pl/declaration_countries/get/456",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -69,7 +69,7 @@ class TestDeclarationCountriesResourceFind:
 
         with respx.mock:
             route = respx.get(
-                "https://api2.wfirma.pl/declaration_countries/find",
+                "https://sandbox-api2.wfirma.pl/declaration_countries/find",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -118,7 +118,7 @@ class TestDeclarationCountriesResourceFind:
 
         with respx.mock:
             route = respx.get(
-                "https://api2.wfirma.pl/declaration_countries/find",
+                "https://sandbox-api2.wfirma.pl/declaration_countries/find",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",

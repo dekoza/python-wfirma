@@ -29,7 +29,7 @@ class TestUsersResource:
         async with client:
             with respx.mock:
                 route = respx.get(
-                    "https://api2.wfirma.pl/users/get/456",
+                    "https://sandbox-api2.wfirma.pl/users/get/456",
                     params={
                         "outputFormat": "json",
                         "company_id": "123",

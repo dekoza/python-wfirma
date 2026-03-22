@@ -38,7 +38,7 @@ class TestWFirmaClientInitialization:
         client = WFirmaClient(auth=auth)
 
         assert client.auth is auth
-        assert client.environment == Environment.PRODUCTION
+        assert client.environment == Environment.SANDBOX
         assert client.company_id is None
 
     def test_client_initializes_with_oauth2_auth(self) -> None:
@@ -57,7 +57,7 @@ class TestWFirmaClientInitialization:
         client = WFirmaClient(auth=auth)
 
         assert client.auth is auth
-        assert client.environment == Environment.PRODUCTION
+        assert client.environment == Environment.SANDBOX
 
     def test_client_rejects_oauth1_auth_in_beta(self) -> None:
         from wfirma.sync.client import WFirmaClient
@@ -81,14 +81,14 @@ class TestWFirmaClientInitialization:
         assert client.environment == Environment.SANDBOX
         assert "sandbox" in client.base_url
 
-    def test_client_uses_production_environment_by_default(self) -> None:
+    def test_client_uses_sandbox_environment_by_default(self) -> None:
         from wfirma.sync.client import WFirmaClient
 
         auth = APIKeyAuth(access_key="ak", secret_key="sk", app_key="appk")
         client = WFirmaClient(auth=auth)
 
-        assert client.environment == Environment.PRODUCTION
-        assert client.base_url == "https://api2.wfirma.pl"
+        assert client.environment == Environment.SANDBOX
+        assert client.base_url == "https://sandbox-api2.wfirma.pl"
 
     def test_client_accepts_company_id(self) -> None:
         from wfirma.sync.client import WFirmaClient
@@ -126,7 +126,7 @@ class TestWFirmaClientHTTPMethods:
 
     @respx.mock
     def test_get_request_sends_authentication_headers(self) -> None:
-        route = respx.get("https://api2.wfirma.pl/users/get/123").mock(
+        route = respx.get("https://sandbox-api2.wfirma.pl/users/get/123").mock(
             return_value=httpx.Response(
                 200,
                 json={
@@ -146,7 +146,7 @@ class TestWFirmaClientHTTPMethods:
 
     @respx.mock
     def test_get_request_returns_response_data(self) -> None:
-        respx.get("https://api2.wfirma.pl/users/get/123").mock(
+        respx.get("https://sandbox-api2.wfirma.pl/users/get/123").mock(
             return_value=httpx.Response(
                 200,
                 json={
@@ -163,7 +163,7 @@ class TestWFirmaClientHTTPMethods:
 
     @respx.mock
     def test_post_request_sends_json_body(self) -> None:
-        route = respx.post("https://api2.wfirma.pl/contractors/add").mock(
+        route = respx.post("https://sandbox-api2.wfirma.pl/contractors/add").mock(
             return_value=httpx.Response(
                 200,
                 json={
@@ -192,7 +192,7 @@ class TestWFirmaClientHTTPMethods:
 
     @respx.mock
     def test_post_request_sends_xml_body(self) -> None:
-        route = respx.post("https://api2.wfirma.pl/contractors/add").mock(
+        route = respx.post("https://sandbox-api2.wfirma.pl/contractors/add").mock(
             return_value=httpx.Response(
                 200,
                 text="""<?xml version="1.0" encoding="UTF-8"?>
@@ -219,7 +219,7 @@ class TestWFirmaClientHTTPMethods:
 
     @respx.mock
     def test_get_request_adds_query_params(self) -> None:
-        route = respx.get("https://api2.wfirma.pl/invoices/find").mock(
+        route = respx.get("https://sandbox-api2.wfirma.pl/invoices/find").mock(
             return_value=httpx.Response(
                 200,
                 json={"invoices": {}, "status": {"code": "OK"}},
@@ -238,7 +238,7 @@ class TestWFirmaClientHTTPMethods:
         from wfirma.sync.client import WFirmaClient
 
         client = WFirmaClient(auth=self.auth, company_id=999)
-        route = respx.get("https://api2.wfirma.pl/invoices/find").mock(
+        route = respx.get("https://sandbox-api2.wfirma.pl/invoices/find").mock(
             return_value=httpx.Response(
                 200,
                 json={"invoices": {}, "status": {"code": "OK"}},
@@ -254,7 +254,7 @@ class TestWFirmaClientHTTPMethods:
     @respx.mock
     def test_get_binary_returns_bytes(self) -> None:
         binary_content = b"PDF content here"
-        respx.get("https://api2.wfirma.pl/invoices/download/123").mock(
+        respx.get("https://sandbox-api2.wfirma.pl/invoices/download/123").mock(
             return_value=httpx.Response(200, content=binary_content)
         )
 
@@ -266,7 +266,7 @@ class TestWFirmaClientHTTPMethods:
     @respx.mock
     def test_post_binary_returns_bytes(self) -> None:
         binary_content = b"PDF file data"
-        respx.post("https://api2.wfirma.pl/documents/generate").mock(
+        respx.post("https://sandbox-api2.wfirma.pl/documents/generate").mock(
             return_value=httpx.Response(200, content=binary_content)
         )
 
@@ -280,7 +280,7 @@ class TestWFirmaClientHTTPMethods:
 
     @respx.mock
     def test_get_binary_raises_on_429(self) -> None:
-        respx.get("https://api2.wfirma.pl/invoices/download/123").mock(
+        respx.get("https://sandbox-api2.wfirma.pl/invoices/download/123").mock(
             return_value=httpx.Response(429)
         )
 
@@ -289,7 +289,7 @@ class TestWFirmaClientHTTPMethods:
 
     @respx.mock
     def test_get_binary_raises_on_503(self) -> None:
-        respx.get("https://api2.wfirma.pl/invoices/download/123").mock(
+        respx.get("https://sandbox-api2.wfirma.pl/invoices/download/123").mock(
             return_value=httpx.Response(503)
         )
 
@@ -298,7 +298,7 @@ class TestWFirmaClientHTTPMethods:
 
     @respx.mock
     def test_get_binary_raises_on_500(self) -> None:
-        respx.get("https://api2.wfirma.pl/invoices/download/123").mock(
+        respx.get("https://sandbox-api2.wfirma.pl/invoices/download/123").mock(
             return_value=httpx.Response(500)
         )
 
@@ -307,7 +307,7 @@ class TestWFirmaClientHTTPMethods:
 
     @respx.mock
     def test_post_binary_raises_on_429(self) -> None:
-        respx.post("https://api2.wfirma.pl/documents/generate").mock(
+        respx.post("https://sandbox-api2.wfirma.pl/documents/generate").mock(
             return_value=httpx.Response(429)
         )
 
@@ -316,7 +316,7 @@ class TestWFirmaClientHTTPMethods:
 
     @respx.mock
     def test_post_binary_raises_on_503(self) -> None:
-        respx.post("https://api2.wfirma.pl/documents/generate").mock(
+        respx.post("https://sandbox-api2.wfirma.pl/documents/generate").mock(
             return_value=httpx.Response(503)
         )
 
@@ -325,7 +325,7 @@ class TestWFirmaClientHTTPMethods:
 
     @respx.mock
     def test_post_binary_raises_on_500(self) -> None:
-        respx.post("https://api2.wfirma.pl/documents/generate").mock(
+        respx.post("https://sandbox-api2.wfirma.pl/documents/generate").mock(
             return_value=httpx.Response(500)
         )
 
@@ -334,7 +334,7 @@ class TestWFirmaClientHTTPMethods:
 
     @respx.mock
     def test_patch_request_sends_json_body(self) -> None:
-        route = respx.patch("https://api2.wfirma.pl/webhooks/edit/123").mock(
+        route = respx.patch("https://sandbox-api2.wfirma.pl/webhooks/edit/123").mock(
             return_value=httpx.Response(
                 200,
                 json={
@@ -362,7 +362,7 @@ class TestWFirmaClientHTTPMethods:
 
     @respx.mock
     def test_patch_request_sends_xml_body(self) -> None:
-        route = respx.patch("https://api2.wfirma.pl/webhooks/edit/123").mock(
+        route = respx.patch("https://sandbox-api2.wfirma.pl/webhooks/edit/123").mock(
             return_value=httpx.Response(
                 200,
                 text="""<?xml version="1.0" encoding="UTF-8"?>
@@ -389,7 +389,7 @@ class TestWFirmaClientHTTPMethods:
 
     @respx.mock
     def test_patch_json_sets_format_params(self) -> None:
-        route = respx.patch("https://api2.wfirma.pl/webhooks/edit/123").mock(
+        route = respx.patch("https://sandbox-api2.wfirma.pl/webhooks/edit/123").mock(
             return_value=httpx.Response(
                 200,
                 json={
@@ -411,7 +411,7 @@ class TestWFirmaClientHTTPMethods:
 
     @respx.mock
     def test_patch_xml_sends_request(self) -> None:
-        route = respx.patch("https://api2.wfirma.pl/webhooks/edit/123").mock(
+        route = respx.patch("https://sandbox-api2.wfirma.pl/webhooks/edit/123").mock(
             return_value=httpx.Response(
                 200,
                 text="""<?xml version="1.0" encoding="UTF-8"?>
@@ -449,7 +449,7 @@ class TestWFirmaClientErrorHandling:
 
     @respx.mock
     def test_raises_authentication_error_on_auth_status(self) -> None:
-        respx.get("https://api2.wfirma.pl/users/get/123").mock(
+        respx.get("https://sandbox-api2.wfirma.pl/users/get/123").mock(
             return_value=httpx.Response(
                 200,
                 json={"status": {"code": "AUTH"}},
@@ -463,7 +463,7 @@ class TestWFirmaClientErrorHandling:
 
     @respx.mock
     def test_raises_authentication_error_on_denied_scope(self) -> None:
-        respx.get("https://api2.wfirma.pl/users/get/123").mock(
+        respx.get("https://sandbox-api2.wfirma.pl/users/get/123").mock(
             return_value=httpx.Response(
                 200,
                 json={"status": {"code": "DENIED SCOPE REQUESTED"}},
@@ -477,7 +477,7 @@ class TestWFirmaClientErrorHandling:
 
     @respx.mock
     def test_raises_resource_not_found_error_on_not_found_status(self) -> None:
-        respx.get("https://api2.wfirma.pl/users/get/999").mock(
+        respx.get("https://sandbox-api2.wfirma.pl/users/get/999").mock(
             return_value=httpx.Response(
                 200,
                 json={"status": {"code": "NOT FOUND"}},
@@ -489,7 +489,7 @@ class TestWFirmaClientErrorHandling:
 
     @respx.mock
     def test_raises_bad_request_error_on_input_error(self) -> None:
-        respx.post("https://api2.wfirma.pl/contractors/add").mock(
+        respx.post("https://sandbox-api2.wfirma.pl/contractors/add").mock(
             return_value=httpx.Response(
                 200,
                 json={"status": {"code": "INPUT ERROR"}},
@@ -501,7 +501,7 @@ class TestWFirmaClientErrorHandling:
 
     @respx.mock
     def test_raises_validation_error_on_error_status_with_errors(self) -> None:
-        respx.post("https://api2.wfirma.pl/contractors/add").mock(
+        respx.post("https://sandbox-api2.wfirma.pl/contractors/add").mock(
             return_value=httpx.Response(
                 200,
                 json={
@@ -529,7 +529,7 @@ class TestWFirmaClientErrorHandling:
 
     @respx.mock
     def test_raises_server_error_on_fatal_status(self) -> None:
-        respx.get("https://api2.wfirma.pl/users/get/123").mock(
+        respx.get("https://sandbox-api2.wfirma.pl/users/get/123").mock(
             return_value=httpx.Response(
                 200,
                 json={"status": {"code": "FATAL"}},
@@ -541,7 +541,7 @@ class TestWFirmaClientErrorHandling:
 
     @respx.mock
     def test_raises_service_unavailable_on_out_of_service(self) -> None:
-        respx.get("https://api2.wfirma.pl/users/get/123").mock(
+        respx.get("https://sandbox-api2.wfirma.pl/users/get/123").mock(
             return_value=httpx.Response(
                 200,
                 json={"status": {"code": "OUT OF SERVICE"}},
@@ -553,7 +553,7 @@ class TestWFirmaClientErrorHandling:
 
     @respx.mock
     def test_raises_rate_limit_error_on_limit_exceeded(self) -> None:
-        respx.get("https://api2.wfirma.pl/users/get/123").mock(
+        respx.get("https://sandbox-api2.wfirma.pl/users/get/123").mock(
             return_value=httpx.Response(
                 200,
                 json={"status": {"code": "TOTAL REQUESTS LIMIT EXCEEDED"}},
@@ -565,7 +565,7 @@ class TestWFirmaClientErrorHandling:
 
     @respx.mock
     def test_raises_rate_limit_error_on_execution_time_exceeded(self) -> None:
-        respx.get("https://api2.wfirma.pl/users/get/123").mock(
+        respx.get("https://sandbox-api2.wfirma.pl/users/get/123").mock(
             return_value=httpx.Response(
                 200,
                 json={"status": {"code": "TOTAL EXECUTION TIME LIMIT EXCEEDED"}},
@@ -577,7 +577,7 @@ class TestWFirmaClientErrorHandling:
 
     @respx.mock
     def test_raises_rate_limit_error_on_http_429(self) -> None:
-        respx.get("https://api2.wfirma.pl/users/get/123").mock(
+        respx.get("https://sandbox-api2.wfirma.pl/users/get/123").mock(
             return_value=httpx.Response(429, text="Too Many Requests")
         )
 
@@ -586,7 +586,7 @@ class TestWFirmaClientErrorHandling:
 
     @respx.mock
     def test_raises_server_error_on_http_500(self) -> None:
-        respx.get("https://api2.wfirma.pl/users/get/123").mock(
+        respx.get("https://sandbox-api2.wfirma.pl/users/get/123").mock(
             return_value=httpx.Response(500, text="Internal Server Error")
         )
 
@@ -595,7 +595,7 @@ class TestWFirmaClientErrorHandling:
 
     @respx.mock
     def test_raises_service_unavailable_on_http_503(self) -> None:
-        respx.get("https://api2.wfirma.pl/users/get/123").mock(
+        respx.get("https://sandbox-api2.wfirma.pl/users/get/123").mock(
             return_value=httpx.Response(503, text="Service Unavailable")
         )
 
@@ -604,7 +604,7 @@ class TestWFirmaClientErrorHandling:
 
     @respx.mock
     def test_raises_invalid_credentials_error_on_http_401(self) -> None:
-        respx.get("https://api2.wfirma.pl/users/get/123").mock(
+        respx.get("https://sandbox-api2.wfirma.pl/users/get/123").mock(
             return_value=httpx.Response(401, text="Unauthorized")
         )
 
@@ -613,7 +613,7 @@ class TestWFirmaClientErrorHandling:
 
     @respx.mock
     def test_raises_insufficient_permissions_error_on_http_403(self) -> None:
-        respx.get("https://api2.wfirma.pl/users/get/123").mock(
+        respx.get("https://sandbox-api2.wfirma.pl/users/get/123").mock(
             return_value=httpx.Response(403, text="Forbidden")
         )
 
@@ -622,7 +622,7 @@ class TestWFirmaClientErrorHandling:
 
     @respx.mock
     def test_raises_bad_request_error_on_http_400_html_response(self) -> None:
-        respx.get("https://api2.wfirma.pl/users/get/123").mock(
+        respx.get("https://sandbox-api2.wfirma.pl/users/get/123").mock(
             return_value=httpx.Response(
                 400,
                 text="<html><body>bad request</body></html>",
@@ -635,7 +635,7 @@ class TestWFirmaClientErrorHandling:
 
     @respx.mock
     def test_raises_resource_conflict_error_on_http_409(self) -> None:
-        respx.get("https://api2.wfirma.pl/users/get/123").mock(
+        respx.get("https://sandbox-api2.wfirma.pl/users/get/123").mock(
             return_value=httpx.Response(409, text="Conflict")
         )
 
@@ -644,7 +644,7 @@ class TestWFirmaClientErrorHandling:
 
     @respx.mock
     def test_raises_validation_error_on_http_422(self) -> None:
-        respx.post("https://api2.wfirma.pl/contractors/add").mock(
+        respx.post("https://sandbox-api2.wfirma.pl/contractors/add").mock(
             return_value=httpx.Response(422, json={"detail": "validation failed"})
         )
 
@@ -653,7 +653,7 @@ class TestWFirmaClientErrorHandling:
 
     @respx.mock
     def test_get_xml_raises_on_xml_error_status(self) -> None:
-        respx.get("https://api2.wfirma.pl/users/get/123").mock(
+        respx.get("https://sandbox-api2.wfirma.pl/users/get/123").mock(
             return_value=httpx.Response(
                 200,
                 text="""<?xml version=\"1.0\" encoding=\"UTF-8\"?>
@@ -667,7 +667,7 @@ class TestWFirmaClientErrorHandling:
 
     @respx.mock
     def test_raises_timeout_error_on_timeout(self) -> None:
-        respx.get("https://api2.wfirma.pl/users/get/123").mock(
+        respx.get("https://sandbox-api2.wfirma.pl/users/get/123").mock(
             side_effect=httpx.TimeoutException("Connection timed out")
         )
 
@@ -676,7 +676,7 @@ class TestWFirmaClientErrorHandling:
 
     @respx.mock
     def test_raises_connection_error_on_network_error(self) -> None:
-        respx.get("https://api2.wfirma.pl/users/get/123").mock(
+        respx.get("https://sandbox-api2.wfirma.pl/users/get/123").mock(
             side_effect=httpx.ConnectError("Failed to connect")
         )
 
@@ -695,7 +695,7 @@ class TestWFirmaClientFormatHandling:
 
     @respx.mock
     def test_get_json_adds_output_format_param(self) -> None:
-        route = respx.get("https://api2.wfirma.pl/users/get/123").mock(
+        route = respx.get("https://sandbox-api2.wfirma.pl/users/get/123").mock(
             return_value=httpx.Response(
                 200,
                 json={"users": {}, "status": {"code": "OK"}},
@@ -710,7 +710,7 @@ class TestWFirmaClientFormatHandling:
 
     @respx.mock
     def test_get_xml_adds_output_format_param(self) -> None:
-        route = respx.get("https://api2.wfirma.pl/users/get/123").mock(
+        route = respx.get("https://sandbox-api2.wfirma.pl/users/get/123").mock(
             return_value=httpx.Response(
                 200,
                 text="""<?xml version="1.0"?>
@@ -727,7 +727,7 @@ class TestWFirmaClientFormatHandling:
 
     @respx.mock
     def test_post_json_sets_format_params(self) -> None:
-        route = respx.post("https://api2.wfirma.pl/contractors/add").mock(
+        route = respx.post("https://sandbox-api2.wfirma.pl/contractors/add").mock(
             return_value=httpx.Response(
                 200,
                 json={"contractors": {}, "status": {"code": "OK"}},
@@ -743,7 +743,7 @@ class TestWFirmaClientFormatHandling:
 
     @respx.mock
     def test_post_xml_sets_format_params(self) -> None:
-        route = respx.post("https://api2.wfirma.pl/contractors/add").mock(
+        route = respx.post("https://sandbox-api2.wfirma.pl/contractors/add").mock(
             return_value=httpx.Response(
                 200,
                 text="""<?xml version="1.0"?>
@@ -804,7 +804,7 @@ class TestWFirmaClientOAuth2Integration:
 
         client = WFirmaClient(auth=auth)
 
-        route = respx.get("https://api2.wfirma.pl/users/get/123").mock(
+        route = respx.get("https://sandbox-api2.wfirma.pl/users/get/123").mock(
             return_value=httpx.Response(
                 200,
                 json={"users": {}, "status": {"code": "OK"}},
@@ -834,7 +834,7 @@ class TestWFirmaClientOAuth2Integration:
 
         client = WFirmaClient(auth=auth)
 
-        route = respx.get("https://api2.wfirma.pl/users/get/123").mock(
+        route = respx.get("https://sandbox-api2.wfirma.pl/users/get/123").mock(
             return_value=httpx.Response(
                 200,
                 json={"users": {}, "status": {"code": "OK"}},
@@ -852,7 +852,7 @@ class TestWFirmaClientOAuth2Integration:
         from wfirma.sync.client import WFirmaClient
 
         client = WFirmaClient(auth=APIKeyAuth(access_key="ak", secret_key="sk", app_key="appk"))
-        respx.get("https://api2.wfirma.pl/invoices/download/123").mock(
+        respx.get("https://sandbox-api2.wfirma.pl/invoices/download/123").mock(
             return_value=httpx.Response(404, text="Not Found")
         )
 
@@ -864,7 +864,7 @@ class TestWFirmaClientOAuth2Integration:
         from wfirma.sync.client import WFirmaClient
 
         client = WFirmaClient(auth=APIKeyAuth(access_key="ak", secret_key="sk", app_key="appk"))
-        respx.post("https://api2.wfirma.pl/documents/generate").mock(
+        respx.post("https://sandbox-api2.wfirma.pl/documents/generate").mock(
             return_value=httpx.Response(400, text="Bad Request")
         )
 

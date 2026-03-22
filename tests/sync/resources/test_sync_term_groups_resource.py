@@ -21,7 +21,7 @@ class TestTermGroupsResourceAdd:
 
         with respx.mock:
             route = respx.post(
-                "https://api2.wfirma.pl/term_groups/add",
+                "https://sandbox-api2.wfirma.pl/term_groups/add",
                 params={
                     "inputFormat": "json",
                     "outputFormat": "json",
@@ -57,7 +57,7 @@ class TestTermGroupsResourceFind:
 
         with respx.mock:
             route = respx.get(
-                "https://api2.wfirma.pl/term_groups/find",
+                "https://sandbox-api2.wfirma.pl/term_groups/find",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -92,7 +92,7 @@ class TestTermGroupsResourceFind:
 
         with respx.mock:
             respx.get(
-                "https://api2.wfirma.pl/term_groups/find",
+                "https://sandbox-api2.wfirma.pl/term_groups/find",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -122,7 +122,7 @@ class TestTermGroupsResourceGet:
 
         with respx.mock:
             route = respx.get(
-                "https://api2.wfirma.pl/term_groups/get/456",
+                "https://sandbox-api2.wfirma.pl/term_groups/get/456",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -157,7 +157,7 @@ class TestTermGroupsResourceEdit:
 
         with respx.mock:
             route = respx.post(
-                "https://api2.wfirma.pl/term_groups/edit/1",
+                "https://sandbox-api2.wfirma.pl/term_groups/edit/1",
                 params={
                     "inputFormat": "json",
                     "outputFormat": "json",
@@ -193,7 +193,7 @@ class TestTermGroupsResourceDelete:
 
         with respx.mock:
             route = respx.delete(
-                "https://api2.wfirma.pl/term_groups/delete/1",
+                "https://sandbox-api2.wfirma.pl/term_groups/delete/1",
                 params={
                     "company_id": "123",
                 },

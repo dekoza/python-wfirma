@@ -20,7 +20,7 @@ class TestDeclarationBodyPitResourceGet:
 
         with respx.mock:
             route = respx.get(
-                "https://api2.wfirma.pl/declaration_body_pit/get/pit11/2025",
+                "https://sandbox-api2.wfirma.pl/declaration_body_pit/get/pit11/2025",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -59,7 +59,7 @@ class TestDeclarationBodyPitResourceGet:
 
         with respx.mock:
             route = respx.get(
-                "https://api2.wfirma.pl/declaration_body_pit/get/pit38/2026",
+                "https://sandbox-api2.wfirma.pl/declaration_body_pit/get/pit38/2026",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -96,7 +96,7 @@ class TestDeclarationBodyPitResourceGet:
 
         with respx.mock:
             route = respx.get(
-                "https://api2.wfirma.pl/declaration_body_pit/get/pit28s/2024",
+                "https://sandbox-api2.wfirma.pl/declaration_body_pit/get/pit28s/2024",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -132,7 +132,7 @@ class TestDeclarationBodyPitResourceGet:
 
         with respx.mock:
             respx.get(
-                "https://api2.wfirma.pl/declaration_body_pit/get/pit11/2025",
+                "https://sandbox-api2.wfirma.pl/declaration_body_pit/get/pit11/2025",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -168,7 +168,7 @@ class TestDeclarationBodyPitResourceGet:
 
         with respx.mock:
             route = respx.get(
-                "https://api2.wfirma.pl/declaration_body_pit/get/pit_ub/2025",
+                "https://sandbox-api2.wfirma.pl/declaration_body_pit/get/pit_ub/2025",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",

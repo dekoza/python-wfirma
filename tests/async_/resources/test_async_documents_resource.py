@@ -42,7 +42,7 @@ class TestDocumentsResourceAdd:
         """Verify add() makes POST request to correct endpoint."""
         with respx.mock:
             respx.post(
-                "https://api2.wfirma.pl/documents/add",
+                "https://sandbox-api2.wfirma.pl/documents/add",
                 params={
                     "outputFormat": "json",
                     "inputFormat": "json",
@@ -81,7 +81,7 @@ class TestDocumentsResourceAdd:
         """Verify add() returns unwrapped payload dict."""
         with respx.mock:
             respx.post(
-                "https://api2.wfirma.pl/documents/add",
+                "https://sandbox-api2.wfirma.pl/documents/add",
                 params={
                     "outputFormat": "json",
                     "inputFormat": "json",
@@ -117,7 +117,7 @@ class TestDocumentsResourceFind:
         """Verify find() makes GET request to correct endpoint."""
         with respx.mock:
             respx.get(
-                "https://api2.wfirma.pl/documents/find",
+                "https://sandbox-api2.wfirma.pl/documents/find",
                 params={
                     "outputFormat": "json",
                     "company_id": "1",
@@ -156,7 +156,7 @@ class TestDocumentsResourceFind:
         """Verify find() accepts optional parameters."""
         with respx.mock:
             respx.get(
-                "https://api2.wfirma.pl/documents/find",
+                "https://sandbox-api2.wfirma.pl/documents/find",
                 params={
                     "outputFormat": "json",
                     "company_id": "1",
@@ -188,7 +188,7 @@ class TestDocumentsResourceFind:
         """Verify find() returns empty list when container is empty."""
         with respx.mock:
             respx.get(
-                "https://api2.wfirma.pl/documents/find",
+                "https://sandbox-api2.wfirma.pl/documents/find",
                 params={
                     "outputFormat": "json",
                     "company_id": "1",
@@ -216,7 +216,7 @@ class TestDocumentsResourceGet:
         """Verify get() makes GET request with ID in path."""
         with respx.mock:
             respx.get(
-                "https://api2.wfirma.pl/documents/get/42",
+                "https://sandbox-api2.wfirma.pl/documents/get/42",
                 params={
                     "outputFormat": "json",
                     "company_id": "1",
@@ -250,7 +250,7 @@ class TestDocumentsResourceGet:
         """Verify get() returns unwrapped payload dict."""
         with respx.mock:
             respx.get(
-                "https://api2.wfirma.pl/documents/get/99",
+                "https://sandbox-api2.wfirma.pl/documents/get/99",
                 params={
                     "outputFormat": "json",
                     "company_id": "1",
@@ -285,7 +285,7 @@ class TestDocumentsResourceDownload:
         """Verify download() makes GET request to correct endpoint."""
         with respx.mock:
             respx.get(
-                "https://api2.wfirma.pl/documents/download/42",
+                "https://sandbox-api2.wfirma.pl/documents/download/42",
                 params={
                     "company_id": "1",
                 },
@@ -307,7 +307,7 @@ class TestDocumentsResourceDownload:
         pdf_content = b"%PDF-1.4\n%\xe4\xe5\xe6\xe7"
         with respx.mock:
             respx.get(
-                "https://api2.wfirma.pl/documents/download/99",
+                "https://sandbox-api2.wfirma.pl/documents/download/99",
                 params={
                     "company_id": "1",
                 },
@@ -332,7 +332,7 @@ class TestDocumentsResourceDelete:
         """Verify delete() makes DELETE request with ID in path."""
         with respx.mock:
             respx.delete(
-                "https://api2.wfirma.pl/documents/delete/42",
+                "https://sandbox-api2.wfirma.pl/documents/delete/42",
                 params={
                     "outputFormat": "json",
                     "company_id": "1",
@@ -364,7 +364,7 @@ class TestDocumentsResourceDelete:
         """Verify delete() returns unwrapped payload dict."""
         with respx.mock:
             respx.delete(
-                "https://api2.wfirma.pl/documents/delete/88",
+                "https://sandbox-api2.wfirma.pl/documents/delete/88",
                 params={
                     "outputFormat": "json",
                     "company_id": "1",

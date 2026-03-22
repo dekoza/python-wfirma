@@ -28,7 +28,7 @@ class TestUserCompaniesResourceGet:
 
             with respx.mock:
                 route = respx.get(
-                    "https://api2.wfirma.pl/user_companies/get/999",
+                    "https://sandbox-api2.wfirma.pl/user_companies/get/999",
                     params={
                         "outputFormat": "json",
                     },
@@ -67,7 +67,7 @@ class TestUserCompaniesResourceGet:
 
             with respx.mock:
                 route = respx.get(
-                    "https://api2.wfirma.pl/user_companies/get/999",
+                    "https://sandbox-api2.wfirma.pl/user_companies/get/999",
                 ).mock(
                     return_value=httpx.Response(
                         200,
@@ -102,7 +102,7 @@ class TestUserCompaniesResourceFind:
 
             with respx.mock:
                 route = respx.get(
-                    "https://api2.wfirma.pl/user_companies/find",
+                    "https://sandbox-api2.wfirma.pl/user_companies/find",
                     params={
                         "outputFormat": "json",
                     },
@@ -146,7 +146,7 @@ class TestUserCompaniesResourceFind:
 
             with respx.mock:
                 route = respx.get(
-                    "https://api2.wfirma.pl/user_companies/find",
+                    "https://sandbox-api2.wfirma.pl/user_companies/find",
                 ).mock(
                     return_value=httpx.Response(
                         200,

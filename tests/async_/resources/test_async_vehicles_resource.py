@@ -30,7 +30,7 @@ class TestVehiclesResourceGet:
         async with client:
             with respx.mock:
                 route = respx.get(
-                    "https://api2.wfirma.pl/vehicles/get/456",
+                    "https://sandbox-api2.wfirma.pl/vehicles/get/456",
                     params={
                         "outputFormat": "json",
                         "company_id": "123",
@@ -73,7 +73,7 @@ class TestVehiclesResourceFind:
         async with client:
             with respx.mock:
                 route = respx.get(
-                    "https://api2.wfirma.pl/vehicles/find",
+                    "https://sandbox-api2.wfirma.pl/vehicles/find",
                     params={
                         "outputFormat": "json",
                         "company_id": "123",
@@ -113,7 +113,7 @@ class TestVehiclesResourceFind:
         async with client:
             with respx.mock:
                 route = respx.get(
-                    "https://api2.wfirma.pl/vehicles/find",
+                    "https://sandbox-api2.wfirma.pl/vehicles/find",
                     params={
                         "outputFormat": "json",
                         "company_id": "123",
@@ -152,7 +152,7 @@ class TestVehiclesResourceAdd:
         async with client:
             with respx.mock:
                 route = respx.post(
-                    "https://api2.wfirma.pl/vehicles/add",
+                    "https://sandbox-api2.wfirma.pl/vehicles/add",
                     params={
                         "inputFormat": "json",
                         "outputFormat": "json",
@@ -196,7 +196,7 @@ class TestVehiclesResourceEdit:
         async with client:
             with respx.mock:
                 route = respx.post(
-                    "https://api2.wfirma.pl/vehicles/edit/10",
+                    "https://sandbox-api2.wfirma.pl/vehicles/edit/10",
                     params={
                         "inputFormat": "json",
                         "outputFormat": "json",
@@ -240,7 +240,7 @@ class TestVehiclesResourceDelete:
         async with client:
             with respx.mock:
                 route = respx.get(
-                    "https://api2.wfirma.pl/vehicles/delete/10",
+                    "https://sandbox-api2.wfirma.pl/vehicles/delete/10",
                     params={
                         "outputFormat": "json",
                         "company_id": "123",

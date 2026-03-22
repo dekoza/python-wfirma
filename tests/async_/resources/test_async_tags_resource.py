@@ -30,7 +30,7 @@ class TestTagsResourceGet:
         async with client:
             with respx.mock:
                 route = respx.get(
-                    "https://api2.wfirma.pl/tags/get/456",
+                    "https://sandbox-api2.wfirma.pl/tags/get/456",
                     params={
                         "outputFormat": "json",
                         "company_id": "123",
@@ -73,7 +73,7 @@ class TestTagsResourceFind:
         async with client:
             with respx.mock:
                 route = respx.get(
-                    "https://api2.wfirma.pl/tags/find",
+                    "https://sandbox-api2.wfirma.pl/tags/find",
                     params={
                         "outputFormat": "json",
                         "company_id": "123",
@@ -113,7 +113,7 @@ class TestTagsResourceFind:
         async with client:
             with respx.mock:
                 route = respx.get(
-                    "https://api2.wfirma.pl/tags/find",
+                    "https://sandbox-api2.wfirma.pl/tags/find",
                     params={
                         "outputFormat": "json",
                         "company_id": "123",
@@ -152,7 +152,7 @@ class TestTagsResourceAdd:
         async with client:
             with respx.mock:
                 route = respx.post(
-                    "https://api2.wfirma.pl/tags/add",
+                    "https://sandbox-api2.wfirma.pl/tags/add",
                     params={
                         "inputFormat": "json",
                         "outputFormat": "json",
@@ -196,7 +196,7 @@ class TestTagsResourceEdit:
         async with client:
             with respx.mock:
                 route = respx.post(
-                    "https://api2.wfirma.pl/tags/edit/10",
+                    "https://sandbox-api2.wfirma.pl/tags/edit/10",
                     params={
                         "inputFormat": "json",
                         "outputFormat": "json",
@@ -240,7 +240,7 @@ class TestTagsResourceDelete:
         async with client:
             with respx.mock:
                 route = respx.delete(
-                    "https://api2.wfirma.pl/tags/delete/10",
+                    "https://sandbox-api2.wfirma.pl/tags/delete/10",
                     params={
                         "outputFormat": "json",
                         "company_id": "123",

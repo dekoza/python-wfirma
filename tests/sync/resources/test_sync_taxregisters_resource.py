@@ -28,7 +28,7 @@ class TestTaxregistersResourceGet:
 
         with respx.mock:
             route = respx.get(
-                "https://api2.wfirma.pl/taxregisters/get/2025/6",
+                "https://sandbox-api2.wfirma.pl/taxregisters/get/2025/6",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -69,7 +69,7 @@ class TestTaxregistersResourceGet:
 
         with respx.mock:
             route = respx.get(
-                "https://api2.wfirma.pl/taxregisters/get/2024/12",
+                "https://sandbox-api2.wfirma.pl/taxregisters/get/2024/12",
                 params={
                     "outputFormat": "json",
                     "company_id": "456",
@@ -109,7 +109,7 @@ class TestTaxregistersResourceGet:
 
         with respx.mock:
             route = respx.get(
-                "https://api2.wfirma.pl/taxregisters/get/2025/1",
+                "https://sandbox-api2.wfirma.pl/taxregisters/get/2025/1",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -153,7 +153,7 @@ class TestTaxregistersResourceGetResponseFormats:
 
         with respx.mock:
             route = respx.get(
-                "https://api2.wfirma.pl/taxregisters/get/2025/3",
+                "https://sandbox-api2.wfirma.pl/taxregisters/get/2025/3",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -197,7 +197,7 @@ class TestTaxregistersResourceGetResponseFormats:
 
         with respx.mock:
             route = respx.get(
-                "https://api2.wfirma.pl/taxregisters/get/2025/5",
+                "https://sandbox-api2.wfirma.pl/taxregisters/get/2025/5",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",

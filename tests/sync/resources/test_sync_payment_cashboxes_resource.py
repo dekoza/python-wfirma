@@ -28,7 +28,7 @@ class TestPaymentCashboxesResourceGet:
 
         with respx.mock:
             route = respx.get(
-                "https://api2.wfirma.pl/payment_cashboxes/get/789",
+                "https://sandbox-api2.wfirma.pl/payment_cashboxes/get/789",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -71,7 +71,7 @@ class TestPaymentCashboxesResourceFind:
 
         with respx.mock:
             route = respx.get(
-                "https://api2.wfirma.pl/payment_cashboxes/find",
+                "https://sandbox-api2.wfirma.pl/payment_cashboxes/find",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -111,7 +111,7 @@ class TestPaymentCashboxesResourceFind:
 
         with respx.mock:
             route = respx.get(
-                "https://api2.wfirma.pl/payment_cashboxes/find",
+                "https://sandbox-api2.wfirma.pl/payment_cashboxes/find",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",

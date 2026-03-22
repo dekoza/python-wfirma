@@ -41,7 +41,7 @@ class TestInvoiceDeliveriesResourceAdd:
         """Verify add() makes POST request to correct endpoint."""
         with respx.mock:
             respx.post(
-                "https://api2.wfirma.pl/invoice_deliveries/add",
+                "https://sandbox-api2.wfirma.pl/invoice_deliveries/add",
                 params={
                     "outputFormat": "json",
                     "inputFormat": "json",
@@ -79,7 +79,7 @@ class TestInvoiceDeliveriesResourceAdd:
         """Verify add() returns unwrapped payload dict."""
         with respx.mock:
             respx.post(
-                "https://api2.wfirma.pl/invoice_deliveries/add",
+                "https://sandbox-api2.wfirma.pl/invoice_deliveries/add",
                 params={
                     "outputFormat": "json",
                     "inputFormat": "json",
@@ -114,7 +114,7 @@ class TestInvoiceDeliveriesResourceFind:
         """Verify find() makes GET request to correct endpoint."""
         with respx.mock:
             respx.get(
-                "https://api2.wfirma.pl/invoice_deliveries/find",
+                "https://sandbox-api2.wfirma.pl/invoice_deliveries/find",
                 params={
                     "outputFormat": "json",
                     "company_id": "1",
@@ -152,7 +152,7 @@ class TestInvoiceDeliveriesResourceFind:
         """Verify find() accepts optional parameters."""
         with respx.mock:
             respx.get(
-                "https://api2.wfirma.pl/invoice_deliveries/find",
+                "https://sandbox-api2.wfirma.pl/invoice_deliveries/find",
                 params={
                     "outputFormat": "json",
                     "company_id": "1",
@@ -183,7 +183,7 @@ class TestInvoiceDeliveriesResourceFind:
         """Verify find() returns empty list when container is empty."""
         with respx.mock:
             respx.get(
-                "https://api2.wfirma.pl/invoice_deliveries/find",
+                "https://sandbox-api2.wfirma.pl/invoice_deliveries/find",
                 params={
                     "outputFormat": "json",
                     "company_id": "1",
@@ -210,7 +210,7 @@ class TestInvoiceDeliveriesResourceGet:
         """Verify get() makes GET request with ID in path."""
         with respx.mock:
             respx.get(
-                "https://api2.wfirma.pl/invoice_deliveries/get/42",
+                "https://sandbox-api2.wfirma.pl/invoice_deliveries/get/42",
                 params={
                     "outputFormat": "json",
                     "company_id": "1",
@@ -243,7 +243,7 @@ class TestInvoiceDeliveriesResourceGet:
         """Verify get() returns unwrapped payload dict."""
         with respx.mock:
             respx.get(
-                "https://api2.wfirma.pl/invoice_deliveries/get/99",
+                "https://sandbox-api2.wfirma.pl/invoice_deliveries/get/99",
                 params={
                     "outputFormat": "json",
                     "company_id": "1",
@@ -277,7 +277,7 @@ class TestInvoiceDeliveriesResourceDelete:
         """Verify delete() makes DELETE request with ID in path."""
         with respx.mock:
             respx.delete(
-                "https://api2.wfirma.pl/invoice_deliveries/delete/42",
+                "https://sandbox-api2.wfirma.pl/invoice_deliveries/delete/42",
                 params={
                     "outputFormat": "json",
                     "company_id": "1",
@@ -308,7 +308,7 @@ class TestInvoiceDeliveriesResourceDelete:
         """Verify delete() returns unwrapped payload dict."""
         with respx.mock:
             respx.delete(
-                "https://api2.wfirma.pl/invoice_deliveries/delete/88",
+                "https://sandbox-api2.wfirma.pl/invoice_deliveries/delete/88",
                 params={
                     "outputFormat": "json",
                     "company_id": "1",

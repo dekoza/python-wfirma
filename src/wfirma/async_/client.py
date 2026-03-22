@@ -69,7 +69,7 @@ class WFirmaClient:
         self,
         auth: APIKeyAuth | OAuth1Auth | OAuth2Auth,
         *,
-        environment: Environment = Environment.PRODUCTION,
+        environment: Environment = Environment.SANDBOX,
         company_id: int | None = None,
         timeout: float = DEFAULT_TIMEOUT,
     ) -> None:
@@ -77,7 +77,7 @@ class WFirmaClient:
 
         Args:
             auth: Authentication provider instance.
-            environment: API environment (default: PRODUCTION).
+            environment: API environment (default: SANDBOX).
             company_id: Optional company ID for multi-company accounts.
             timeout: HTTP request timeout in seconds (default: 30.0).
         """

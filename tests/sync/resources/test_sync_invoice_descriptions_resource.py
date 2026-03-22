@@ -27,7 +27,7 @@ class TestInvoiceDescriptionsResourceGet:
 
         with respx.mock:
             route = respx.get(
-                "https://api2.wfirma.pl/invoice_descriptions/get/456",
+                "https://sandbox-api2.wfirma.pl/invoice_descriptions/get/456",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -69,7 +69,7 @@ class TestInvoiceDescriptionsResourceFind:
 
         with respx.mock:
             route = respx.get(
-                "https://api2.wfirma.pl/invoice_descriptions/find",
+                "https://sandbox-api2.wfirma.pl/invoice_descriptions/find",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -118,7 +118,7 @@ class TestInvoiceDescriptionsResourceFind:
 
         with respx.mock:
             route = respx.get(
-                "https://api2.wfirma.pl/invoice_descriptions/find",
+                "https://sandbox-api2.wfirma.pl/invoice_descriptions/find",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",

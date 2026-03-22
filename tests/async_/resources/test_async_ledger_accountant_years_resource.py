@@ -29,7 +29,7 @@ class TestLedgerAccountantYearsResourceGet:
 
         with respx.mock:
             route = respx.get(
-                "https://api2.wfirma.pl/ledger_accountant_years/get/456",
+                "https://sandbox-api2.wfirma.pl/ledger_accountant_years/get/456",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -73,7 +73,7 @@ class TestLedgerAccountantYearsResourceFind:
 
         with respx.mock:
             route = respx.get(
-                "https://api2.wfirma.pl/ledger_accountant_years/find",
+                "https://sandbox-api2.wfirma.pl/ledger_accountant_years/find",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -124,7 +124,7 @@ class TestLedgerAccountantYearsResourceFind:
 
         with respx.mock:
             route = respx.get(
-                "https://api2.wfirma.pl/ledger_accountant_years/find",
+                "https://sandbox-api2.wfirma.pl/ledger_accountant_years/find",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",

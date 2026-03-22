@@ -28,7 +28,7 @@ class TestVehiclesResourceGet:
 
         with respx.mock:
             route = respx.get(
-                "https://api2.wfirma.pl/vehicles/get/456",
+                "https://sandbox-api2.wfirma.pl/vehicles/get/456",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -71,7 +71,7 @@ class TestVehiclesResourceFind:
 
         with respx.mock:
             route = respx.get(
-                "https://api2.wfirma.pl/vehicles/find",
+                "https://sandbox-api2.wfirma.pl/vehicles/find",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -111,7 +111,7 @@ class TestVehiclesResourceFind:
 
         with respx.mock:
             route = respx.get(
-                "https://api2.wfirma.pl/vehicles/find",
+                "https://sandbox-api2.wfirma.pl/vehicles/find",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -150,7 +150,7 @@ class TestVehiclesResourceAdd:
 
         with respx.mock:
             route = respx.post(
-                "https://api2.wfirma.pl/vehicles/add",
+                "https://sandbox-api2.wfirma.pl/vehicles/add",
                 params={
                     "inputFormat": "json",
                     "outputFormat": "json",
@@ -194,7 +194,7 @@ class TestVehiclesResourceEdit:
 
         with respx.mock:
             route = respx.post(
-                "https://api2.wfirma.pl/vehicles/edit/10",
+                "https://sandbox-api2.wfirma.pl/vehicles/edit/10",
                 params={
                     "inputFormat": "json",
                     "outputFormat": "json",
@@ -238,7 +238,7 @@ class TestVehiclesResourceDelete:
 
         with respx.mock:
             route = respx.get(
-                "https://api2.wfirma.pl/vehicles/delete/10",
+                "https://sandbox-api2.wfirma.pl/vehicles/delete/10",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",

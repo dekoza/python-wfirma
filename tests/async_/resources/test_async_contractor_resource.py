@@ -30,7 +30,7 @@ class TestContractorResourceGet:
         async with client:
             with respx.mock:
                 route = respx.get(
-                    "https://api2.wfirma.pl/contractors/get/456",
+                    "https://sandbox-api2.wfirma.pl/contractors/get/456",
                     params={
                         "outputFormat": "json",
                         "company_id": "123",
@@ -79,7 +79,7 @@ class TestContractorResourceFind:
         async with client:
             with respx.mock:
                 route = respx.get(
-                    "https://api2.wfirma.pl/contractors/find",
+                    "https://sandbox-api2.wfirma.pl/contractors/find",
                     params={
                         "outputFormat": "json",
                         "company_id": "123",
@@ -134,7 +134,7 @@ class TestContractorResourceFind:
         async with client:
             with respx.mock:
                 route = respx.get(
-                    "https://api2.wfirma.pl/contractors/find",
+                    "https://sandbox-api2.wfirma.pl/contractors/find",
                     params={
                         "outputFormat": "json",
                         "company_id": "123",
@@ -175,7 +175,7 @@ class TestContractorResourceAdd:
         async with client:
             with respx.mock:
                 route = respx.post(
-                    "https://api2.wfirma.pl/contractors/add",
+                    "https://sandbox-api2.wfirma.pl/contractors/add",
                     params={
                         "inputFormat": "json",
                         "outputFormat": "json",
@@ -223,7 +223,7 @@ class TestContractorResourceAdd:
         async with client:
             with respx.mock:
                 route = respx.post(
-                    "https://api2.wfirma.pl/contractors/add",
+                    "https://sandbox-api2.wfirma.pl/contractors/add",
                 ).mock(
                     return_value=httpx.Response(
                         200,
@@ -291,7 +291,7 @@ class TestContractorResourceEdit:
         async with client:
             with respx.mock:
                 route = respx.post(
-                    "https://api2.wfirma.pl/contractors/edit/456",
+                    "https://sandbox-api2.wfirma.pl/contractors/edit/456",
                     params={
                         "inputFormat": "json",
                         "outputFormat": "json",
@@ -342,7 +342,7 @@ class TestContractorResourceDelete:
         async with client:
             with respx.mock:
                 route = respx.delete(
-                    "https://api2.wfirma.pl/contractors/delete/456",
+                    "https://sandbox-api2.wfirma.pl/contractors/delete/456",
                     params={
                         "outputFormat": "json",
                         "company_id": "123",
@@ -372,7 +372,7 @@ class TestContractorResourceDelete:
         async with client:
             with respx.mock:
                 route = respx.delete(
-                    "https://api2.wfirma.pl/contractors/delete/999",
+                    "https://sandbox-api2.wfirma.pl/contractors/delete/999",
                     params={
                         "outputFormat": "json",
                         "company_id": "123",
