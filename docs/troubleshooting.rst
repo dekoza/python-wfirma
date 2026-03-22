@@ -194,7 +194,7 @@ Frequently Asked Questions
 
 **Q: Can I use this library in production?**
 
-A: ``1.0b1`` is a beta release. ``WFirmaClient`` now supports API Key, OAuth2, and OAuth1, but you should still validate your exact flows and accept API churn before ``1.0.0``.
+A: ``1.0b2`` is a beta release. ``WFirmaClient`` now supports API Key, OAuth2, and OAuth1, but you should still validate your exact flows and accept API churn before ``1.0.0``.
 
 **Q: Does this library support Python 3.11?**
 

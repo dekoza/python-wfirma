@@ -1,6 +1,6 @@
 # Roadmap
 
-Current target version: **1.0b2**.
+Current target version: **1.0rc1**.
 Last updated: 2026-03-23.
 
 ## 1.0b1 — Released
@@ -18,12 +18,15 @@ Released beta for the supported client surface.
 - 40+ resource implementations (invoices, contractors, goods, payments, warehouse documents, etc.)
 - Production-aligned client defaults and hardened HTTP error handling
 
-## 1.0b2 — Beta hardening
+## 1.0b2 — Released
 
-- Add a formal release checklist and blocker policy
-- Document manual live read-only verification with the packaged CLI
-- Rewrite docs around safe production-first usage
-- Broader packaging and compatibility validation
+Hardening release focused on process, docs, and manual verification.
+
+**Done:**
+- Added a formal release checklist and blocker policy
+- Documented manual live read-only verification with the packaged CLI
+- Rewrote docs around safe production-first usage
+- Broadened packaging and compatibility validation
 
 ## 1.0rc1 — Release candidate
 

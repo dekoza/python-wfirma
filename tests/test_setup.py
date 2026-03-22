@@ -26,7 +26,7 @@ def test_project_setup():
 
     docs_conf = _load_docs_conf()
 
-    assert wfirma.__version__ == "1.0b1"
+    assert wfirma.__version__ == "1.0b2"
     assert docs_conf.release == wfirma.__version__
 
 
@@ -51,13 +51,13 @@ def test_integration_readme_describes_beta_smoke_scope():
     """Test that the integration readme reflects the current beta contract."""
     readme = (REPO_ROOT / "tests" / "integration" / "README.md").read_text(encoding="utf-8")
 
-    assert "1.0b1" in readme
+    assert "1.0b2" in readme
     assert "WFIRMA_RUN_INTEGRATION=1 pytest" in readme
     assert "WFIRMA_OAUTH2_ACCESS_TOKEN" in readme
 
 
 def test_authentication_docs_match_beta_public_api() -> None:
-    """Test that authentication docs describe the real 1.0b1 API surface."""
+    """Test that authentication docs describe the real 1.0b2 API surface."""
     docs = (REPO_ROOT / "docs" / "authentication.rst").read_text(encoding="utf-8")
 
     assert "uses OAuth for authentication" not in docs
@@ -65,7 +65,7 @@ def test_authentication_docs_match_beta_public_api() -> None:
     assert 'secret="your_secret"' not in docs
     assert "WFIRMA_ACCESS_KEY" in docs
     assert "WFIRMA_SECRET_KEY" in docs
-    assert "``WFirmaClient`` supports API Key, OAuth 2.0, and OAuth 1.0a in ``1.0b1``." in docs
+    assert "``WFirmaClient`` supports API Key, OAuth 2.0, and OAuth 1.0a in ``1.0b2``." in docs
     assert "first-class ``WFirmaClient`` support is deferred" not in docs
 
 
@@ -86,7 +86,7 @@ def test_troubleshooting_docs_do_not_claim_missing_features() -> None:
     assert "client.company.get_info()" not in docs
     assert "client.company.switch(company_id)" not in docs
     assert "Version 0.1.x" not in docs
-    assert "1.0b1" in docs
+    assert "1.0b2" in docs
 
 
 def test_releasing_guide_covers_release_checks_and_manual_verification() -> None:
@@ -119,10 +119,10 @@ def test_release_metadata_reflects_post_beta_state() -> None:
     roadmap = (REPO_ROOT / "ROADMAP.md").read_text(encoding="utf-8")
     changelog = (REPO_ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
 
-    assert "Current target version: **1.0b2**." in roadmap
-    assert "## 1.0b1 — Released" in roadmap
+    assert "Current target version: **1.0rc1**." in roadmap
+    assert "## 1.0b2 — Released" in roadmap
     assert "This branch is preparing the `1.0b1` beta release." not in changelog
-    assert "- Add a formal release checklist and blocker policy" in changelog
+    assert "## [1.0b2] - 2026-03-23" in changelog
 
 
 def test_contributing_points_to_release_workflow() -> None:

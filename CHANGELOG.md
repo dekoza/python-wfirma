@@ -7,7 +7,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Post-`1.0b1` hardening work.
+Work toward `1.0rc1`.
+
+## [1.0b2] - 2026-03-23
 
 ### Added
 - Packaged `wfirma` CLI for read-only API inspection
@@ -17,10 +19,7 @@ Post-`1.0b1` hardening work.
 - README now prioritizes safe read-only production usage before mutating examples
 - Roadmap now targets `1.0b2` hardening instead of the already-shipped beta
 - Contributor docs now point to the release workflow
-
-### Planned
-- Add a formal release checklist and blocker policy
-- Document manual live verification with least-privilege credentials
+- Version metadata now targets `1.0b2`
 
 ## [1.0b1] - 2026-03-23
 
@@ -45,5 +44,6 @@ Post-`1.0b1` hardening work.
 - `WFirmaClient` now supports `OAuth1Auth` as a first-class auth mode
 - HTTP and XML error handling is hardened for non-JSON and binary responses
 
-[Unreleased]: https://github.com/dekoza/python-wfirma/compare/v1.0b1...HEAD
+[Unreleased]: https://github.com/dekoza/python-wfirma/compare/v1.0b2...HEAD
+[1.0b2]: https://github.com/dekoza/python-wfirma/releases/tag/v1.0b2
 [1.0b1]: https://github.com/dekoza/python-wfirma/releases/tag/v1.0b1
