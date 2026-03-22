@@ -1,12 +1,16 @@
 Authentication
 ==============
 
-wFirma API uses OAuth for authentication. This guide will help you set up authentication.
+wFirma exposes API Key, OAuth 2.0, and OAuth 1.0a authentication modes. This guide explains the parts that ``python-wfirma`` supports in ``1.0b1``.
+
+.. important::
+   ``WFirmaClient`` supports API Key and OAuth 2.0 in 1.0b1.
+   OAuth 1.0a helper flows remain available, but first-class ``WFirmaClient`` support is deferred.
 
 .. note::
-   OAuth support in this library is implemented using **Authlib** under the hood.
-   The public APIs in ``wfirma.sync.auth`` and ``wfirma.async_.auth`` stay small and explicit,
-   while Authlib handles the protocol details.
+   OAuth2 support in this library is implemented using **Authlib** under the hood.
+   OAuth1 helper flows are implemented directly in ``wfirma.sync.auth`` and
+   ``wfirma.async_.auth``.
 
 Getting API Credentials
 ------------------------
@@ -22,29 +26,38 @@ Configuration Methods
 Environment Variables
 ~~~~~~~~~~~~~~~~~~~~~
 
-The recommended method for production::
+API Key auth uses these environment variables::
 
     export WFIRMA_APP_KEY=your_app_key
-    export WFIRMA_APP_SECRET=your_app_secret
+    export WFIRMA_ACCESS_KEY=your_access_key
+    export WFIRMA_SECRET_KEY=your_secret_key
     export WFIRMA_ENVIRONMENT=sandbox  # or production
+    export WFIRMA_COMPANY_ID=123
 
 Or create a ``.env`` file::
 
     WFIRMA_APP_KEY=your_app_key
-    WFIRMA_APP_SECRET=your_app_secret
+    WFIRMA_ACCESS_KEY=your_access_key
+    WFIRMA_SECRET_KEY=your_secret_key
     WFIRMA_ENVIRONMENT=sandbox
+    WFIRMA_COMPANY_ID=123
 
 Direct Configuration
 ~~~~~~~~~~~~~~~~~~~~
 
-Pass credentials directly when creating the client::
+Pass API Key credentials via ``APIKeyAuth``::
 
-    from wfirma import WFirmaClient
+    from wfirma.sync import APIKeyAuth, WFirmaClient
+
+    auth = APIKeyAuth(
+        access_key="your_access_key",
+        secret_key="your_secret_key",
+        app_key="your_app_key",
+    )
 
     client = WFirmaClient(
-        app_key="your_app_key",
-        secret="your_secret",
-        environment="sandbox"
+        auth=auth,
+        company_id=123,
     )
 
 Environments
@@ -55,22 +68,32 @@ Sandbox Environment
 
 Use sandbox for testing::
 
-    client = WFirmaClient(
+    from wfirma.config import Environment
+    from wfirma.sync import APIKeyAuth, WFirmaClient
+
+    auth = APIKeyAuth(
+        access_key="your_sandbox_access_key",
+        secret_key="your_sandbox_secret_key",
         app_key="your_sandbox_key",
-        secret="your_sandbox_secret",
-        environment="sandbox"
     )
+
+    client = WFirmaClient(auth=auth, environment=Environment.SANDBOX, company_id=123)
 
 Production Environment
 ~~~~~~~~~~~~~~~~~~~~~~
 
 Use production for live data::
 
-    client = WFirmaClient(
+    from wfirma.config import Environment
+    from wfirma.sync import APIKeyAuth, WFirmaClient
+
+    auth = APIKeyAuth(
+        access_key="your_production_access_key",
+        secret_key="your_production_secret_key",
         app_key="your_production_key",
-        secret="your_production_secret",
-        environment="production"
     )
+
+    client = WFirmaClient(auth=auth, environment=Environment.PRODUCTION, company_id=123)
 
 .. warning::
    Always test your integration in the sandbox environment before using production credentials.
@@ -78,12 +101,13 @@ Use production for live data::
 Token Management
 ----------------
 
-The library handles token management automatically:
+The library does not obtain OAuth tokens automatically on the first API call.
+Instead:
 
-* Tokens are obtained on first API call
-* Tokens are cached during the session
-* Expired tokens are automatically renewed
-* No manual token handling required
+* API Key auth uses static headers and does not involve token storage
+* OAuth2 requires a manual authorization-code exchange once
+* After an OAuth token is stored, the helper reuses it and refreshes it when possible
+* OAuth1 helper flows store tokens after you complete the authorization handshake
 
 OAuth Token Store
 -----------------
@@ -140,10 +164,17 @@ Multi-Company Support
 
 If you have access to multiple companies::
 
-    client = WFirmaClient(
+    from wfirma.sync import APIKeyAuth, WFirmaClient
+
+    auth = APIKeyAuth(
+        access_key="your_access_key",
+        secret_key="your_secret_key",
         app_key="your_app_key",
-        secret="your_secret",
-        company_id="specific_company_id"
+    )
+
+    client = WFirmaClient(
+        auth=auth,
+        company_id=123
     )
 
 Security Best Practices
@@ -177,7 +208,7 @@ Use when you can open the user consent page. Minimal sync example::
         client_id="your_client_id",
         client_secret="your_client_secret",
         redirect_uri="https://your.app/callback",
-        environment=Environment.PRODUCTION,
+        environment=Environment.SANDBOX,
         token_store=FileTokenStore("~/.cache/wfirma/tokens.json"),
     )
 
@@ -190,7 +221,7 @@ Use when you can open the user consent page. Minimal sync example::
     # Step 3: reuse token for API calls (auto-refresh when expired)
     token = auth.get_token()
 
-Async variants are available via ``wfirma.async_.auth.OAuth2Auth`` and ``wfirma.async_.auth.OAuth1Auth`` with identical APIs using ``httpx.AsyncClient`` under the hood.
+Async OAuth2 is available via ``wfirma.async_.auth.OAuth2Auth`` with the same public flow.
 
 OAuth 1.0a
 ~~~~~~~~~~
@@ -217,7 +248,7 @@ Use when the integration cannot open an OAuth2 consent page. Minimal sync exampl
         oauth_verifier="oauth-verifier-from-callback",
     )
 
-Async variants are available via ``wfirma.async_.auth.OAuth2Auth`` and ``wfirma.async_.auth.OAuth1Auth`` with identical APIs using ``httpx.AsyncClient`` under the hood.
+Async OAuth1 helpers are available via ``wfirma.async_.auth.OAuth1Auth`` with the same public flow.
 
 OAuth 1.0a signature details
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~

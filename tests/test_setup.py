@@ -56,6 +56,48 @@ def test_integration_readme_describes_beta_smoke_scope():
     assert "WFIRMA_OAUTH2_ACCESS_TOKEN" in readme
 
 
+def test_authentication_docs_match_beta_public_api() -> None:
+    """Test that authentication docs describe the real 1.0b1 API surface."""
+    docs = (REPO_ROOT / "docs" / "authentication.rst").read_text(encoding="utf-8")
+
+    assert "uses OAuth for authentication" not in docs
+    assert "from wfirma import WFirmaClient" not in docs
+    assert 'secret="your_secret"' not in docs
+    assert "WFIRMA_ACCESS_KEY" in docs
+    assert "WFIRMA_SECRET_KEY" in docs
+    assert "``WFirmaClient`` supports API Key and OAuth 2.0 in 1.0b1" in docs
+    assert "OAuth 1.0a helper flows remain available" in docs
+
+
+def test_quickstart_docs_use_sandbox_for_default_client_examples() -> None:
+    """Test that quickstart mocks match the sandbox default client environment."""
+    docs = (REPO_ROOT / "docs" / "quickstart.rst").read_text(encoding="utf-8")
+
+    assert "https://sandbox-api2.wfirma.pl/users/get/123" in docs
+    assert "https://api2.wfirma.pl/users/get/123" not in docs
+
+
+def test_troubleshooting_docs_do_not_claim_missing_features() -> None:
+    """Test that troubleshooting docs do not promise behavior the library lacks."""
+    docs = (REPO_ROOT / "docs" / "troubleshooting.rst").read_text(encoding="utf-8")
+
+    assert "automatic retry with backoff" not in docs
+    assert "last_response" not in docs
+    assert "client.company.get_info()" not in docs
+    assert "client.company.switch(company_id)" not in docs
+    assert "Version 0.1.x" not in docs
+    assert "1.0b1" in docs
+
+
+def test_readme_does_not_advertise_unconfigured_parallel_pytest() -> None:
+    """Test that the README only documents supported test commands."""
+    readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+
+    assert "pytest -n auto" not in readme
+    assert "WFIRMA_ACCESS_KEY" in readme
+    assert "WFIRMA_SECRET_KEY" in readme
+
+
 def test_fixture_availability(wfirma_config_data, api_key_auth_data):
     """Test that pytest fixtures are available."""
     assert wfirma_config_data["app_key"] == "test_app_key"

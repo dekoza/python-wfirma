@@ -22,7 +22,7 @@ Features
 * 🎯 **Type-Safe**: Complete type hints for better IDE support
 * ✅ **Validated**: Automatic request/response validation using Pydantic
 * 📦 **Format Agnostic**: Seamless JSON and XML handling
-* 🔐 **OAuth Ready**: Built-in OAuth authentication
+* 🔐 **Auth Choices**: API Key + OAuth2 client support, OAuth1 helper utilities
 
 Quick Example
 -------------

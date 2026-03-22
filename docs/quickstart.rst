@@ -28,7 +28,7 @@ Synchronous Example
     # The base HTTP client returns the parsed API payload (dict).
     # Below we mock the HTTP call to keep the example self-contained.
     with respx.mock:
-        respx.get("https://api2.wfirma.pl/users/get/123").mock(
+        respx.get("https://sandbox-api2.wfirma.pl/users/get/123").mock(
             return_value=httpx.Response(
                 200,
                 json={
@@ -59,7 +59,7 @@ Asynchronous Example
 
     async def main() -> None:
         with respx.mock:
-            respx.get("https://api2.wfirma.pl/users/get/123").mock(
+            respx.get("https://sandbox-api2.wfirma.pl/users/get/123").mock(
                 return_value=httpx.Response(
                     200,
                     json={

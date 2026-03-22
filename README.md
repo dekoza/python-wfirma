@@ -96,7 +96,29 @@ with WFirmaClient(auth=oauth, company_id=123) as client:
 
 ## Configuration
 
-The library reads credentials from environment variables when using `from_env()` class methods:
+The library has two different environment-driven helpers:
+
+- `APIKeyAuth.from_env()` reads API key credentials for `WFirmaClient`
+- `get_config()` / `WFirmaConfig.from_env()` read shared application settings
+
+API key authentication from environment:
+
+```bash
+# .env
+WFIRMA_APP_KEY=your_app_key
+WFIRMA_ACCESS_KEY=your_access_key
+WFIRMA_SECRET_KEY=your_secret_key
+WFIRMA_ENVIRONMENT=sandbox
+WFIRMA_COMPANY_ID=123
+```
+
+```python
+from wfirma.sync.auth import APIKeyAuth
+
+auth = APIKeyAuth.from_env()
+```
+
+Shared configuration helper:
 
 ```bash
 # .env
@@ -145,7 +167,7 @@ uv run pre-commit install
 ```bash
 uv run pytest                                     # all tests
 uv run pytest --cov=wfirma --cov-report=html      # with coverage
-uv run pytest -n auto                             # parallel
+uv run pytest -m integration                      # opt-in live integration tests
 ```
 
 ### Linting & type-checking

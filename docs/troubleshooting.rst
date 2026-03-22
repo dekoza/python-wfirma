@@ -61,7 +61,10 @@ Network Errors
 2. Verify wFirma API status
 3. Increase timeout setting::
 
-    client = WFirmaClient(..., timeout=60)
+    from wfirma.sync import APIKeyAuth, WFirmaClient
+
+    auth = APIKeyAuth(access_key="...", secret_key="...", app_key="...")
+    client = WFirmaClient(auth=auth, timeout=60)
 
 4. Check firewall/proxy settings
 
@@ -84,10 +87,10 @@ Rate Limiting
 
 **Solution**:
 
-1. The library implements automatic retry with backoff
-2. Reduce request frequency
-3. Use bulk operations where available
-4. Contact wFirma support to increase rate limits
+1. ``python-wfirma`` raises ``RateLimitError`` but does not retry automatically in ``1.0b1``
+2. If the exception includes ``retry_after``, wait that many seconds before retrying
+3. Reduce request frequency
+4. Contact wFirma support if your integration needs a higher limit
 
 Data Issues
 ~~~~~~~~~~~
@@ -123,15 +126,17 @@ Enable Detailed Logging
     logger = logging.getLogger('wfirma')
     logger.setLevel(logging.DEBUG)
 
-Inspect Raw Responses
-~~~~~~~~~~~~~~~~~~~~~
+Inspect Structured API Errors
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
 
-    # Access raw response data
-    response = client.invoices._client.last_response
-    print(response.status_code)
-    print(response.json())
+    from wfirma.exceptions import APIError
+
+    try:
+        client.get_json("/invoices/find")
+    except APIError as exc:
+        print(exc.to_dict())
 
 Test Connectivity
 ~~~~~~~~~~~~~~~~~
@@ -139,7 +144,7 @@ Test Connectivity
 .. code-block:: python
 
     try:
-        company = client.company.get_info()
+        company = client.company.get()
         print("Connection successful!")
     except Exception as e:
         print(f"Connection failed: {e}")
@@ -189,7 +194,7 @@ Frequently Asked Questions
 
 **Q: Can I use this library in production?**
 
-A: Version 0.1.x is in development. Wait for 1.0.0 for production use, or thoroughly test in your environment.
+A: ``1.0b1`` is a beta release. ``WFirmaClient`` support is limited to API Key and OAuth2 in this release, while OAuth1 remains helper-only. Use it only if you validate your exact flows first and accept API churn before ``1.0.0``.
 
 **Q: Does this library support Python 3.11?**
 
@@ -197,7 +202,7 @@ A: Currently requires Python 3.12+. Python 3.11 support may be added based on de
 
 **Q: How do I handle multi-company scenarios?**
 
-A: Specify ``company_id`` when creating the client, or use ``client.company.switch(company_id)``.
+A: Create the client with the target ``company_id``. If you need a different company, create another client configured for that company. For company lookups specifically, you can also call ``client.company.get(company_id=...)``.
 
 **Q: Can I use this with Django/Flask?**
 
