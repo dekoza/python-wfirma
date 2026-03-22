@@ -189,6 +189,13 @@ except APIError as exc:
 - run the CLI after install, not only from the repository checkout
 - follow `RELEASING.md` before tagging or publishing
 
+## Stability Policy
+
+- `1.0b2` is still a beta and may change in minor but user-visible ways
+- `1.0rc1` is the planned API freeze point
+- the freeze is expected to cover import paths, auth constructors, exception semantics, client defaults, and CLI command names and flags
+- `1.0.0` should not ship until the RC checklist is clean
+
 ## Supported Resources
 
 The client exposes the following wFirma API resources. Each resource provides methods matching the upstream API (typically `add`, `find`, `get`, `edit`, `delete`):

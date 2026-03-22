@@ -53,14 +53,14 @@ Verify both artifacts outside the active development environment.
 python -m venv .venv-release-check
 . .venv-release-check/bin/activate
 pip install dist/python_wfirma-*.whl
-wfirma --help
+python -m wfirma.cli --help
 deactivate
 rm -rf .venv-release-check
 
 python -m venv .venv-release-check
 . .venv-release-check/bin/activate
 pip install dist/python_wfirma-*.tar.gz
-wfirma --help
+python -m wfirma.cli --help
 deactivate
 rm -rf .venv-release-check
 ```
@@ -107,3 +107,15 @@ Before tagging:
 - `1.0b2`: hardening only, no broad new feature work
 - `1.0rc1`: API freeze starts here
 - `1.0.0`: publish only if RC validation is clean and no blockers remain
+
+## Public API freeze scope
+
+The `1.0rc1` freeze covers these public surfaces:
+
+- import paths under `wfirma`, `wfirma.sync`, and `wfirma.async_`
+- auth constructors and required parameters
+- exception classes and their intended semantics
+- client defaults and production-only environment model
+- CLI command names and flags
+
+After `1.0rc1`, changes to these surfaces are blockers unless they fix a release-critical defect.

@@ -98,9 +98,12 @@ def test_releasing_guide_covers_release_checks_and_manual_verification() -> None
     assert "uv run mypy src" in guide
     assert "uv build" in guide
     assert "uv tool run twine check dist/*" in guide
+    assert "python -m wfirma.cli --help" in guide
+    assert "wfirma --help" not in guide
     assert "wfirma company show" in guide
     assert "wfirma tags list" in guide
     assert "Stable blockers" in guide
+    assert "Public API freeze scope" in guide
 
 
 def test_readme_prioritizes_safe_readonly_usage_and_release_hardening() -> None:
@@ -130,6 +133,33 @@ def test_contributing_points_to_release_workflow() -> None:
     contributing = (REPO_ROOT / "CONTRIBUTING.md").read_text(encoding="utf-8")
 
     assert "RELEASING.md" in contributing
+
+
+def test_docs_index_includes_migration_guide() -> None:
+    """Test that published docs expose migration guidance."""
+    index = (REPO_ROOT / "docs" / "index.rst").read_text(encoding="utf-8")
+
+    assert "migration_guide" in index
+
+
+def test_migration_guide_covers_beta_to_rc_changes() -> None:
+    """Test that migration guidance exists for post-beta users."""
+    guide = (REPO_ROOT / "docs" / "migration_guide.rst").read_text(encoding="utf-8")
+
+    assert "1.0b1" in guide
+    assert "1.0b2" in guide
+    assert "production-only environment model" in guide
+    assert "OAuth1Auth" in guide
+    assert "wfirma company show" in guide
+
+
+def test_readme_mentions_rc_freeze_scope() -> None:
+    """Test that the README tells users what is expected to freeze for rc1."""
+    readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+
+    assert "## Stability Policy" in readme
+    assert "1.0rc1" in readme
+    assert "CLI command names and flags" in readme
 
 
 def test_readme_does_not_advertise_unconfigured_parallel_pytest() -> None:
