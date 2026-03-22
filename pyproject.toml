@@ -81,6 +81,9 @@ Homepage = "https://github.com/dekoza/python-wfirma"
 Repository = "https://github.com/dekoza/python-wfirma"
 Issues = "https://github.com/dekoza/python-wfirma/issues"
 
+[project.scripts]
+wfirma = "wfirma.cli:main"
+
 [dependency-groups]
 dev = [
     "ipdb>=0.13.13",

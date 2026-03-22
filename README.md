@@ -170,6 +170,33 @@ uv run pytest --cov=wfirma --cov-report=html      # with coverage
 uv run pytest -m integration                      # opt-in live integration tests
 ```
 
+## CLI
+
+The package now ships a small read-only CLI for manual API verification.
+
+Required environment variables:
+
+```bash
+export WFIRMA_APP_KEY='...'
+export WFIRMA_ACCESS_KEY='...'
+export WFIRMA_SECRET_KEY='...'
+export WFIRMA_COMPANY_ID='123'
+```
+
+Examples:
+
+```bash
+wfirma company show
+wfirma company show --json
+wfirma tags list
+wfirma terms list
+wfirma term-groups list --json
+wfirma warehouses list
+wfirma vat-codes list
+```
+
+Default list output uses `ID` and `Label`. `company show` uses `ID` and `Name`.
+
 ### Linting & type-checking
 
 ```bash
