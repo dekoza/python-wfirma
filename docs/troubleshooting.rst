@@ -201,7 +201,7 @@ A: Specify ``company_id`` when creating the client, or use ``client.company.swit
 
 **Q: Can I use this with Django/Flask?**
 
-A: Yes! See examples in ``examples/flask_integration`` and ``examples/fastapi_integration``.
+A: Yes. The client is framework-agnostic and can be used anywhere you can manage credentials and HTTP request lifecycles. Framework-specific examples are not bundled yet.
 
 **Q: Is async mode required?**
 

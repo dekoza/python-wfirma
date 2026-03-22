@@ -323,7 +323,6 @@ class TestWFirmaClientHTTPMethods:
         with pytest.raises(ServerError):
             await self.client.post_binary("/documents/generate", data={"doc_id": "1"})
 
-
     @respx.mock
     @pytest.mark.asyncio
     async def test_patch_request_sends_json_body(self) -> None:

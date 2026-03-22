@@ -138,9 +138,7 @@ class TestNotesResourceFind:
                     "outputFormat": "json",
                     "company_id": "123",
                 },
-            ).mock(
-                return_value=httpx.Response(200, json={"status": {"code": "OK"}, "notes": {}})
-            )
+            ).mock(return_value=httpx.Response(200, json={"status": {"code": "OK"}, "notes": {}}))
 
             result = await resource.find()
 

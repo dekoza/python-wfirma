@@ -21,7 +21,7 @@ This repository uses `uv` (see `uv.lock`). To set up a local development environ
 
     git clone https://github.com/dekoza/python-wfirma.git
     cd python-wfirma
-    uv sync
+    uv sync --extra dev --group dev --extra docs
 
 Optional Dependencies
 ---------------------
@@ -40,19 +40,12 @@ To build documentation locally, add the docs extras::
 
     uv sync --extra docs
 
-Examples and Integrations
-~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-To run examples, add the examples extras::
-
-    uv sync --extra examples
-
 All Optional Dependencies
 ~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 To install everything::
 
-    uv sync --group dev --extra docs --extra examples
+    uv sync --extra dev --group dev --extra docs
 
 Verifying Installation
 ----------------------
@@ -68,4 +61,3 @@ Next Steps
 
 * :doc:`authentication` - Set up API credentials
 * :doc:`quickstart` - Your first API call
-

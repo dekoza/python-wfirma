@@ -161,7 +161,9 @@ class TestWarehouseDocumentZPDResourceAdd:
                 )
             )
 
-            result = resource.add({"fullnumber": "ZPD 3/2024", "date": "2024-01-20", "type": "z_p_d"})
+            result = resource.add(
+                {"fullnumber": "ZPD 3/2024", "date": "2024-01-20", "type": "z_p_d"}
+            )
 
         client.close()
 

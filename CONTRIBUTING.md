@@ -51,9 +51,9 @@ This project follows a standard code of conduct:
 
 3. **Create virtual environment and install dependencies**:
    ```bash
-   uv venv
-   uv pip install -e ".[dev,docs,examples]"
-   ```
+    uv venv
+    uv sync --extra dev --group dev --extra docs
+    ```
 
    Note: `uv` automatically manages the virtual environment. To activate manually:
    ```bash
@@ -140,7 +140,7 @@ tests/
 ├── models/           # Pydantic model tests
 ├── sync/             # Synchronous implementation tests
 ├── async_/           # Asynchronous implementation tests
-└── integration/      # Integration tests (optional)
+└── integration/      # Integration tests (sandbox-backed, gated)
 ```
 
 ### Writing Tests
@@ -210,8 +210,6 @@ pytest -m "not slow"
 # Only integration tests
 pytest -m integration
 
-# Parallel execution
-pytest -n auto
 ```
 
 ---
@@ -231,20 +229,20 @@ Code is automatically formatted with **ruff**:
 
 ```bash
 # Format code
-ruff format src tests examples
+ruff format src tests
 
 # Check formatting
-ruff format --check src tests examples
+ruff format --check src tests
 ```
 
 ### Linting
 
 ```bash
 # Lint and auto-fix
-ruff check --fix src tests examples
+ruff check --fix src tests
 
 # Lint only
-ruff check src tests examples
+ruff check src tests
 ```
 
 ### Type Checking

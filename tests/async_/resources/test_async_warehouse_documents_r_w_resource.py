@@ -155,7 +155,9 @@ class TestWarehouseDocumentRWResourceAdd:
                     )
                 )
 
-                result = await resource.add({"fullnumber": "RW 3/2024", "date": "2024-01-20", "type": "r_w"})
+                result = await resource.add(
+                    {"fullnumber": "RW 3/2024", "date": "2024-01-20", "type": "r_w"}
+                )
 
             assert route.called
             assert result.id == 789

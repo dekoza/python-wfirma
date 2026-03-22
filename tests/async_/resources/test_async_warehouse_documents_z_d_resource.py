@@ -155,7 +155,9 @@ class TestWarehouseDocumentZDResourceAdd:
                     )
                 )
 
-                result = await resource.add({"fullnumber": "ZD 3/2024", "date": "2024-01-20", "type": "z_d"})
+                result = await resource.add(
+                    {"fullnumber": "ZD 3/2024", "date": "2024-01-20", "type": "z_d"}
+                )
 
             assert route.called
             assert result.id == 789

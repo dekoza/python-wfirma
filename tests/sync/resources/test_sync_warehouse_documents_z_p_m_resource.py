@@ -161,7 +161,9 @@ class TestWarehouseDocumentZPMResourceAdd:
                 )
             )
 
-            result = resource.add({"fullnumber": "ZPM 3/2024", "date": "2024-01-20", "type": "z_p_m"})
+            result = resource.add(
+                {"fullnumber": "ZPM 3/2024", "date": "2024-01-20", "type": "z_p_m"}
+            )
 
         client.close()
 

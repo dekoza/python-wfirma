@@ -1,75 +1,85 @@
 name: CI
-          twine check dist/*
-          pip install twine
-        run: |
-      - name: Check package
-        run: python -m build
-      - name: Build package
-        run: pip install build
-      - name: Install build tools
-          python-version: "3.12"
-        with:
-      - uses: actions/setup-python@v5
-      - uses: actions/checkout@v4
-    steps:
-    needs: [lint, type-check, test]
-    runs-on: ubuntu-latest
-  build:
 
-          fail_ci_if_error: false
-          file: ./coverage.xml
-        with:
-        uses: codecov/codecov-action@v4
-      - name: Upload coverage to Codecov
-        run: pytest --cov=wfirma --cov-report=xml --cov-report=term
-      - name: Run tests
-          pip install -e ".[dev]"
-        run: |
-      - name: Install dependencies
-          python-version: ${{ matrix.python-version }}
-        with:
-      - uses: actions/setup-python@v5
-      - uses: actions/checkout@v4
-    steps:
-        python-version: ["3.12", "3.13"]
-      matrix:
-    strategy:
-    runs-on: ubuntu-latest
-  test:
-
-        run: mypy src
-      - name: Run mypy
-          pip install -e ".[dev]"
-        run: |
-      - name: Install dependencies
-          python-version: "3.12"
-        with:
-      - uses: actions/setup-python@v5
-      - uses: actions/checkout@v4
-    steps:
-    runs-on: ubuntu-latest
-  type-check:
-
-        run: ruff format --check src tests examples
-      - name: Run ruff format check
-        run: ruff check src tests examples
-      - name: Run ruff check
-          pip install ruff
-        run: |
-      - name: Install dependencies
-          python-version: "3.12"
-        with:
-      - uses: actions/setup-python@v5
-      - uses: actions/checkout@v4
-    steps:
-    runs-on: ubuntu-latest
-  lint:
-jobs:
-
+on:
+  push:
     branches: [main, develop]
   pull_request:
     branches: [main, develop]
-  push:
-on:
+  workflow_dispatch:
 
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install uv
+        run: python -m pip install uv
+      - name: Sync dependencies
+        run: uv sync --frozen --extra dev --group dev --extra docs
+      - name: Run ruff format check
+        run: uv run ruff format --check src tests
+      - name: Run ruff check
+        run: uv run ruff check src tests
 
+  type-check:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install uv
+        run: python -m pip install uv
+      - name: Sync dependencies
+        run: uv sync --frozen --extra dev --group dev --extra docs
+      - name: Run mypy
+        run: uv run mypy src
+
+  test:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.12", "3.13"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install uv
+        run: python -m pip install uv
+      - name: Sync dependencies
+        run: uv sync --frozen --extra dev --group dev --extra docs
+      - name: Run pytest
+        run: uv run pytest --cov=wfirma --cov-report=xml --cov-report=term
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.xml
+          fail_ci_if_error: false
+
+  build:
+    runs-on: ubuntu-latest
+    needs: [lint, type-check, test]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install uv
+        run: python -m pip install uv
+      - name: Build package
+        run: uv build
+      - name: Check package metadata
+        run: uv tool run twine check dist/*
+      - name: Smoke install wheel
+        run: |
+          uv venv .venv-smoke --python 3.12
+          uv pip install --python .venv-smoke/bin/python dist/*.whl
+          .venv-smoke/bin/python -c "import wfirma; print(wfirma.__version__)"
+      - name: Smoke install sdist
+        run: |
+          uv pip install --python .venv-smoke/bin/python --reinstall dist/*.tar.gz
+          .venv-smoke/bin/python -c "from wfirma.sync import WFirmaClient; print('ok')"

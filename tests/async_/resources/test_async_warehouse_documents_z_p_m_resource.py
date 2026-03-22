@@ -81,8 +81,12 @@ class TestWarehouseDocumentZPMResourceFind:
                         json={
                             "status": {"code": "OK"},
                             "warehouse_documents": {
-                                "0": {"warehouse_document": {"id": 100, "fullnumber": "ZPM 1/2024"}},
-                                "1": {"warehouse_document": {"id": 101, "fullnumber": "ZPM 2/2024"}},
+                                "0": {
+                                    "warehouse_document": {"id": 100, "fullnumber": "ZPM 1/2024"}
+                                },
+                                "1": {
+                                    "warehouse_document": {"id": 101, "fullnumber": "ZPM 2/2024"}
+                                },
                             },
                             "parameters": {"page": 1, "limit": 20, "total": 2},
                         },
@@ -155,7 +159,9 @@ class TestWarehouseDocumentZPMResourceAdd:
                     )
                 )
 
-                result = await resource.add({"fullnumber": "ZPM 3/2024", "date": "2024-01-20", "type": "z_p_m"})
+                result = await resource.add(
+                    {"fullnumber": "ZPM 3/2024", "date": "2024-01-20", "type": "z_p_m"}
+                )
 
             assert route.called
             assert result.id == 789

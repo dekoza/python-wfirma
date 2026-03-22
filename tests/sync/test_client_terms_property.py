@@ -1,6 +1,5 @@
 """Tests for WFirmaClient.terms property."""
 
-
 from wfirma.sync.client import WFirmaClient
 from wfirma.sync.resources.terms import TermsResource
 
