@@ -11,6 +11,7 @@ from __future__ import annotations
 from typing import Any
 
 from wfirma.async_.client import WFirmaClient
+from wfirma.exceptions import InvalidConfigurationError
 from wfirma.models.company import CompanyAddress, CompanyDetail
 
 
@@ -40,11 +41,13 @@ class CompanyResource:
             Parsed company detail model.
 
         Raises:
-            ValueError: If both ``company_id`` and ``client.company_id`` are missing.
+            InvalidConfigurationError: If both ``company_id`` and ``client.company_id`` are missing.
         """
         resolved_company_id = company_id if company_id is not None else self._client.company_id
         if resolved_company_id is None:
-            raise ValueError("company_id is required (either pass it or set client.company_id).")
+            raise InvalidConfigurationError(
+                "company_id is required (either pass it or set client.company_id)."
+            )
 
         data = await self._client.get_json(f"/companies/get/{resolved_company_id}")
         payload = self._extract_company_detail_payload(data)

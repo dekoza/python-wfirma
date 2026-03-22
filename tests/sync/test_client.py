@@ -15,14 +15,18 @@ from wfirma.exceptions import (
     AuthenticationError,
     BadRequestError,
     ConnectionError,
+    InsufficientPermissionsError,
+    InvalidConfigurationError,
+    InvalidCredentialsError,
     RateLimitError,
+    ResourceConflictError,
     ResourceNotFoundError,
     ServerError,
     ServiceUnavailableError,
     TimeoutError,
     ValidationError,
 )
-from wfirma.sync.auth import APIKeyAuth, OAuth2Auth, OAuthToken
+from wfirma.sync.auth import APIKeyAuth, OAuth1Auth, OAuth2Auth, OAuthToken
 
 
 @pytest.mark.aicomplete
@@ -54,6 +58,19 @@ class TestWFirmaClientInitialization:
 
         assert client.auth is auth
         assert client.environment == Environment.PRODUCTION
+
+    def test_client_rejects_oauth1_auth_in_beta(self) -> None:
+        from wfirma.sync.client import WFirmaClient
+
+        auth = OAuth1Auth(
+            consumer_key="ck",
+            consumer_secret="cs",
+            scope="invoices-read",
+            callback_url=None,
+        )
+
+        with pytest.raises(InvalidConfigurationError, match="OAuth1Auth is not supported"):
+            WFirmaClient(auth=auth)
 
     def test_client_uses_sandbox_environment(self) -> None:
         from wfirma.sync.client import WFirmaClient
@@ -586,6 +603,69 @@ class TestWFirmaClientErrorHandling:
             self.client.get("/users/get/123")
 
     @respx.mock
+    def test_raises_invalid_credentials_error_on_http_401(self) -> None:
+        respx.get("https://api2.wfirma.pl/users/get/123").mock(
+            return_value=httpx.Response(401, text="Unauthorized")
+        )
+
+        with pytest.raises(InvalidCredentialsError):
+            self.client.get("/users/get/123")
+
+    @respx.mock
+    def test_raises_insufficient_permissions_error_on_http_403(self) -> None:
+        respx.get("https://api2.wfirma.pl/users/get/123").mock(
+            return_value=httpx.Response(403, text="Forbidden")
+        )
+
+        with pytest.raises(InsufficientPermissionsError):
+            self.client.get("/users/get/123")
+
+    @respx.mock
+    def test_raises_bad_request_error_on_http_400_html_response(self) -> None:
+        respx.get("https://api2.wfirma.pl/users/get/123").mock(
+            return_value=httpx.Response(
+                400,
+                text="<html><body>bad request</body></html>",
+                headers={"Content-Type": "text/html"},
+            )
+        )
+
+        with pytest.raises(BadRequestError):
+            self.client.get("/users/get/123")
+
+    @respx.mock
+    def test_raises_resource_conflict_error_on_http_409(self) -> None:
+        respx.get("https://api2.wfirma.pl/users/get/123").mock(
+            return_value=httpx.Response(409, text="Conflict")
+        )
+
+        with pytest.raises(ResourceConflictError):
+            self.client.get("/users/get/123")
+
+    @respx.mock
+    def test_raises_validation_error_on_http_422(self) -> None:
+        respx.post("https://api2.wfirma.pl/contractors/add").mock(
+            return_value=httpx.Response(422, json={"detail": "validation failed"})
+        )
+
+        with pytest.raises(ValidationError):
+            self.client.post("/contractors/add", json={})
+
+    @respx.mock
+    def test_get_xml_raises_on_xml_error_status(self) -> None:
+        respx.get("https://api2.wfirma.pl/users/get/123").mock(
+            return_value=httpx.Response(
+                200,
+                text="""<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+                <api><status><code>NOT FOUND</code></status></api>""",
+                headers={"Content-Type": "application/xml"},
+            )
+        )
+
+        with pytest.raises(ResourceNotFoundError):
+            self.client.get_xml("/users/get/123")
+
+    @respx.mock
     def test_raises_timeout_error_on_timeout(self) -> None:
         respx.get("https://api2.wfirma.pl/users/get/123").mock(
             side_effect=httpx.TimeoutException("Connection timed out")
@@ -638,11 +718,12 @@ class TestWFirmaClientFormatHandling:
             )
         )
 
-        self.client.get_xml("/users/get/123")
+        result = self.client.get_xml("/users/get/123")
 
         assert route.called
         request = route.calls.last.request
         assert "outputFormat=xml" in str(request.url)
+        assert "<?xml" in result
 
     @respx.mock
     def test_post_json_sets_format_params(self) -> None:
@@ -765,3 +846,27 @@ class TestWFirmaClientOAuth2Integration:
         assert route.called
         request = route.calls.last.request
         assert "oauth_version=2" in str(request.url)
+
+    @respx.mock
+    def test_get_binary_raises_resource_not_found_on_http_404(self) -> None:
+        from wfirma.sync.client import WFirmaClient
+
+        client = WFirmaClient(auth=APIKeyAuth(access_key="ak", secret_key="sk", app_key="appk"))
+        respx.get("https://api2.wfirma.pl/invoices/download/123").mock(
+            return_value=httpx.Response(404, text="Not Found")
+        )
+
+        with pytest.raises(ResourceNotFoundError):
+            client.get_binary("/invoices/download/123")
+
+    @respx.mock
+    def test_post_binary_raises_bad_request_on_http_400(self) -> None:
+        from wfirma.sync.client import WFirmaClient
+
+        client = WFirmaClient(auth=APIKeyAuth(access_key="ak", secret_key="sk", app_key="appk"))
+        respx.post("https://api2.wfirma.pl/documents/generate").mock(
+            return_value=httpx.Response(400, text="Bad Request")
+        )
+
+        with pytest.raises(BadRequestError):
+            client.post_binary("/documents/generate", data={"doc_id": "1"})

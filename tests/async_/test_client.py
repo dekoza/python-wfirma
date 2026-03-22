@@ -10,13 +10,17 @@ import httpx
 import pytest
 import respx
 
-from wfirma.async_.auth import APIKeyAuth, OAuth2Auth, OAuthToken
+from wfirma.async_.auth import APIKeyAuth, OAuth1Auth, OAuth2Auth, OAuthToken
 from wfirma.config import Environment
 from wfirma.exceptions import (
     AuthenticationError,
     BadRequestError,
     ConnectionError,
+    InsufficientPermissionsError,
+    InvalidConfigurationError,
+    InvalidCredentialsError,
     RateLimitError,
+    ResourceConflictError,
     ResourceNotFoundError,
     ServerError,
     ServiceUnavailableError,
@@ -57,6 +61,20 @@ class TestWFirmaClientInitialization:
 
         assert client.auth is auth
         assert client.environment == Environment.PRODUCTION
+
+    @pytest.mark.asyncio
+    async def test_client_rejects_oauth1_auth_in_beta(self) -> None:
+        from wfirma.async_.client import WFirmaClient
+
+        auth = OAuth1Auth(
+            consumer_key="ck",
+            consumer_secret="cs",
+            scope="invoices-read",
+            callback_url=None,
+        )
+
+        with pytest.raises(InvalidConfigurationError, match="OAuth1Auth is not supported"):
+            WFirmaClient(auth=auth)
 
     @pytest.mark.asyncio
     async def test_client_uses_sandbox_environment(self) -> None:
@@ -627,6 +645,69 @@ class TestWFirmaClientErrorHandling:
 
     @pytest.mark.asyncio
     @respx.mock
+    async def test_handles_http_401_invalid_credentials(self) -> None:
+        respx.get("https://api2.wfirma.pl/test").mock(return_value=httpx.Response(401))
+
+        with pytest.raises(InvalidCredentialsError):
+            await self.client.get("/test")
+
+    @pytest.mark.asyncio
+    @respx.mock
+    async def test_handles_http_403_insufficient_permissions(self) -> None:
+        respx.get("https://api2.wfirma.pl/test").mock(return_value=httpx.Response(403))
+
+        with pytest.raises(InsufficientPermissionsError):
+            await self.client.get("/test")
+
+    @pytest.mark.asyncio
+    @respx.mock
+    async def test_handles_http_400_html_response(self) -> None:
+        respx.get("https://api2.wfirma.pl/test").mock(
+            return_value=httpx.Response(
+                400,
+                text="<html><body>bad request</body></html>",
+                headers={"Content-Type": "text/html"},
+            )
+        )
+
+        with pytest.raises(BadRequestError):
+            await self.client.get("/test")
+
+    @pytest.mark.asyncio
+    @respx.mock
+    async def test_handles_http_409_resource_conflict(self) -> None:
+        respx.get("https://api2.wfirma.pl/test").mock(return_value=httpx.Response(409))
+
+        with pytest.raises(ResourceConflictError):
+            await self.client.get("/test")
+
+    @pytest.mark.asyncio
+    @respx.mock
+    async def test_handles_http_422_validation_error(self) -> None:
+        respx.post("https://api2.wfirma.pl/contractors/add").mock(
+            return_value=httpx.Response(422, json={"detail": "validation failed"})
+        )
+
+        with pytest.raises(ValidationError):
+            await self.client.post("/contractors/add", json={})
+
+    @pytest.mark.asyncio
+    @respx.mock
+    async def test_get_xml_raises_on_xml_error_status(self) -> None:
+        respx.get("https://api2.wfirma.pl/users/get/123").mock(
+            return_value=httpx.Response(
+                200,
+                text="""<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+                <api><status><code>NOT FOUND</code></status></api>""",
+                headers={"Content-Type": "application/xml"},
+            )
+        )
+
+        with pytest.raises(ResourceNotFoundError):
+            await self.client.get_xml("/users/get/123")
+
+    @pytest.mark.asyncio
+    @respx.mock
     async def test_handles_timeout_error(self) -> None:
         respx.get("https://api2.wfirma.pl/test").mock(side_effect=httpx.TimeoutException("Timeout"))
 
@@ -828,3 +909,29 @@ class TestWFirmaClientOAuth2Integration:
         assert route.called
         request = route.calls.last.request
         assert "oauth_version=2" in str(request.url)
+
+    @pytest.mark.asyncio
+    @respx.mock
+    async def test_get_binary_raises_resource_not_found_on_http_404(self) -> None:
+        from wfirma.async_.client import WFirmaClient
+
+        client = WFirmaClient(auth=APIKeyAuth(access_key="ak", secret_key="sk", app_key="appk"))
+        respx.get("https://api2.wfirma.pl/invoices/download/123").mock(
+            return_value=httpx.Response(404, text="Not Found")
+        )
+
+        with pytest.raises(ResourceNotFoundError):
+            await client.get_binary("/invoices/download/123")
+
+    @pytest.mark.asyncio
+    @respx.mock
+    async def test_post_binary_raises_bad_request_on_http_400(self) -> None:
+        from wfirma.async_.client import WFirmaClient
+
+        client = WFirmaClient(auth=APIKeyAuth(access_key="ak", secret_key="sk", app_key="appk"))
+        respx.post("https://api2.wfirma.pl/documents/generate").mock(
+            return_value=httpx.Response(400, text="Bad Request")
+        )
+
+        with pytest.raises(BadRequestError):
+            await client.post_binary("/documents/generate", data={"doc_id": "1"})

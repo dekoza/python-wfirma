@@ -10,6 +10,7 @@ import httpx
 import pytest
 import respx
 
+from wfirma.exceptions import InvalidConfigurationError
 from wfirma.models.company import CompanyAddress, CompanyDetail
 from wfirma.sync.auth import APIKeyAuth
 from wfirma.sync.client import WFirmaClient
@@ -53,13 +54,13 @@ class TestCompanyResource:
         assert result.name == "Test Company"
 
     # AICOMPLETE: Sync company resource requires company_id when client.company_id is missing - ready for review
-    def test_get_raises_value_error_when_company_id_missing(self) -> None:
+    def test_get_raises_configuration_error_when_company_id_missing(self) -> None:
         """Should raise when company_id isn't provided and client.company_id is None."""
         auth = APIKeyAuth(access_key="ak", secret_key="sk", app_key="app")
         client = WFirmaClient(auth=auth, company_id=None)
         resource = CompanyResource(client)
 
-        with pytest.raises(ValueError, match="company_id is required"):
+        with pytest.raises(InvalidConfigurationError, match="company_id is required"):
             resource.get()
 
         client.close()

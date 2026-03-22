@@ -7,45 +7,33 @@ It handles authentication, request formatting, response parsing, and error handl
 from __future__ import annotations
 
 import logging
+import xml.etree.ElementTree as ET
 from types import TracebackType
-from typing import Any, Protocol, cast
+from typing import Any
 
 import httpx
 
 from wfirma.config import Environment
 from wfirma.exceptions import (
     APIError,
-    AuthenticationError,
     BadRequestError,
     ConnectionError,
+    InsufficientPermissionsError,
+    InvalidConfigurationError,
+    InvalidCredentialsError,
     RateLimitError,
+    ResourceConflictError,
     ResourceNotFoundError,
     ServerError,
     ServiceUnavailableError,
     TimeoutError,
     ValidationError,
 )
+from wfirma.sync.auth import APIKeyAuth, OAuth1Auth, OAuth2Auth
 
 logger = logging.getLogger(__name__)
 
-# Default timeout for HTTP requests (in seconds)
 DEFAULT_TIMEOUT = 30.0
-
-
-class AuthProvider(Protocol):
-    """Protocol for authentication providers."""
-
-    def get_headers(self) -> dict[str, str]:
-        """Return HTTP headers for authentication."""
-        ...
-
-
-class OAuth2AuthProvider(Protocol):
-    """Protocol for OAuth2 authentication providers."""
-
-    def get_token(self) -> Any:
-        """Return the current OAuth token."""
-        ...
 
 
 class WFirmaClient:
@@ -74,7 +62,7 @@ class WFirmaClient:
 
     def __init__(
         self,
-        auth: AuthProvider | OAuth2AuthProvider,
+        auth: APIKeyAuth | OAuth1Auth | OAuth2Auth,
         *,
         environment: Environment = Environment.PRODUCTION,
         company_id: int | None = None,
@@ -88,7 +76,13 @@ class WFirmaClient:
             company_id: Optional company ID for multi-company accounts.
             timeout: HTTP request timeout in seconds (default: 30.0).
         """
-        self.auth = auth
+        if isinstance(auth, OAuth1Auth):
+            raise InvalidConfigurationError(
+                "OAuth1Auth is not supported by WFirmaClient in 1.0b1. "
+                "Use OAuth1Auth helper methods directly until first-class client support lands."
+            )
+
+        self.auth: APIKeyAuth | OAuth2Auth = auth
         self.environment = environment
         self.company_id = company_id
         self.timeout = timeout
@@ -758,13 +752,10 @@ class WFirmaClient:
 
     def _get_auth_headers(self) -> dict[str, str]:
         """Get authentication headers based on auth type."""
-        # Check if it's an OAuth2Auth by looking for get_token method
-        if hasattr(self.auth, "get_token"):
-            # Safe to cast - we just checked for get_token attribute
-            auth_with_token = cast(OAuth2AuthProvider, self.auth)
-            token = auth_with_token.get_token()
+        if isinstance(self.auth, OAuth2Auth):
+            token = self.auth.get_token()
             return {"Authorization": f"Bearer {token.access_token}"}
-        # Otherwise it's API Key auth
+
         return self.auth.get_headers()
 
     def _build_url(self, path: str) -> str:
@@ -782,11 +773,68 @@ class WFirmaClient:
         if self.company_id is not None:
             result["company_id"] = str(self.company_id)
 
-        # Add oauth_version=2 for OAuth2 auth
-        if hasattr(self.auth, "get_token"):
+        if isinstance(self.auth, OAuth2Auth):
             result["oauth_version"] = "2"
 
         return result
+
+    @staticmethod
+    def _parse_retry_after(response: httpx.Response) -> int | None:
+        retry_after = response.headers.get("Retry-After")
+        if retry_after is None:
+            return None
+
+        try:
+            return int(retry_after)
+        except ValueError:
+            return None
+
+    @staticmethod
+    def _extract_xml_status_code(payload: str) -> str | None:
+        stripped_payload = payload.lstrip()
+        if not stripped_payload.startswith("<"):
+            return None
+
+        try:
+            root = ET.fromstring(payload)
+        except ET.ParseError:
+            return None
+
+        code = root.findtext(".//status/code")
+        if code is None:
+            return None
+
+        return code.strip() or None
+
+    def _raise_for_http_status(self, response: httpx.Response) -> None:
+        if 200 <= response.status_code < 300:
+            return
+
+        status_code = response.status_code
+        if status_code == 400:
+            raise BadRequestError("Bad request.")
+        if status_code == 401:
+            raise InvalidCredentialsError("Invalid or missing credentials.")
+        if status_code == 403:
+            raise InsufficientPermissionsError("Access denied.")
+        if status_code == 404:
+            raise ResourceNotFoundError("Resource not found.")
+        if status_code == 409:
+            raise ResourceConflictError("Resource conflict.")
+        if status_code == 422:
+            raise ValidationError("Validation error.")
+        if status_code == 429:
+            raise RateLimitError(
+                "Rate limit exceeded (HTTP 429).",
+                status_code=429,
+                retry_after=self._parse_retry_after(response),
+            )
+        if status_code == 503:
+            raise ServiceUnavailableError("Service unavailable (HTTP 503).")
+        if status_code >= 500:
+            raise ServerError(f"Server error (HTTP {status_code}).")
+        if status_code >= 400:
+            raise BadRequestError(f"Request failed (HTTP {status_code}).")
 
     def _handle_response(self, response: httpx.Response) -> dict[str, Any]:
         """Handle API response and raise appropriate exceptions.
@@ -800,29 +848,29 @@ class WFirmaClient:
         Raises:
             Various exceptions based on HTTP status and API status codes.
         """
-        # Handle HTTP errors first
-        if response.status_code == 429:
-            raise RateLimitError("Rate limit exceeded (HTTP 429).")
-        if response.status_code >= 500:
-            if response.status_code == 503:
-                raise ServiceUnavailableError(f"Service unavailable (HTTP {response.status_code}).")
-            raise ServerError(f"Server error (HTTP {response.status_code}).")
+        self._raise_for_http_status(response)
 
-        # Try to parse response as JSON
         try:
             data: dict[str, Any] = response.json()
         except Exception:
-            # If not JSON, return raw text wrapped in a dict
-            return {"raw": response.text, "status": {"code": "OK"}}
+            xml_status_code = self._extract_xml_status_code(response.text)
+            if xml_status_code is None:
+                return {"raw": response.text, "status": {"code": "OK"}}
+            if xml_status_code == "OK":
+                return {"raw": response.text, "status": {"code": xml_status_code}}
 
-        # Check API status code
+            self._raise_for_status_code(xml_status_code, {"raw": response.text})
+            return {"raw": response.text, "status": {"code": xml_status_code}}
+
         status: dict[str, Any] = data.get("status", {})
         code: str = status.get("code", "")
+
+        if not code:
+            return data
 
         if code == "OK":
             return data
 
-        # Map wFirma status codes to exceptions
         self._raise_for_status_code(code, data)
 
         return dict(data)
@@ -838,13 +886,13 @@ class WFirmaClient:
             Various exceptions based on the status code.
         """
         if code in ("AUTH", "AUTH FAILED LIMIT WAIT 5 MINUTES"):
-            raise AuthenticationError(f"Authentication failed: {code}")
+            raise InvalidCredentialsError(f"Authentication failed: {code}")
 
         if code == "DENIED SCOPE REQUESTED":
-            raise AuthenticationError(f"Access denied: {code}")
+            raise InsufficientPermissionsError(f"Access denied: {code}")
 
         if code == "ACCESS DENIED":
-            raise AuthenticationError(f"Access denied: {code}")
+            raise InsufficientPermissionsError(f"Access denied: {code}")
 
         if code == "NOT FOUND":
             raise ResourceNotFoundError("Resource not found.")
@@ -878,13 +926,7 @@ class WFirmaClient:
         raise APIError(f"API error: {code}")
 
     def _handle_binary_response(self, response: httpx.Response) -> bytes:
-        if response.status_code == 429:
-            raise RateLimitError("Rate limit exceeded (HTTP 429).")
-        if response.status_code >= 500:
-            if response.status_code == 503:
-                raise ServiceUnavailableError(f"Service unavailable (HTTP {response.status_code}).")
-            raise ServerError(f"Server error (HTTP {response.status_code}).")
-
+        self._raise_for_http_status(response)
         return response.content
 
     def get(
