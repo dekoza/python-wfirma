@@ -104,6 +104,10 @@ def test_releasing_guide_covers_release_checks_and_manual_verification() -> None
     assert "wfirma tags list" in guide
     assert "Stable blockers" in guide
     assert "Public API freeze scope" in guide
+    assert "## 1.0.0 Go/No-Go Checklist" in guide
+    assert "No public API changes since `v1.0rc1` except blocker-class fixes." in guide
+    assert "No known P0/P1 defects remain open." in guide
+    assert "Tag and publish `1.0.0` only if every item above is a hard yes." in guide
 
 
 def test_readme_prioritizes_safe_readonly_usage_and_release_hardening() -> None:

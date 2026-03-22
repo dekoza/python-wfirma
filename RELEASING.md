@@ -119,3 +119,44 @@ The `1.0rc1` freeze covers these public surfaces:
 - CLI command names and flags
 
 After `1.0rc1`, changes to these surfaces are blockers unless they fix a release-critical defect.
+
+## 1.0.0 Go/No-Go Checklist
+
+Do not cut `1.0.0` because the RC feels quiet. Cut it only if every item below is true.
+
+### Product and API contract
+
+- No public API changes since `v1.0rc1` except blocker-class fixes.
+- No undocumented sync/async behavior differences remain.
+- No auth-mode support claim in docs exceeds what was actually re-verified.
+- No known ambiguity remains around the production-only environment model.
+
+### Evidence and defects
+
+- No known P0/P1 defects remain open.
+- No packaging, install, or entrypoint bug remains open.
+- No docs-vs-code contradiction remains open in `README.md`, `docs/`, or `RELEASING.md`.
+- Any RC issue found after release was either fixed narrowly or judged non-blocking with written rationale.
+
+### Verification
+
+- `uv run pytest -q` passes on the release candidate commit.
+- `uv run ruff check src tests` passes on the release candidate commit.
+- `uv run mypy src` passes on the release candidate commit.
+- `uv build` and `uv tool run twine check dist/*` pass on the stable-candidate commit.
+- Fresh wheel install passes with `python -m wfirma.cli --help`.
+- Fresh sdist install passes with `python -m wfirma.cli --help`.
+- Manual live read-only verification was rerun close to the release tag and recorded.
+
+### Release metadata
+
+- `src/wfirma/__init__.py` targets `1.0.0`.
+- `README.md` status text says stable, not beta or release candidate.
+- `CHANGELOG.md` contains the final `1.0.0` entry.
+- `ROADMAP.md` points to the next milestone after `1.0.0`.
+
+### Decision rule
+
+- Tag and publish `1.0.0` only if every item above is a hard yes.
+- If any item is "not sure", the answer is no.
+- If a fix changes observable behavior after `v1.0rc1`, cut another RC instead of pretending the stable release was unchanged.
