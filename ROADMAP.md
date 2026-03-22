@@ -1,6 +1,6 @@
 # Roadmap
 
-Current target version: **1.0rc1**.
+Current target version: **1.0.0**.
 Last updated: 2026-03-23.
 
 ## 1.0b1 — Released
@@ -28,11 +28,15 @@ Hardening release focused on process, docs, and manual verification.
 - Rewrote docs around safe production-first usage
 - Broadened packaging and compatibility validation
 
-## 1.0rc1 — Release candidate
+## 1.0rc1 — Released
 
-- Freeze the public API for `1.0.0`
-- Finish documentation, examples, and release notes
-- Re-run packaging and compatibility validation
+Release candidate that freezes the public API for `1.0.0`.
+
+**Done:**
+- Froze the public API surface for `1.0.0`
+- Added migration guidance for post-beta users
+- Tightened release verification wording around installed CLI checks
+- Expanded targeted coverage for CLI env parsing and auth/client edge cases
 
 ## 1.0.0 — Stable release
 

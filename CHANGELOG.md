@@ -7,7 +7,24 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Work toward `1.0rc1`.
+Work toward `1.0.0`.
+
+## [1.0rc1] - 2026-03-23
+
+### Added
+- Migration guide covering beta-to-RC changes and the public freeze scope
+- Release candidate documentation for the frozen public API surface
+
+### Changed
+- Version metadata now targets `1.0rc1`
+- README and authentication docs now describe the release candidate contract
+- Roadmap now targets `1.0.0` as the next milestone after the RC cut
+
+### Fixed
+- Release checklist now verifies the installed CLI via `python -m wfirma.cli --help`
+- CLI company display now falls back to alternate company name fields when needed
+- CLI environment parsing now reports invalid `WFIRMA_COMPANY_ID` values clearly
+- OAuth2 auth helpers and HTTP clients now have stronger coverage for error-wrapping edge cases
 
 ## [1.0b2] - 2026-03-23
 
@@ -44,6 +61,7 @@ Work toward `1.0rc1`.
 - `WFirmaClient` now supports `OAuth1Auth` as a first-class auth mode
 - HTTP and XML error handling is hardened for non-JSON and binary responses
 
-[Unreleased]: https://github.com/dekoza/python-wfirma/compare/v1.0b2...HEAD
+[Unreleased]: https://github.com/dekoza/python-wfirma/compare/v1.0rc1...HEAD
+[1.0rc1]: https://github.com/dekoza/python-wfirma/releases/tag/v1.0rc1
 [1.0b2]: https://github.com/dekoza/python-wfirma/releases/tag/v1.0b2
 [1.0b1]: https://github.com/dekoza/python-wfirma/releases/tag/v1.0b1

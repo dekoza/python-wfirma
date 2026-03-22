@@ -2,9 +2,9 @@
 
 This directory contains optional live tests against the public wFirma docs and the production API.
 
-## Scope for `1.0b2`
+## Scope for `1.0rc1`
 
-The beta release only claims live coverage for:
+The release candidate claims live coverage for:
 
 - public Postman collection availability via `WFirmaAPIScraper`
 - API Key sync client reading company details from production

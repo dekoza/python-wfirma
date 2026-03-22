@@ -2,7 +2,7 @@
 
 Python client for the [wFirma](https://wfirma.pl/) accounting API. Supports both synchronous and asynchronous usage.
 
-> **Status**: Beta (`1.0b2`). `WFirmaClient` supports API Key, OAuth 2.0, and OAuth 1.0a in this release.
+> **Status**: Release candidate (`1.0rc1`). `WFirmaClient` supports API Key, OAuth 2.0, and OAuth 1.0a in this release.
 
 ## Installation
 
@@ -191,8 +191,7 @@ except APIError as exc:
 
 ## Stability Policy
 
-- `1.0b2` is still a beta and may change in minor but user-visible ways
-- `1.0rc1` is the planned API freeze point
+- `1.0rc1` is the API freeze point
 - the freeze is expected to cover import paths, auth constructors, exception semantics, client defaults, and CLI command names and flags
 - `1.0.0` should not ship until the RC checklist is clean
 
