@@ -11,6 +11,7 @@ Thank you for your interest in contributing to python-wfirma! This document prov
 - [Code Style](#code-style)
 - [Commit Messages](#commit-messages)
 - [Pull Request Process](#pull-request-process)
+- [Release Workflow](#release-workflow)
 - [NOAI System](#noai-system)
 
 ---
@@ -211,6 +212,17 @@ pytest -m "not slow"
 pytest -m integration
 
 ```
+
+## Release Workflow
+
+Releases must follow `RELEASING.md`. Do not tag or publish based on memory.
+
+Before a release candidate or stable tag:
+
+- run the full quality gate commands
+- build and verify both wheel and sdist
+- run the manual read-only CLI verification procedure
+- update changelog, roadmap, and README to match the shipped state
 
 ---
 

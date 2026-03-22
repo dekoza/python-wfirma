@@ -89,6 +89,49 @@ def test_troubleshooting_docs_do_not_claim_missing_features() -> None:
     assert "1.0b1" in docs
 
 
+def test_releasing_guide_covers_release_checks_and_manual_verification() -> None:
+    """Test that the release process is documented explicitly."""
+    guide = (REPO_ROOT / "RELEASING.md").read_text(encoding="utf-8")
+
+    assert "uv run pytest -q" in guide
+    assert "uv run ruff check src tests" in guide
+    assert "uv run mypy src" in guide
+    assert "uv build" in guide
+    assert "uv tool run twine check dist/*" in guide
+    assert "wfirma company show" in guide
+    assert "wfirma tags list" in guide
+    assert "Stable blockers" in guide
+
+
+def test_readme_prioritizes_safe_readonly_usage_and_release_hardening() -> None:
+    """Test that the README reflects post-1.0b1 hardening priorities."""
+    readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
+
+    assert "## Production Use Checklist" in readme
+    assert "## Choosing Auth Mode" in readme
+    assert "## Handling API Errors" in readme
+    assert "wfirma company show" in readme
+    assert "mutate real production data" in readme
+
+
+def test_release_metadata_reflects_post_beta_state() -> None:
+    """Test that roadmap and changelog moved past the initial beta release."""
+    roadmap = (REPO_ROOT / "ROADMAP.md").read_text(encoding="utf-8")
+    changelog = (REPO_ROOT / "CHANGELOG.md").read_text(encoding="utf-8")
+
+    assert "Current target version: **1.0b2**." in roadmap
+    assert "## 1.0b1 — Released" in roadmap
+    assert "This branch is preparing the `1.0b1` beta release." not in changelog
+    assert "- Add a formal release checklist and blocker policy" in changelog
+
+
+def test_contributing_points_to_release_workflow() -> None:
+    """Test that contributor docs link to the release process."""
+    contributing = (REPO_ROOT / "CONTRIBUTING.md").read_text(encoding="utf-8")
+
+    assert "RELEASING.md" in contributing
+
+
 def test_readme_does_not_advertise_unconfigured_parallel_pytest() -> None:
     """Test that the README only documents supported test commands."""
     readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")

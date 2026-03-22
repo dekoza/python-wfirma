@@ -7,7 +7,22 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-This branch is preparing the `1.0b1` beta release.
+Post-`1.0b1` hardening work.
+
+### Added
+- Packaged `wfirma` CLI for read-only API inspection
+- Formal release checklist and blocker policy in `RELEASING.md`
+
+### Changed
+- README now prioritizes safe read-only production usage before mutating examples
+- Roadmap now targets `1.0b2` hardening instead of the already-shipped beta
+- Contributor docs now point to the release workflow
+
+### Planned
+- Add a formal release checklist and blocker policy
+- Document manual live verification with least-privilege credentials
+
+## [1.0b1] - 2026-03-23
 
 ### Added
 - Project setup: pyproject.toml with hatchling, uv for dependency management
@@ -30,4 +45,5 @@ This branch is preparing the `1.0b1` beta release.
 - `WFirmaClient` now supports `OAuth1Auth` as a first-class auth mode
 - HTTP and XML error handling is hardened for non-JSON and binary responses
 
-[Unreleased]: https://github.com/dekoza/python-wfirma/compare/main...HEAD
+[Unreleased]: https://github.com/dekoza/python-wfirma/compare/v1.0b1...HEAD
+[1.0b1]: https://github.com/dekoza/python-wfirma/releases/tag/v1.0b1

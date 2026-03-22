@@ -1,11 +1,11 @@
 # Roadmap
 
-Current target version: **1.0b1**.
-Last updated: 2026-03-22.
+Current target version: **1.0b2**.
+Last updated: 2026-03-23.
 
-## 1.0b1 — Current beta target
+## 1.0b1 — Released
 
-Honest beta for the supported client surface.
+Released beta for the supported client surface.
 
 **Done:**
 - Project setup (pyproject.toml, uv, ruff, mypy, pytest, pre-commit, CI)
@@ -20,7 +20,9 @@ Honest beta for the supported client surface.
 
 ## 1.0b2 — Beta hardening
 
-- Optional live read-only production checks with least-privilege credentials
+- Add a formal release checklist and blocker policy
+- Document manual live read-only verification with the packaged CLI
+- Rewrite docs around safe production-first usage
 - Broader packaging and compatibility validation
 
 ## 1.0rc1 — Release candidate

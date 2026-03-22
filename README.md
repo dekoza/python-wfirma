@@ -18,7 +18,38 @@ uv add python-wfirma
 
 ## Usage
 
-### API Key Authentication
+### Safe Read-Only Start
+
+```python
+from wfirma.sync.auth import APIKeyAuth
+from wfirma.sync.client import WFirmaClient
+
+auth = APIKeyAuth(
+    access_key="your_access_key",
+    secret_key="your_secret_key",
+    app_key="your_app_key",
+)
+
+with WFirmaClient(auth=auth, company_id=123) as client:
+    company = client.company.get()
+    terms = client.terms.find()
+
+print(company.name)
+print(len(terms))
+```
+
+### CLI Read-Only Verification
+
+```bash
+wfirma company show
+wfirma tags list
+wfirma terms list
+wfirma warehouses list
+```
+
+### Write Operations
+
+These examples mutate real production data. Do not run them casually.
 
 ```python
 from wfirma.sync.auth import APIKeyAuth
@@ -32,7 +63,6 @@ auth = APIKeyAuth(
 
 with WFirmaClient(auth=auth, company_id=123) as client:
     contractor = client.contractors.add(name="ACME Sp. z o.o.", nip="1234567890")
-
     invoice = client.invoices.add(
         invoice={
             "contractor_id": contractor.id,
@@ -40,8 +70,6 @@ with WFirmaClient(auth=auth, company_id=123) as client:
             "paid": "0",
         }
     )
-
-    invoices = client.invoices.find()
 ```
 
 ### Async
@@ -134,6 +162,32 @@ from wfirma import get_config
 config = get_config()
 print(config.base_url)  # https://api2.wfirma.pl
 ```
+
+## Choosing Auth Mode
+
+- `APIKeyAuth`: best for service integrations and manual CLI verification
+- `OAuth2Auth`: best when you need upstream read/write scope control and user authorization flows
+- `OAuth1Auth`: supported for upstream compatibility, but use it only when the target workflow requires it
+
+## Handling API Errors
+
+```python
+from wfirma.exceptions import APIError
+
+try:
+    with WFirmaClient(auth=auth, company_id=123) as client:
+        company = client.company.get()
+except APIError as exc:
+    print(exc.to_dict())
+```
+
+## Production Use Checklist
+
+- use least-privilege credentials
+- prefer read-only verification first (`company`, `tags`, `terms`, `warehouses`)
+- treat write examples as production mutations
+- run the CLI after install, not only from the repository checkout
+- follow `RELEASING.md` before tagging or publishing
 
 ## Supported Resources
 
