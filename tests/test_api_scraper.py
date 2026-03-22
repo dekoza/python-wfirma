@@ -13,6 +13,12 @@ import pytest
 class TestAPIScraper:
     """Test suite for API documentation scraper."""
 
+    def test_scraper_is_exported_from_tools_package(self):
+        """Test that the package exposes the scraper implementation."""
+        from wfirma.tools import WFirmaAPIScraper
+
+        assert WFirmaAPIScraper.__name__ == "WFirmaAPIScraper"
+
     def test_can_extract_endpoints_from_local_snapshot(self, scraper, postman_collection_snapshot):
         """Test that scraper can extract endpoints from a local Postman collection snapshot."""
         endpoints = scraper.extract_endpoints(postman_collection_snapshot)
@@ -71,12 +77,6 @@ def postman_collection_snapshot() -> dict:
 @pytest.fixture
 def scraper():
     """Fixture providing API scraper instance."""
-    import sys
-
-    # Add scripts directory to path
-    scripts_dir = Path(__file__).parent.parent / "scripts"
-    sys.path.insert(0, str(scripts_dir))
-
-    from scrape_api_docs import WFirmaAPIScraper
+    from wfirma.tools.api_scraper import WFirmaAPIScraper
 
     return WFirmaAPIScraper()

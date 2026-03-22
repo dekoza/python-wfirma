@@ -1,13 +1,50 @@
-"""
-Basic sanity tests to verify project setup.
-"""
+"""Basic sanity tests to verify project setup."""
+
+from __future__ import annotations
+
+import importlib.util
+import tomllib
+from pathlib import Path
+
+REPO_ROOT = Path(__file__).resolve().parents[1]
+
+
+def _load_docs_conf():
+    conf_path = REPO_ROOT / "docs" / "conf.py"
+    spec = importlib.util.spec_from_file_location("wfirma_docs_conf", conf_path)
+    assert spec is not None
+    assert spec.loader is not None
+
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
 def test_project_setup():
-    """Test that basic project setup is working."""
+    """Test that package version metadata stays aligned."""
     import wfirma
 
-    assert wfirma.__version__ == "0.1.0"
+    docs_conf = _load_docs_conf()
+
+    assert wfirma.__version__ == "1.0b1"
+    assert docs_conf.release == wfirma.__version__
+
+
+def test_pyproject_uses_dynamic_beta_version_metadata():
+    """Test that build metadata reads the version from the package."""
+    pyproject = tomllib.loads((REPO_ROOT / "pyproject.toml").read_text(encoding="utf-8"))
+
+    assert "version" not in pyproject["project"]
+    assert "version" in pyproject["project"]["dynamic"]
+    assert pyproject["tool"]["hatch"]["version"]["path"] == "src/wfirma/__init__.py"
+    assert "Development Status :: 4 - Beta" in pyproject["project"]["classifiers"]
+
+
+def test_gitignore_excludes_temporary_virtualenvs():
+    """Test that local smoke-test virtualenvs do not leak into sdists."""
+    gitignore = (REPO_ROOT / ".gitignore").read_text(encoding="utf-8")
+
+    assert ".venv*/" in gitignore or ".venv-smoke/" in gitignore
 
 
 def test_fixture_availability(wfirma_config_data, api_key_auth_data):

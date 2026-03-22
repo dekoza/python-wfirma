@@ -2,7 +2,7 @@
 
 Python client for the [wFirma](https://wfirma.pl/) accounting API. Supports both synchronous and asynchronous usage.
 
-> **Status**: Alpha (v0.1.0). The API surface may change before 1.0.
+> **Status**: Beta (`1.0b1`). `WFirmaClient` supports API Key and OAuth 2.0 in this release; OAuth 1.0a helper flows remain available, but first-class client support is deferred until `1.0b2`.
 
 ## Installation
 
@@ -168,4 +168,3 @@ MIT — see [LICENSE](LICENSE).
 
 This library is not affiliated with wFirma. It is an independent project.
 Built on [httpx](https://www.python-httpx.org/), [Pydantic](https://docs.pydantic.dev/), and [authlib](https://docs.authlib.org/).
-

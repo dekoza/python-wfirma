@@ -1,16 +1,19 @@
 # Configuration file for the Sphinx documentation builder.
 
-import os
 import sys
+from pathlib import Path
 
-sys.path.insert(0, os.path.abspath("../src"))
+PROJECT_ROOT = Path(__file__).resolve().parents[1]
+sys.path.insert(0, str(PROJECT_ROOT / "src"))
+
+import wfirma
 
 # -- Project information -----------------------------------------------------
 
 project = "python-wfirma"
 copyright = "2026, Python wFirma Contributors"
 author = "Python wFirma Contributors"
-release = "0.1.0"
+release = wfirma.__version__
 
 # -- General configuration ---------------------------------------------------
 

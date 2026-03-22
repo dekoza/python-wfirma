@@ -1,43 +1,39 @@
 # Roadmap
 
-Current version: **0.1.0** (in development).
-Last updated: 2026-02-20.
+Current target version: **1.0b1**.
+Last updated: 2026-03-22.
 
-## 0.1.0 — Current
+## 1.0b1 — Current beta target
 
-Core library with sync/async clients covering all major wFirma API resources.
+Honest beta for the supported client surface.
 
 **Done:**
 - Project setup (pyproject.toml, uv, ruff, mypy, pytest, pre-commit, CI)
 - Configuration management with environment variable support
 - Exception hierarchy mapped to wFirma API status codes
 - API Key authentication (sync & async)
-- OAuth 1.0a and OAuth 2.0 authentication (sync & async)
+- OAuth 2.0 authentication (sync & async)
+- OAuth 1.0a helper flows (sync & async)
 - HTTP client (sync & async) with JSON/XML support
 - 40+ resource implementations (invoices, contractors, goods, payments, warehouse documents, etc.)
+- Sandbox-aligned client defaults and hardened HTTP error handling
 
-**In progress:**
-- Pagination helpers
-- Usage examples
-- Sphinx documentation
+**Deferred from this beta:**
+- First-class `OAuth1Auth` support in `WFirmaClient`
 
-## 0.2.0 — Integration & hardening
+## 1.0b2 — OAuth1 first-class support
 
-- Integration tests against wFirma sandbox
-- Automatic retry with exponential backoff
-- Response caching (pluggable backends)
-- Bulk operations (batch create/update/delete)
-- Webhook signature verification utilities
+- Add first-class OAuth 1.0a support to `WFirmaClient`
+- Verify OAuth1 flows against sandbox before widening support claims
 
-## 0.3.0 — Developer experience
+## 1.0rc1 — Release candidate
 
-- Query builder for filtering/sorting
-- Request/response middleware (logging, timing)
-- Rate limiting coordination
+- Freeze the public API for `1.0.0`
+- Finish documentation, examples, and release notes
+- Re-run packaging and compatibility validation
 
 ## 1.0.0 — Stable release
 
+- Publish only after RC validation is clean
 - Stable public API with semver guarantees
-- Production hardening (connection pool tuning, load testing)
-- Comprehensive documentation and migration guide from 0.x
-
+- Comprehensive documentation and migration guidance for post-beta users

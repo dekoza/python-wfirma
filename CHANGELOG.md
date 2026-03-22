@@ -7,6 +7,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
+This branch is preparing the `1.0b1` beta release.
+
 ### Added
 - Project setup: pyproject.toml with hatchling, uv for dependency management
 - Development tooling: ruff, mypy, pytest, pre-commit
@@ -17,6 +19,15 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Pydantic models with pydantic-xml for XML request/response handling
 - Resource implementations for 40+ wFirma API endpoints (invoices, contractors, goods, payments, warehouse documents, etc.)
 - Test suite with respx-based HTTP mocking
+- Packaged `WFirmaAPIScraper` utility under `wfirma.tools`
+
+### Changed
+- Version metadata now targets `1.0b1`
+- Development status is now beta instead of alpha
+
+### Fixed
+- Sync and async clients now default to the sandbox environment to match configuration defaults
+- `WFirmaClient` now fails fast when `OAuth1Auth` is passed during the `1.0b1` beta
+- HTTP and XML error handling is hardened for non-JSON and binary responses
 
 [Unreleased]: https://github.com/dekoza/python-wfirma/compare/main...HEAD
-

@@ -2,7 +2,7 @@
 python-wfirma - Python library for wFirma API
 """
 
-__version__ = "0.1.0"
+__version__ = "1.0b1"
 
 # Configuration - public API
 from wfirma.config import (
