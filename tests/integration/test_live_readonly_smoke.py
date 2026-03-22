@@ -1,4 +1,4 @@
-"""Live sandbox smoke tests for the supported beta surface."""
+"""Live read-only production checks for the supported beta surface."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ pytestmark = pytest.mark.integration
 def test_api_key_sync_client_can_read_company(
     live_api_key_sync_client, integration_company_id
 ) -> None:
-    """API key auth should support a read-only sandbox company fetch."""
+    """API key auth should support a read-only company fetch."""
     with live_api_key_sync_client as client:
         company = client.company.get()
 
@@ -22,7 +22,7 @@ def test_api_key_sync_client_can_read_company(
 async def test_api_key_async_client_can_read_company(
     live_api_key_async_client, integration_company_id
 ) -> None:
-    """Async API key auth should support a read-only sandbox company fetch."""
+    """Async API key auth should support a read-only company fetch."""
     async with live_api_key_async_client as client:
         company = await client.company.get()
 

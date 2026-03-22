@@ -285,7 +285,7 @@ class TestOAuth2Auth:
         assert self.store.get("company-123").access_token == "a"
         assert route.called
 
-    def test_sandbox_environment_uses_sandbox_base_url(self) -> None:
+    def test_production_environment_uses_production_base_url(self) -> None:
         auth = OAuth2Auth(
             client_id="cid",
             client_secret="csecret",

@@ -140,7 +140,7 @@ tests/
 ├── models/           # Pydantic model tests
 ├── sync/             # Synchronous implementation tests
 ├── async_/           # Asynchronous implementation tests
-└── integration/      # Integration tests (sandbox-backed, gated)
+└── integration/      # Integration tests (live, read-only, gated)
 ```
 
 ### Writing Tests

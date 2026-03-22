@@ -13,18 +13,15 @@ Honest beta for the supported client surface.
 - Exception hierarchy mapped to wFirma API status codes
 - API Key authentication (sync & async)
 - OAuth 2.0 authentication (sync & async)
-- OAuth 1.0a helper flows (sync & async)
+- OAuth 1.0a authentication (sync & async, including `WFirmaClient`)
 - HTTP client (sync & async) with JSON/XML support
 - 40+ resource implementations (invoices, contractors, goods, payments, warehouse documents, etc.)
-- Sandbox-aligned client defaults and hardened HTTP error handling
+- Production-aligned client defaults and hardened HTTP error handling
 
-**Deferred from this beta:**
-- First-class `OAuth1Auth` support in `WFirmaClient`
+## 1.0b2 — Beta hardening
 
-## 1.0b2 — OAuth1 first-class support
-
-- Add first-class OAuth 1.0a support to `WFirmaClient`
-- Verify OAuth1 flows against sandbox before widening support claims
+- Optional live read-only production checks with least-privilege credentials
+- Broader packaging and compatibility validation
 
 ## 1.0rc1 — Release candidate
 

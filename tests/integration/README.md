@@ -1,18 +1,18 @@
 # Integration Tests
 
-This directory contains optional live tests against the public wFirma docs and the sandbox API.
+This directory contains optional live tests against the public wFirma docs and the production API.
 
 ## Scope for `1.0b1`
 
 The beta release only claims live coverage for:
 
 - public Postman collection availability via `WFirmaAPIScraper`
-- API Key sync client reading company details from sandbox
-- API Key async client reading company details from sandbox
-- OAuth2 sync client reading company details from sandbox
-- OAuth2 async client reading company details from sandbox
+- API Key sync client reading company details from production
+- API Key async client reading company details from production
+- OAuth2 sync client reading company details from production
+- OAuth2 async client reading company details from production
 
-The suite is intentionally read-only. It does not create, edit, or delete sandbox data.
+The suite is intentionally read-only. It does not create, edit, or delete production data.
 
 ## How to Run
 
@@ -33,7 +33,7 @@ WFIRMA_RUN_INTEGRATION=1 pytest
 Run a specific file:
 
 ```bash
-pytest tests/integration/test_sandbox_smoke.py -m integration
+pytest tests/integration/test_live_readonly_smoke.py -m integration
 ```
 
 ## Required Environment Variables
@@ -56,7 +56,7 @@ WFIRMA_OAUTH2_REDIRECT_URI=https://your.app/callback
 WFIRMA_OAUTH2_ACCESS_TOKEN=your_access_token
 ```
 
-OAuth2 smoke tests assume the provided bearer token is already valid for the sandbox company.
+OAuth2 smoke tests assume the provided bearer token is already valid for the target production company.
 
 ## Notes
 
@@ -64,4 +64,3 @@ OAuth2 smoke tests assume the provided bearer token is already valid for the san
 - They make real network calls.
 - They are release-gating evidence, not unit tests.
 - If a required variable is missing, the corresponding test skips instead of failing noisily.
-
