@@ -285,11 +285,11 @@ class TestOAuth2Auth:
             client_id="cid",
             client_secret="csecret",
             redirect_uri="https://app.local/callback",
-            environment=Environment.SANDBOX,
+            environment=Environment.PRODUCTION,
             token_store=self.store,
         )
 
-        assert auth.token_url == "https://sandbox-api2.wfirma.pl/oauth2/token"
+        assert auth.token_url == "https://api2.wfirma.pl/oauth2/token"
 
     # AICOMPLETE: OAuth2 authorization URL builder (async module) - ready for review
     def test_build_authorization_url_builds_expected_query_params(self) -> None:

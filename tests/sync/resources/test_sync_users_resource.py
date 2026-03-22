@@ -26,7 +26,7 @@ class TestUsersResource:
 
         with respx.mock:
             route = respx.get(
-                "https://sandbox-api2.wfirma.pl/users/get/456",
+                "https://api2.wfirma.pl/users/get/456",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",

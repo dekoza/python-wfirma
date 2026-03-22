@@ -19,7 +19,6 @@ from wfirma.exceptions import (
     BadRequestError,
     ConnectionError,
     InsufficientPermissionsError,
-    InvalidConfigurationError,
     InvalidCredentialsError,
     RateLimitError,
     ResourceConflictError,
@@ -64,7 +63,7 @@ class WFirmaClient:
         self,
         auth: APIKeyAuth | OAuth1Auth | OAuth2Auth,
         *,
-        environment: Environment = Environment.SANDBOX,
+        environment: Environment = Environment.PRODUCTION,
         company_id: int | None = None,
         timeout: float = DEFAULT_TIMEOUT,
     ) -> None:
@@ -72,17 +71,11 @@ class WFirmaClient:
 
         Args:
             auth: Authentication provider instance.
-            environment: API environment (default: SANDBOX).
+            environment: API environment (default: PRODUCTION).
             company_id: Optional company ID for multi-company accounts.
             timeout: HTTP request timeout in seconds (default: 30.0).
         """
-        if isinstance(auth, OAuth1Auth):
-            raise InvalidConfigurationError(
-                "OAuth1Auth is not supported by WFirmaClient in 1.0b1. "
-                "Use OAuth1Auth helper methods directly until first-class client support lands."
-            )
-
-        self.auth: APIKeyAuth | OAuth2Auth = auth
+        self.auth: APIKeyAuth | OAuth1Auth | OAuth2Auth = auth
         self.environment = environment
         self.company_id = company_id
         self.timeout = timeout

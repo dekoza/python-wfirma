@@ -30,7 +30,7 @@ class TestWebhooksResourceGet:
         async with client:
             with respx.mock:
                 route = respx.get(
-                    "https://sandbox-api2.wfirma.pl/webhooks/get/456",
+                    "https://api2.wfirma.pl/webhooks/get/456",
                     params={
                         "outputFormat": "json",
                         "company_id": "123",
@@ -73,7 +73,7 @@ class TestWebhooksResourceTrigger:
         async with client:
             with respx.mock:
                 route = respx.get(
-                    "https://sandbox-api2.wfirma.pl/webhooks/trigger/456",
+                    "https://api2.wfirma.pl/webhooks/trigger/456",
                     params={
                         "outputFormat": "json",
                         "company_id": "123",
@@ -107,7 +107,7 @@ class TestWebhooksResourceFind:
         async with client:
             with respx.mock:
                 route = respx.get(
-                    "https://sandbox-api2.wfirma.pl/webhooks/find",
+                    "https://api2.wfirma.pl/webhooks/find",
                     params={
                         "outputFormat": "json",
                         "company_id": "123",
@@ -147,7 +147,7 @@ class TestWebhooksResourceFind:
         async with client:
             with respx.mock:
                 route = respx.get(
-                    "https://sandbox-api2.wfirma.pl/webhooks/find",
+                    "https://api2.wfirma.pl/webhooks/find",
                     params={
                         "outputFormat": "json",
                         "company_id": "123",
@@ -186,7 +186,7 @@ class TestWebhooksResourceAdd:
         async with client:
             with respx.mock:
                 route = respx.post(
-                    "https://sandbox-api2.wfirma.pl/webhooks/add",
+                    "https://api2.wfirma.pl/webhooks/add",
                     params={
                         "inputFormat": "json",
                         "outputFormat": "json",
@@ -230,7 +230,7 @@ class TestWebhooksResourceEdit:
         async with client:
             with respx.mock:
                 route = respx.patch(
-                    "https://sandbox-api2.wfirma.pl/webhooks/edit/10",
+                    "https://api2.wfirma.pl/webhooks/edit/10",
                     params={
                         "inputFormat": "json",
                         "outputFormat": "json",
@@ -274,7 +274,7 @@ class TestWebhooksResourceDelete:
         async with client:
             with respx.mock:
                 route = respx.delete(
-                    "https://sandbox-api2.wfirma.pl/webhooks/delete/10",
+                    "https://api2.wfirma.pl/webhooks/delete/10",
                     params={
                         "outputFormat": "json",
                         "company_id": "123",

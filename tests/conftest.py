@@ -23,7 +23,7 @@ def wfirma_config_data() -> dict[str, str]:
     return {
         "app_key": "test_app_key",
         "app_secret": "test_app_secret",
-        "environment": "sandbox",
+        "environment": "production",
     }
 
 
@@ -74,7 +74,7 @@ def live_api_scraper() -> WFirmaAPIScraper:
 
 @pytest.fixture
 def integration_company_id() -> int:
-    """Provide the sandbox company ID used for read-only smoke tests."""
+    """Provide the company ID used for opt-in live checks."""
     company_id = _get_required_env("WFIRMA_COMPANY_ID")
     try:
         return int(company_id)
@@ -84,7 +84,7 @@ def integration_company_id() -> int:
 
 @pytest.fixture
 def live_api_key_sync_client(integration_company_id: int) -> SyncWFirmaClient:
-    """Provide a sync client configured for sandbox API key auth."""
+    """Provide a sync client configured for production API key auth."""
     auth = SyncAPIKeyAuth(
         access_key=_get_required_env("WFIRMA_ACCESS_KEY"),
         secret_key=_get_required_env("WFIRMA_SECRET_KEY"),
@@ -92,14 +92,14 @@ def live_api_key_sync_client(integration_company_id: int) -> SyncWFirmaClient:
     )
     return SyncWFirmaClient(
         auth=auth,
-        environment=Environment.SANDBOX,
+        environment=Environment.PRODUCTION,
         company_id=integration_company_id,
     )
 
 
 @pytest.fixture
 def live_api_key_async_client(integration_company_id: int) -> AsyncWFirmaClient:
-    """Provide an async client configured for sandbox API key auth."""
+    """Provide an async client configured for production API key auth."""
     auth = AsyncAPIKeyAuth(
         access_key=_get_required_env("WFIRMA_ACCESS_KEY"),
         secret_key=_get_required_env("WFIRMA_SECRET_KEY"),
@@ -107,7 +107,7 @@ def live_api_key_async_client(integration_company_id: int) -> AsyncWFirmaClient:
     )
     return AsyncWFirmaClient(
         auth=auth,
-        environment=Environment.SANDBOX,
+        environment=Environment.PRODUCTION,
         company_id=integration_company_id,
     )
 
@@ -122,35 +122,35 @@ def _oauth2_token_store() -> MemoryTokenStore:
 
 @pytest.fixture
 def live_oauth2_sync_client(integration_company_id: int) -> SyncWFirmaClient:
-    """Provide a sync client configured for sandbox OAuth2 bearer auth."""
+    """Provide a sync client configured for production OAuth2 bearer auth."""
     auth = SyncOAuth2Auth(
         client_id=_get_required_env("WFIRMA_OAUTH2_CLIENT_ID"),
         client_secret=_get_required_env("WFIRMA_OAUTH2_CLIENT_SECRET"),
         redirect_uri=_get_required_env("WFIRMA_OAUTH2_REDIRECT_URI"),
-        environment=Environment.SANDBOX,
+        environment=Environment.PRODUCTION,
         token_store=_oauth2_token_store(),
         store_key="integration",
     )
     return SyncWFirmaClient(
         auth=auth,
-        environment=Environment.SANDBOX,
+        environment=Environment.PRODUCTION,
         company_id=integration_company_id,
     )
 
 
 @pytest.fixture
 def live_oauth2_async_client(integration_company_id: int) -> AsyncWFirmaClient:
-    """Provide an async client configured for sandbox OAuth2 bearer auth."""
+    """Provide an async client configured for production OAuth2 bearer auth."""
     auth = AsyncOAuth2Auth(
         client_id=_get_required_env("WFIRMA_OAUTH2_CLIENT_ID"),
         client_secret=_get_required_env("WFIRMA_OAUTH2_CLIENT_SECRET"),
         redirect_uri=_get_required_env("WFIRMA_OAUTH2_REDIRECT_URI"),
-        environment=Environment.SANDBOX,
+        environment=Environment.PRODUCTION,
         token_store=_oauth2_token_store(),
         store_key="integration",
     )
     return AsyncWFirmaClient(
         auth=auth,
-        environment=Environment.SANDBOX,
+        environment=Environment.PRODUCTION,
         company_id=integration_company_id,
     )

@@ -27,7 +27,7 @@ class TestTranslationLanguagesResourceGet:
 
         with respx.mock:
             route = respx.get(
-                "https://sandbox-api2.wfirma.pl/translation_languages/get/456",
+                "https://api2.wfirma.pl/translation_languages/get/456",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -69,7 +69,7 @@ class TestTranslationLanguagesResourceFind:
 
         with respx.mock:
             route = respx.get(
-                "https://sandbox-api2.wfirma.pl/translation_languages/find",
+                "https://api2.wfirma.pl/translation_languages/find",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -120,7 +120,7 @@ class TestTranslationLanguagesResourceFind:
 
         with respx.mock:
             route = respx.get(
-                "https://sandbox-api2.wfirma.pl/translation_languages/find",
+                "https://api2.wfirma.pl/translation_languages/find",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",

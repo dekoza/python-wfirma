@@ -28,7 +28,7 @@ class TestTagsResourceGet:
 
         with respx.mock:
             route = respx.get(
-                "https://sandbox-api2.wfirma.pl/tags/get/456",
+                "https://api2.wfirma.pl/tags/get/456",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -71,7 +71,7 @@ class TestTagsResourceFind:
 
         with respx.mock:
             route = respx.get(
-                "https://sandbox-api2.wfirma.pl/tags/find",
+                "https://api2.wfirma.pl/tags/find",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -111,7 +111,7 @@ class TestTagsResourceFind:
 
         with respx.mock:
             route = respx.get(
-                "https://sandbox-api2.wfirma.pl/tags/find",
+                "https://api2.wfirma.pl/tags/find",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -150,7 +150,7 @@ class TestTagsResourceAdd:
 
         with respx.mock:
             route = respx.post(
-                "https://sandbox-api2.wfirma.pl/tags/add",
+                "https://api2.wfirma.pl/tags/add",
                 params={
                     "inputFormat": "json",
                     "outputFormat": "json",
@@ -194,7 +194,7 @@ class TestTagsResourceEdit:
 
         with respx.mock:
             route = respx.post(
-                "https://sandbox-api2.wfirma.pl/tags/edit/10",
+                "https://api2.wfirma.pl/tags/edit/10",
                 params={
                     "inputFormat": "json",
                     "outputFormat": "json",
@@ -238,7 +238,7 @@ class TestTagsResourceDelete:
 
         with respx.mock:
             route = respx.delete(
-                "https://sandbox-api2.wfirma.pl/tags/delete/10",
+                "https://api2.wfirma.pl/tags/delete/10",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",

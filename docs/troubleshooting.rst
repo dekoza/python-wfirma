@@ -12,7 +12,7 @@ Authentication Errors
 **Solution**:
 
 1. Verify your app key and secret
-2. Check that you're using the correct environment (sandbox/production)
+2. Check that you're using the production API base URL and correct credentials
 3. Ensure credentials haven't expired
 4. Try regenerating your API credentials in wFirma settings
 

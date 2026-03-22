@@ -28,7 +28,7 @@ class TestInvoicesResourceGet:
 
         with respx.mock:
             route = respx.get(
-                "https://sandbox-api2.wfirma.pl/invoices/get/456",
+                "https://api2.wfirma.pl/invoices/get/456",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -76,7 +76,7 @@ class TestInvoicesResourceFind:
 
         with respx.mock:
             route = respx.get(
-                "https://sandbox-api2.wfirma.pl/invoices/find",
+                "https://api2.wfirma.pl/invoices/find",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -112,7 +112,7 @@ class TestInvoicesResourceFind:
 
         with respx.mock:
             route = respx.get(
-                "https://sandbox-api2.wfirma.pl/invoices/find",
+                "https://api2.wfirma.pl/invoices/find",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -147,7 +147,7 @@ class TestInvoicesResourceAdd:
 
         with respx.mock:
             route = respx.post(
-                "https://sandbox-api2.wfirma.pl/invoices/add",
+                "https://api2.wfirma.pl/invoices/add",
                 params={
                     "inputFormat": "json",
                     "outputFormat": "json",
@@ -194,7 +194,7 @@ class TestInvoicesResourceEdit:
 
         with respx.mock:
             route = respx.post(
-                "https://sandbox-api2.wfirma.pl/invoices/edit/456",
+                "https://api2.wfirma.pl/invoices/edit/456",
                 params={
                     "inputFormat": "json",
                     "outputFormat": "json",
@@ -241,7 +241,7 @@ class TestInvoicesResourceDelete:
 
         with respx.mock:
             route = respx.delete(
-                "https://sandbox-api2.wfirma.pl/invoices/delete/456",
+                "https://api2.wfirma.pl/invoices/delete/456",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -268,7 +268,7 @@ class TestInvoicesResourceDownload:
 
         with respx.mock:
             route = respx.post(
-                "https://sandbox-api2.wfirma.pl/invoices/download/456",
+                "https://api2.wfirma.pl/invoices/download/456",
                 params={"company_id": "123"},
             ).mock(
                 return_value=httpx.Response(
@@ -295,7 +295,7 @@ class TestInvoicesResourceDownload:
 
         with respx.mock:
             route = respx.post(
-                "https://sandbox-api2.wfirma.pl/invoices/download/456",
+                "https://api2.wfirma.pl/invoices/download/456",
                 params={"company_id": "123"},
             ).mock(
                 return_value=httpx.Response(
@@ -326,7 +326,7 @@ class TestInvoicesResourceSend:
 
         with respx.mock:
             route = respx.post(
-                "https://sandbox-api2.wfirma.pl/invoices/send/456",
+                "https://api2.wfirma.pl/invoices/send/456",
                 params={
                     "inputFormat": "json",
                     "outputFormat": "json",
@@ -357,7 +357,7 @@ class TestInvoicesResourceSend:
 
         with respx.mock:
             route = respx.post(
-                "https://sandbox-api2.wfirma.pl/invoices/send/456",
+                "https://api2.wfirma.pl/invoices/send/456",
                 params={
                     "inputFormat": "json",
                     "outputFormat": "json",
@@ -398,7 +398,7 @@ class TestInvoicesResourceFiscalize:
 
         with respx.mock:
             route = respx.get(
-                "https://sandbox-api2.wfirma.pl/invoices/fiscalize/456",
+                "https://api2.wfirma.pl/invoices/fiscalize/456",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -432,7 +432,7 @@ class TestInvoicesResourceUnfiscalize:
 
         with respx.mock:
             route = respx.get(
-                "https://sandbox-api2.wfirma.pl/invoices/unfiscalize/456",
+                "https://api2.wfirma.pl/invoices/unfiscalize/456",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",

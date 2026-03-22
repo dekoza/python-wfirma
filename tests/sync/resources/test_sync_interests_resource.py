@@ -27,7 +27,7 @@ class TestInterestsResourceFind:
 
         with respx.mock:
             route = respx.get(
-                "https://sandbox-api2.wfirma.pl/interests/find",
+                "https://api2.wfirma.pl/interests/find",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -76,7 +76,7 @@ class TestInterestsResourceFind:
 
         with respx.mock:
             route = respx.get(
-                "https://sandbox-api2.wfirma.pl/interests/find",
+                "https://api2.wfirma.pl/interests/find",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",

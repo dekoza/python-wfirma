@@ -37,7 +37,7 @@ class TestNotesResourceAdd:
         """Verify add() calls POST /notes/add and returns dict."""
         with respx.mock:
             respx.post(
-                "https://sandbox-api2.wfirma.pl/notes/add",
+                "https://api2.wfirma.pl/notes/add",
                 params={
                     "inputFormat": "json",
                     "outputFormat": "json",
@@ -75,7 +75,7 @@ class TestNotesResourceAdd:
         """Verify add() wraps payload in {'note': {...}}."""
         with respx.mock:
             route = respx.post(
-                "https://sandbox-api2.wfirma.pl/notes/add",
+                "https://api2.wfirma.pl/notes/add",
                 params={
                     "inputFormat": "json",
                     "outputFormat": "json",
@@ -103,7 +103,7 @@ class TestNotesResourceFind:
         """Verify find() calls GET /notes/find and returns list."""
         with respx.mock:
             respx.get(
-                "https://sandbox-api2.wfirma.pl/notes/find",
+                "https://api2.wfirma.pl/notes/find",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -133,7 +133,7 @@ class TestNotesResourceFind:
         """Verify find() returns [] when container is empty."""
         with respx.mock:
             respx.get(
-                "https://sandbox-api2.wfirma.pl/notes/find",
+                "https://api2.wfirma.pl/notes/find",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -148,7 +148,7 @@ class TestNotesResourceFind:
     async def test_find_with_params(self, resource):
         """Verify find() passes optional params to request."""
         with respx.mock:
-            route = respx.get("https://sandbox-api2.wfirma.pl/notes/find").mock(
+            route = respx.get("https://api2.wfirma.pl/notes/find").mock(
                 return_value=httpx.Response(200, json={"status": {"code": "OK"}, "notes": {}})
             )
 
@@ -166,7 +166,7 @@ class TestNotesResourceGet:
         """Verify get() calls GET /notes/get/{id} and returns dict."""
         with respx.mock:
             respx.get(
-                "https://sandbox-api2.wfirma.pl/notes/get/123",
+                "https://api2.wfirma.pl/notes/get/123",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -196,7 +196,7 @@ class TestNotesResourceEdit:
         """Verify edit() calls PUT /notes/edit/{id} and returns dict."""
         with respx.mock:
             respx.put(
-                "https://sandbox-api2.wfirma.pl/notes/edit/123",
+                "https://api2.wfirma.pl/notes/edit/123",
                 params={
                     "inputFormat": "json",
                     "outputFormat": "json",
@@ -223,7 +223,7 @@ class TestNotesResourceEdit:
         """CRITICAL: Verify edit() uses /notes/edit/{id} NOT /goods/notes/{id}."""
         with respx.mock:
             route = respx.put(
-                "https://sandbox-api2.wfirma.pl/notes/edit/123",
+                "https://api2.wfirma.pl/notes/edit/123",
                 params={
                     "inputFormat": "json",
                     "outputFormat": "json",
@@ -235,7 +235,7 @@ class TestNotesResourceEdit:
                 )
             )
 
-            respx.put("https://sandbox-api2.wfirma.pl/goods/notes/123").mock(
+            respx.put("https://api2.wfirma.pl/goods/notes/123").mock(
                 side_effect=Exception("Wrong endpoint!")
             )
 
@@ -248,7 +248,7 @@ class TestNotesResourceEdit:
         """Verify edit() wraps payload in {'note': {...}}."""
         with respx.mock:
             route = respx.put(
-                "https://sandbox-api2.wfirma.pl/notes/edit/123",
+                "https://api2.wfirma.pl/notes/edit/123",
                 params={
                     "inputFormat": "json",
                     "outputFormat": "json",
@@ -276,7 +276,7 @@ class TestNotesResourceDelete:
         """Verify delete() calls DELETE /notes/delete/{id} and returns dict."""
         with respx.mock:
             respx.delete(
-                "https://sandbox-api2.wfirma.pl/notes/delete/123",
+                "https://api2.wfirma.pl/notes/delete/123",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",

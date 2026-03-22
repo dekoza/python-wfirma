@@ -30,7 +30,7 @@ class TestLedgerOperationSchemasResourceGet:
         async with client:
             with respx.mock:
                 route = respx.get(
-                    "https://sandbox-api2.wfirma.pl/ledger_operation_schemas/get/789",
+                    "https://api2.wfirma.pl/ledger_operation_schemas/get/789",
                     params={
                         "outputFormat": "json",
                         "company_id": "123",
@@ -73,7 +73,7 @@ class TestLedgerOperationSchemasResourceFind:
         async with client:
             with respx.mock:
                 route = respx.get(
-                    "https://sandbox-api2.wfirma.pl/ledger_operation_schemas/find",
+                    "https://api2.wfirma.pl/ledger_operation_schemas/find",
                     params={
                         "outputFormat": "json",
                         "company_id": "123",
@@ -123,7 +123,7 @@ class TestLedgerOperationSchemasResourceFind:
         async with client:
             with respx.mock:
                 route = respx.get(
-                    "https://sandbox-api2.wfirma.pl/ledger_operation_schemas/find",
+                    "https://api2.wfirma.pl/ledger_operation_schemas/find",
                     params={
                         "outputFormat": "json",
                         "company_id": "123",

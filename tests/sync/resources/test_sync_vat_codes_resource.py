@@ -27,7 +27,7 @@ class TestVatCodesResourceGet:
 
         with respx.mock:
             route = respx.get(
-                "https://sandbox-api2.wfirma.pl/vat_codes/get/456",
+                "https://api2.wfirma.pl/vat_codes/get/456",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -69,7 +69,7 @@ class TestVatCodesResourceFind:
 
         with respx.mock:
             route = respx.get(
-                "https://sandbox-api2.wfirma.pl/vat_codes/find",
+                "https://api2.wfirma.pl/vat_codes/find",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -120,7 +120,7 @@ class TestVatCodesResourceFind:
 
         with respx.mock:
             route = respx.get(
-                "https://sandbox-api2.wfirma.pl/vat_codes/find",
+                "https://api2.wfirma.pl/vat_codes/find",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",

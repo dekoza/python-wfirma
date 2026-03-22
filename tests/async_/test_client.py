@@ -17,8 +17,8 @@ from wfirma.exceptions import (
     BadRequestError,
     ConnectionError,
     InsufficientPermissionsError,
-    InvalidConfigurationError,
     InvalidCredentialsError,
+    MissingConfigurationError,
     RateLimitError,
     ResourceConflictError,
     ResourceNotFoundError,
@@ -40,7 +40,7 @@ class TestWFirmaClientInitialization:
         client = WFirmaClient(auth=auth)
 
         assert client.auth is auth
-        assert client.environment == Environment.SANDBOX
+        assert client.environment == Environment.PRODUCTION
         assert client.company_id is None
 
     @pytest.mark.asyncio
@@ -60,41 +60,46 @@ class TestWFirmaClientInitialization:
         client = WFirmaClient(auth=auth)
 
         assert client.auth is auth
-        assert client.environment == Environment.SANDBOX
+        assert client.environment == Environment.PRODUCTION
 
     @pytest.mark.asyncio
-    async def test_client_rejects_oauth1_auth_in_beta(self) -> None:
+    async def test_client_initializes_with_oauth1_auth(self) -> None:
         from wfirma.async_.client import WFirmaClient
+        from wfirma.auth.common import MemoryTokenStore
 
+        store = MemoryTokenStore()
+        store.set("default", OAuthToken(access_token="oauth1-token", refresh_token="oauth1-secret"))
         auth = OAuth1Auth(
             consumer_key="ck",
             consumer_secret="cs",
             scope="invoices-read",
             callback_url=None,
+            token_store=store,
         )
+        client = WFirmaClient(auth=auth)
 
-        with pytest.raises(InvalidConfigurationError, match="OAuth1Auth is not supported"):
-            WFirmaClient(auth=auth)
+        assert client.auth is auth
+        assert client.environment == Environment.PRODUCTION
 
     @pytest.mark.asyncio
-    async def test_client_uses_sandbox_environment(self) -> None:
+    async def test_client_uses_production_environment(self) -> None:
         from wfirma.async_.client import WFirmaClient
 
         auth = APIKeyAuth(access_key="ak", secret_key="sk", app_key="appk")
-        client = WFirmaClient(auth=auth, environment=Environment.SANDBOX)
+        client = WFirmaClient(auth=auth, environment=Environment.PRODUCTION)
 
-        assert client.environment == Environment.SANDBOX
-        assert "sandbox" in client.base_url
+        assert client.environment == Environment.PRODUCTION
+        assert client.base_url == "https://api2.wfirma.pl"
 
     @pytest.mark.asyncio
-    async def test_client_uses_sandbox_environment_by_default(self) -> None:
+    async def test_client_uses_production_environment_by_default(self) -> None:
         from wfirma.async_.client import WFirmaClient
 
         auth = APIKeyAuth(access_key="ak", secret_key="sk", app_key="appk")
         client = WFirmaClient(auth=auth)
 
-        assert client.environment == Environment.SANDBOX
-        assert client.base_url == "https://sandbox-api2.wfirma.pl"
+        assert client.environment == Environment.PRODUCTION
+        assert client.base_url == "https://api2.wfirma.pl"
 
     @pytest.mark.asyncio
     async def test_client_accepts_company_id(self) -> None:
@@ -137,7 +142,7 @@ class TestWFirmaClientHTTPMethods:
     @pytest.mark.asyncio
     @respx.mock
     async def test_get_request_sends_authentication_headers(self) -> None:
-        route = respx.get("https://sandbox-api2.wfirma.pl/users/get/123").mock(
+        route = respx.get("https://api2.wfirma.pl/users/get/123").mock(
             return_value=httpx.Response(
                 200,
                 json={
@@ -158,7 +163,7 @@ class TestWFirmaClientHTTPMethods:
     @pytest.mark.asyncio
     @respx.mock
     async def test_get_request_returns_response_data(self) -> None:
-        respx.get("https://sandbox-api2.wfirma.pl/users/get/123").mock(
+        respx.get("https://api2.wfirma.pl/users/get/123").mock(
             return_value=httpx.Response(
                 200,
                 json={
@@ -176,7 +181,7 @@ class TestWFirmaClientHTTPMethods:
     @pytest.mark.asyncio
     @respx.mock
     async def test_post_request_sends_json_body(self) -> None:
-        route = respx.post("https://sandbox-api2.wfirma.pl/contractors/add").mock(
+        route = respx.post("https://api2.wfirma.pl/contractors/add").mock(
             return_value=httpx.Response(
                 200,
                 json={
@@ -206,7 +211,7 @@ class TestWFirmaClientHTTPMethods:
     @pytest.mark.asyncio
     @respx.mock
     async def test_post_request_sends_xml_body(self) -> None:
-        route = respx.post("https://sandbox-api2.wfirma.pl/contractors/add").mock(
+        route = respx.post("https://api2.wfirma.pl/contractors/add").mock(
             return_value=httpx.Response(
                 200,
                 text="""<?xml version="1.0" encoding="UTF-8"?>
@@ -234,7 +239,7 @@ class TestWFirmaClientHTTPMethods:
     @pytest.mark.asyncio
     @respx.mock
     async def test_get_request_adds_company_id_parameter(self) -> None:
-        route = respx.get("https://sandbox-api2.wfirma.pl/users/get/123").mock(
+        route = respx.get("https://api2.wfirma.pl/users/get/123").mock(
             return_value=httpx.Response(
                 200,
                 json={"status": {"code": "OK"}},
@@ -256,7 +261,7 @@ class TestWFirmaClientHTTPMethods:
     @respx.mock
     async def test_get_binary_returns_bytes(self) -> None:
         binary_content = b"PDF content here"
-        respx.get("https://sandbox-api2.wfirma.pl/invoices/download/123").mock(
+        respx.get("https://api2.wfirma.pl/invoices/download/123").mock(
             return_value=httpx.Response(200, content=binary_content)
         )
 
@@ -269,7 +274,7 @@ class TestWFirmaClientHTTPMethods:
     @respx.mock
     async def test_post_binary_returns_bytes(self) -> None:
         binary_content = b"PDF file data"
-        respx.post("https://sandbox-api2.wfirma.pl/documents/generate").mock(
+        respx.post("https://api2.wfirma.pl/documents/generate").mock(
             return_value=httpx.Response(200, content=binary_content)
         )
 
@@ -284,7 +289,7 @@ class TestWFirmaClientHTTPMethods:
     @pytest.mark.asyncio
     @respx.mock
     async def test_get_binary_raises_on_429(self) -> None:
-        respx.get("https://sandbox-api2.wfirma.pl/invoices/download/123").mock(
+        respx.get("https://api2.wfirma.pl/invoices/download/123").mock(
             return_value=httpx.Response(429)
         )
 
@@ -294,7 +299,7 @@ class TestWFirmaClientHTTPMethods:
     @pytest.mark.asyncio
     @respx.mock
     async def test_get_binary_raises_on_503(self) -> None:
-        respx.get("https://sandbox-api2.wfirma.pl/invoices/download/123").mock(
+        respx.get("https://api2.wfirma.pl/invoices/download/123").mock(
             return_value=httpx.Response(503)
         )
 
@@ -304,7 +309,7 @@ class TestWFirmaClientHTTPMethods:
     @pytest.mark.asyncio
     @respx.mock
     async def test_get_binary_raises_on_500(self) -> None:
-        respx.get("https://sandbox-api2.wfirma.pl/invoices/download/123").mock(
+        respx.get("https://api2.wfirma.pl/invoices/download/123").mock(
             return_value=httpx.Response(500)
         )
 
@@ -314,7 +319,7 @@ class TestWFirmaClientHTTPMethods:
     @pytest.mark.asyncio
     @respx.mock
     async def test_post_binary_raises_on_429(self) -> None:
-        respx.post("https://sandbox-api2.wfirma.pl/documents/generate").mock(
+        respx.post("https://api2.wfirma.pl/documents/generate").mock(
             return_value=httpx.Response(429)
         )
 
@@ -324,7 +329,7 @@ class TestWFirmaClientHTTPMethods:
     @pytest.mark.asyncio
     @respx.mock
     async def test_post_binary_raises_on_503(self) -> None:
-        respx.post("https://sandbox-api2.wfirma.pl/documents/generate").mock(
+        respx.post("https://api2.wfirma.pl/documents/generate").mock(
             return_value=httpx.Response(503)
         )
 
@@ -334,7 +339,7 @@ class TestWFirmaClientHTTPMethods:
     @pytest.mark.asyncio
     @respx.mock
     async def test_post_binary_raises_on_500(self) -> None:
-        respx.post("https://sandbox-api2.wfirma.pl/documents/generate").mock(
+        respx.post("https://api2.wfirma.pl/documents/generate").mock(
             return_value=httpx.Response(500)
         )
 
@@ -344,7 +349,7 @@ class TestWFirmaClientHTTPMethods:
     @respx.mock
     @pytest.mark.asyncio
     async def test_patch_request_sends_json_body(self) -> None:
-        route = respx.patch("https://sandbox-api2.wfirma.pl/webhooks/edit/123").mock(
+        route = respx.patch("https://api2.wfirma.pl/webhooks/edit/123").mock(
             return_value=httpx.Response(
                 200,
                 json={
@@ -373,7 +378,7 @@ class TestWFirmaClientHTTPMethods:
     @respx.mock
     @pytest.mark.asyncio
     async def test_patch_request_sends_xml_body(self) -> None:
-        route = respx.patch("https://sandbox-api2.wfirma.pl/webhooks/edit/123").mock(
+        route = respx.patch("https://api2.wfirma.pl/webhooks/edit/123").mock(
             return_value=httpx.Response(
                 200,
                 text="""<?xml version="1.0" encoding="UTF-8"?>
@@ -403,7 +408,7 @@ class TestWFirmaClientHTTPMethods:
     @respx.mock
     @pytest.mark.asyncio
     async def test_patch_json_adds_format_parameters(self) -> None:
-        route = respx.patch("https://sandbox-api2.wfirma.pl/webhooks/edit/123").mock(
+        route = respx.patch("https://api2.wfirma.pl/webhooks/edit/123").mock(
             return_value=httpx.Response(
                 200,
                 json={
@@ -426,7 +431,7 @@ class TestWFirmaClientHTTPMethods:
     @respx.mock
     @pytest.mark.asyncio
     async def test_patch_xml_sends_request(self) -> None:
-        route = respx.patch("https://sandbox-api2.wfirma.pl/webhooks/edit/123").mock(
+        route = respx.patch("https://api2.wfirma.pl/webhooks/edit/123").mock(
             return_value=httpx.Response(
                 200,
                 text="""<?xml version="1.0" encoding="UTF-8"?>
@@ -466,7 +471,7 @@ class TestWFirmaClientErrorHandling:
     @pytest.mark.asyncio
     @respx.mock
     async def test_handles_authentication_error_auth(self) -> None:
-        respx.get("https://sandbox-api2.wfirma.pl/test").mock(
+        respx.get("https://api2.wfirma.pl/test").mock(
             return_value=httpx.Response(
                 200,
                 json={"status": {"code": "AUTH"}},
@@ -479,7 +484,7 @@ class TestWFirmaClientErrorHandling:
     @pytest.mark.asyncio
     @respx.mock
     async def test_handles_authentication_error_limit(self) -> None:
-        respx.get("https://sandbox-api2.wfirma.pl/test").mock(
+        respx.get("https://api2.wfirma.pl/test").mock(
             return_value=httpx.Response(
                 200,
                 json={"status": {"code": "AUTH FAILED LIMIT WAIT 5 MINUTES"}},
@@ -492,7 +497,7 @@ class TestWFirmaClientErrorHandling:
     @pytest.mark.asyncio
     @respx.mock
     async def test_handles_denied_scope_requested(self) -> None:
-        respx.get("https://sandbox-api2.wfirma.pl/test").mock(
+        respx.get("https://api2.wfirma.pl/test").mock(
             return_value=httpx.Response(
                 200,
                 json={"status": {"code": "DENIED SCOPE REQUESTED"}},
@@ -505,7 +510,7 @@ class TestWFirmaClientErrorHandling:
     @pytest.mark.asyncio
     @respx.mock
     async def test_handles_access_denied(self) -> None:
-        respx.get("https://sandbox-api2.wfirma.pl/test").mock(
+        respx.get("https://api2.wfirma.pl/test").mock(
             return_value=httpx.Response(
                 200,
                 json={"status": {"code": "ACCESS DENIED"}},
@@ -518,7 +523,7 @@ class TestWFirmaClientErrorHandling:
     @pytest.mark.asyncio
     @respx.mock
     async def test_handles_not_found(self) -> None:
-        respx.get("https://sandbox-api2.wfirma.pl/test").mock(
+        respx.get("https://api2.wfirma.pl/test").mock(
             return_value=httpx.Response(
                 200,
                 json={"status": {"code": "NOT FOUND"}},
@@ -531,7 +536,7 @@ class TestWFirmaClientErrorHandling:
     @pytest.mark.asyncio
     @respx.mock
     async def test_handles_action_not_found(self) -> None:
-        respx.get("https://sandbox-api2.wfirma.pl/test").mock(
+        respx.get("https://api2.wfirma.pl/test").mock(
             return_value=httpx.Response(
                 200,
                 json={"status": {"code": "ACTION NOT FOUND"}},
@@ -544,7 +549,7 @@ class TestWFirmaClientErrorHandling:
     @pytest.mark.asyncio
     @respx.mock
     async def test_handles_input_error(self) -> None:
-        respx.get("https://sandbox-api2.wfirma.pl/test").mock(
+        respx.get("https://api2.wfirma.pl/test").mock(
             return_value=httpx.Response(
                 200,
                 json={"status": {"code": "INPUT ERROR"}},
@@ -557,7 +562,7 @@ class TestWFirmaClientErrorHandling:
     @pytest.mark.asyncio
     @respx.mock
     async def test_handles_validation_error(self) -> None:
-        respx.get("https://sandbox-api2.wfirma.pl/test").mock(
+        respx.get("https://api2.wfirma.pl/test").mock(
             return_value=httpx.Response(
                 200,
                 json={"status": {"code": "ERROR"}},
@@ -570,7 +575,7 @@ class TestWFirmaClientErrorHandling:
     @pytest.mark.asyncio
     @respx.mock
     async def test_handles_fatal_error(self) -> None:
-        respx.get("https://sandbox-api2.wfirma.pl/test").mock(
+        respx.get("https://api2.wfirma.pl/test").mock(
             return_value=httpx.Response(
                 200,
                 json={"status": {"code": "FATAL"}},
@@ -583,7 +588,7 @@ class TestWFirmaClientErrorHandling:
     @pytest.mark.asyncio
     @respx.mock
     async def test_handles_out_of_service(self) -> None:
-        respx.get("https://sandbox-api2.wfirma.pl/test").mock(
+        respx.get("https://api2.wfirma.pl/test").mock(
             return_value=httpx.Response(
                 200,
                 json={"status": {"code": "OUT OF SERVICE"}},
@@ -596,7 +601,7 @@ class TestWFirmaClientErrorHandling:
     @pytest.mark.asyncio
     @respx.mock
     async def test_handles_snapshot_lock(self) -> None:
-        respx.get("https://sandbox-api2.wfirma.pl/test").mock(
+        respx.get("https://api2.wfirma.pl/test").mock(
             return_value=httpx.Response(
                 200,
                 json={"status": {"code": "SNAPSHOT LOCK"}},
@@ -609,7 +614,7 @@ class TestWFirmaClientErrorHandling:
     @pytest.mark.asyncio
     @respx.mock
     async def test_handles_rate_limit_exceeded(self) -> None:
-        respx.get("https://sandbox-api2.wfirma.pl/test").mock(
+        respx.get("https://api2.wfirma.pl/test").mock(
             return_value=httpx.Response(
                 200,
                 json={"status": {"code": "TOTAL REQUESTS LIMIT EXCEEDED"}},
@@ -622,7 +627,7 @@ class TestWFirmaClientErrorHandling:
     @pytest.mark.asyncio
     @respx.mock
     async def test_handles_http_429_rate_limit(self) -> None:
-        respx.get("https://sandbox-api2.wfirma.pl/test").mock(return_value=httpx.Response(429))
+        respx.get("https://api2.wfirma.pl/test").mock(return_value=httpx.Response(429))
 
         with pytest.raises(RateLimitError, match="Rate limit exceeded"):
             await self.client.get("/test")
@@ -630,7 +635,7 @@ class TestWFirmaClientErrorHandling:
     @pytest.mark.asyncio
     @respx.mock
     async def test_handles_http_500_server_error(self) -> None:
-        respx.get("https://sandbox-api2.wfirma.pl/test").mock(return_value=httpx.Response(500))
+        respx.get("https://api2.wfirma.pl/test").mock(return_value=httpx.Response(500))
 
         with pytest.raises(ServerError, match="Server error"):
             await self.client.get("/test")
@@ -638,7 +643,7 @@ class TestWFirmaClientErrorHandling:
     @pytest.mark.asyncio
     @respx.mock
     async def test_handles_http_503_service_unavailable(self) -> None:
-        respx.get("https://sandbox-api2.wfirma.pl/test").mock(return_value=httpx.Response(503))
+        respx.get("https://api2.wfirma.pl/test").mock(return_value=httpx.Response(503))
 
         with pytest.raises(ServiceUnavailableError, match="Service unavailable"):
             await self.client.get("/test")
@@ -646,7 +651,7 @@ class TestWFirmaClientErrorHandling:
     @pytest.mark.asyncio
     @respx.mock
     async def test_handles_http_401_invalid_credentials(self) -> None:
-        respx.get("https://sandbox-api2.wfirma.pl/test").mock(return_value=httpx.Response(401))
+        respx.get("https://api2.wfirma.pl/test").mock(return_value=httpx.Response(401))
 
         with pytest.raises(InvalidCredentialsError):
             await self.client.get("/test")
@@ -654,7 +659,7 @@ class TestWFirmaClientErrorHandling:
     @pytest.mark.asyncio
     @respx.mock
     async def test_handles_http_403_insufficient_permissions(self) -> None:
-        respx.get("https://sandbox-api2.wfirma.pl/test").mock(return_value=httpx.Response(403))
+        respx.get("https://api2.wfirma.pl/test").mock(return_value=httpx.Response(403))
 
         with pytest.raises(InsufficientPermissionsError):
             await self.client.get("/test")
@@ -662,7 +667,7 @@ class TestWFirmaClientErrorHandling:
     @pytest.mark.asyncio
     @respx.mock
     async def test_handles_http_400_html_response(self) -> None:
-        respx.get("https://sandbox-api2.wfirma.pl/test").mock(
+        respx.get("https://api2.wfirma.pl/test").mock(
             return_value=httpx.Response(
                 400,
                 text="<html><body>bad request</body></html>",
@@ -676,7 +681,7 @@ class TestWFirmaClientErrorHandling:
     @pytest.mark.asyncio
     @respx.mock
     async def test_handles_http_409_resource_conflict(self) -> None:
-        respx.get("https://sandbox-api2.wfirma.pl/test").mock(return_value=httpx.Response(409))
+        respx.get("https://api2.wfirma.pl/test").mock(return_value=httpx.Response(409))
 
         with pytest.raises(ResourceConflictError):
             await self.client.get("/test")
@@ -684,7 +689,7 @@ class TestWFirmaClientErrorHandling:
     @pytest.mark.asyncio
     @respx.mock
     async def test_handles_http_422_validation_error(self) -> None:
-        respx.post("https://sandbox-api2.wfirma.pl/contractors/add").mock(
+        respx.post("https://api2.wfirma.pl/contractors/add").mock(
             return_value=httpx.Response(422, json={"detail": "validation failed"})
         )
 
@@ -694,7 +699,7 @@ class TestWFirmaClientErrorHandling:
     @pytest.mark.asyncio
     @respx.mock
     async def test_get_xml_raises_on_xml_error_status(self) -> None:
-        respx.get("https://sandbox-api2.wfirma.pl/users/get/123").mock(
+        respx.get("https://api2.wfirma.pl/users/get/123").mock(
             return_value=httpx.Response(
                 200,
                 text="""<?xml version=\"1.0\" encoding=\"UTF-8\"?>
@@ -709,7 +714,9 @@ class TestWFirmaClientErrorHandling:
     @pytest.mark.asyncio
     @respx.mock
     async def test_handles_timeout_error(self) -> None:
-        respx.get("https://sandbox-api2.wfirma.pl/test").mock(side_effect=httpx.TimeoutException("Timeout"))
+        respx.get("https://api2.wfirma.pl/test").mock(
+            side_effect=httpx.TimeoutException("Timeout")
+        )
 
         with pytest.raises(TimeoutError, match="Request timed out"):
             await self.client.get("/test")
@@ -717,7 +724,7 @@ class TestWFirmaClientErrorHandling:
     @pytest.mark.asyncio
     @respx.mock
     async def test_handles_connection_error(self) -> None:
-        respx.get("https://sandbox-api2.wfirma.pl/test").mock(
+        respx.get("https://api2.wfirma.pl/test").mock(
             side_effect=httpx.ConnectError("Connection failed")
         )
 
@@ -727,7 +734,7 @@ class TestWFirmaClientErrorHandling:
     @pytest.mark.asyncio
     @respx.mock
     async def test_handles_generic_request_error(self) -> None:
-        respx.get("https://sandbox-api2.wfirma.pl/test").mock(
+        respx.get("https://api2.wfirma.pl/test").mock(
             side_effect=httpx.RequestError("Network error")
         )
 
@@ -748,7 +755,7 @@ class TestWFirmaClientFormatHandling:
     @pytest.mark.asyncio
     @respx.mock
     async def test_get_json_adds_output_format_parameter(self) -> None:
-        route = respx.get("https://sandbox-api2.wfirma.pl/users/get/123").mock(
+        route = respx.get("https://api2.wfirma.pl/users/get/123").mock(
             return_value=httpx.Response(
                 200,
                 json={"status": {"code": "OK"}, "users": {}},
@@ -764,7 +771,7 @@ class TestWFirmaClientFormatHandling:
     @pytest.mark.asyncio
     @respx.mock
     async def test_get_xml_adds_output_format_parameter(self) -> None:
-        route = respx.get("https://sandbox-api2.wfirma.pl/users/get/123").mock(
+        route = respx.get("https://api2.wfirma.pl/users/get/123").mock(
             return_value=httpx.Response(
                 200,
                 text="""<?xml version="1.0" encoding="UTF-8"?>
@@ -782,7 +789,7 @@ class TestWFirmaClientFormatHandling:
     @pytest.mark.asyncio
     @respx.mock
     async def test_post_json_adds_format_parameters(self) -> None:
-        route = respx.post("https://sandbox-api2.wfirma.pl/contractors/add").mock(
+        route = respx.post("https://api2.wfirma.pl/contractors/add").mock(
             return_value=httpx.Response(
                 200,
                 json={"status": {"code": "OK"}},
@@ -799,7 +806,7 @@ class TestWFirmaClientFormatHandling:
     @pytest.mark.asyncio
     @respx.mock
     async def test_post_xml_adds_format_parameters(self) -> None:
-        route = respx.post("https://sandbox-api2.wfirma.pl/contractors/add").mock(
+        route = respx.post("https://api2.wfirma.pl/contractors/add").mock(
             return_value=httpx.Response(
                 200,
                 text="""<?xml version="1.0" encoding="UTF-8"?>
@@ -834,7 +841,7 @@ class TestWFirmaClientContextManager:
     async def test_client_closes_http_client_on_exit(self) -> None:
         from wfirma.async_.client import WFirmaClient
 
-        respx.get("https://sandbox-api2.wfirma.pl/test").mock(
+        respx.get("https://api2.wfirma.pl/test").mock(
             return_value=httpx.Response(200, json={"status": {"code": "OK"}})
         )
 
@@ -856,7 +863,7 @@ class TestWFirmaClientOAuth2Integration:
         from wfirma.async_.client import WFirmaClient
         from wfirma.auth.common import MemoryTokenStore
 
-        route = respx.get("https://sandbox-api2.wfirma.pl/users/get/123").mock(
+        route = respx.get("https://api2.wfirma.pl/users/get/123").mock(
             return_value=httpx.Response(
                 200,
                 json={"status": {"code": "OK"}},
@@ -886,7 +893,7 @@ class TestWFirmaClientOAuth2Integration:
         from wfirma.async_.client import WFirmaClient
         from wfirma.auth.common import MemoryTokenStore
 
-        route = respx.get("https://sandbox-api2.wfirma.pl/users/get/123").mock(
+        route = respx.get("https://api2.wfirma.pl/users/get/123").mock(
             return_value=httpx.Response(
                 200,
                 json={"status": {"code": "OK"}},
@@ -916,7 +923,7 @@ class TestWFirmaClientOAuth2Integration:
         from wfirma.async_.client import WFirmaClient
 
         client = WFirmaClient(auth=APIKeyAuth(access_key="ak", secret_key="sk", app_key="appk"))
-        respx.get("https://sandbox-api2.wfirma.pl/invoices/download/123").mock(
+        respx.get("https://api2.wfirma.pl/invoices/download/123").mock(
             return_value=httpx.Response(404, text="Not Found")
         )
 
@@ -929,9 +936,58 @@ class TestWFirmaClientOAuth2Integration:
         from wfirma.async_.client import WFirmaClient
 
         client = WFirmaClient(auth=APIKeyAuth(access_key="ak", secret_key="sk", app_key="appk"))
-        respx.post("https://sandbox-api2.wfirma.pl/documents/generate").mock(
+        respx.post("https://api2.wfirma.pl/documents/generate").mock(
             return_value=httpx.Response(400, text="Bad Request")
         )
 
         with pytest.raises(BadRequestError):
             await client.post_binary("/documents/generate", data={"doc_id": "1"})
+
+
+class TestWFirmaClientOAuth1Integration:
+    @pytest.mark.asyncio
+    @respx.mock
+    async def test_oauth1_auth_sends_authorization_header(self) -> None:
+        from wfirma.async_.client import WFirmaClient
+        from wfirma.auth.common import MemoryTokenStore
+
+        route = respx.get("https://api2.wfirma.pl/users/get/123").mock(
+            return_value=httpx.Response(200, json={"status": {"code": "OK"}})
+        )
+
+        store = MemoryTokenStore()
+        store.set("default", OAuthToken(access_token="token123", refresh_token="secret456"))
+        auth = OAuth1Auth(
+            consumer_key="ck",
+            consumer_secret="cs",
+            scope="invoices-read",
+            callback_url=None,
+            token_store=store,
+        )
+
+        async with WFirmaClient(auth=auth) as client:
+            await client.get("/users/get/123")
+
+        assert route.called
+        request = route.calls.last.request
+        assert request.headers["Authorization"].startswith("OAuth ")
+        assert "Bearer" not in request.headers["Authorization"]
+        assert "oauth_version=2" not in str(request.url)
+
+    @pytest.mark.asyncio
+    @respx.mock
+    async def test_oauth1_request_raises_when_token_missing(self) -> None:
+        from wfirma.async_.client import WFirmaClient
+        from wfirma.auth.common import MemoryTokenStore
+
+        auth = OAuth1Auth(
+            consumer_key="ck",
+            consumer_secret="cs",
+            scope="invoices-read",
+            callback_url=None,
+            token_store=MemoryTokenStore(),
+        )
+
+        async with WFirmaClient(auth=auth) as client:
+            with pytest.raises(MissingConfigurationError, match="OAuth1 token is not available"):
+                await client.get("/users/get/123")

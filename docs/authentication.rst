@@ -4,8 +4,7 @@ Authentication
 wFirma exposes API Key, OAuth 2.0, and OAuth 1.0a authentication modes. This guide explains the parts that ``python-wfirma`` supports in ``1.0b1``.
 
 .. important::
-   ``WFirmaClient`` supports API Key and OAuth 2.0 in 1.0b1.
-   OAuth 1.0a helper flows remain available, but first-class ``WFirmaClient`` support is deferred.
+   ``WFirmaClient`` supports API Key, OAuth 2.0, and OAuth 1.0a in ``1.0b1``.
 
 .. note::
    OAuth2 support in this library is implemented using **Authlib** under the hood.
@@ -31,7 +30,7 @@ API Key auth uses these environment variables::
     export WFIRMA_APP_KEY=your_app_key
     export WFIRMA_ACCESS_KEY=your_access_key
     export WFIRMA_SECRET_KEY=your_secret_key
-    export WFIRMA_ENVIRONMENT=sandbox  # or production
+    export WFIRMA_ENVIRONMENT=production
     export WFIRMA_COMPANY_ID=123
 
 Or create a ``.env`` file::
@@ -39,7 +38,7 @@ Or create a ``.env`` file::
     WFIRMA_APP_KEY=your_app_key
     WFIRMA_ACCESS_KEY=your_access_key
     WFIRMA_SECRET_KEY=your_secret_key
-    WFIRMA_ENVIRONMENT=sandbox
+    WFIRMA_ENVIRONMENT=production
     WFIRMA_COMPANY_ID=123
 
 Direct Configuration
@@ -63,22 +62,6 @@ Pass API Key credentials via ``APIKeyAuth``::
 Environments
 ------------
 
-Sandbox Environment
-~~~~~~~~~~~~~~~~~~~
-
-Use sandbox for testing::
-
-    from wfirma.config import Environment
-    from wfirma.sync import APIKeyAuth, WFirmaClient
-
-    auth = APIKeyAuth(
-        access_key="your_sandbox_access_key",
-        secret_key="your_sandbox_secret_key",
-        app_key="your_sandbox_key",
-    )
-
-    client = WFirmaClient(auth=auth, environment=Environment.SANDBOX, company_id=123)
-
 Production Environment
 ~~~~~~~~~~~~~~~~~~~~~~
 
@@ -96,7 +79,7 @@ Use production for live data::
     client = WFirmaClient(auth=auth, environment=Environment.PRODUCTION, company_id=123)
 
 .. warning::
-   Always test your integration in the sandbox environment before using production credentials.
+   wFirma publicly documents the production API base URL only. Use least-privilege credentials and keep automated checks read-only.
 
 Token Management
 ----------------
@@ -183,7 +166,7 @@ Security Best Practices
 1. **Never commit credentials** to version control
 2. **Use environment variables** in production
 3. **Rotate credentials** regularly
-4. **Use sandbox** for development and testing
+4. **Use least-privilege credentials** for development and testing
 5. **Limit API key permissions** to minimum required
 
 Next Steps
@@ -208,7 +191,7 @@ Use when you can open the user consent page. Minimal sync example::
         client_id="your_client_id",
         client_secret="your_client_secret",
         redirect_uri="https://your.app/callback",
-        environment=Environment.SANDBOX,
+        environment=Environment.PRODUCTION,
         token_store=FileTokenStore("~/.cache/wfirma/tokens.json"),
     )
 

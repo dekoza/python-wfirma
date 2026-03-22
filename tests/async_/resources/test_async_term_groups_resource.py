@@ -23,7 +23,7 @@ class TestAsyncTermGroupsResourceAdd:
 
         with respx.mock:
             route = respx.post(
-                "https://sandbox-api2.wfirma.pl/term_groups/add",
+                "https://api2.wfirma.pl/term_groups/add",
                 params={
                     "inputFormat": "json",
                     "outputFormat": "json",
@@ -60,7 +60,7 @@ class TestAsyncTermGroupsResourceFind:
 
         with respx.mock:
             route = respx.get(
-                "https://sandbox-api2.wfirma.pl/term_groups/find",
+                "https://api2.wfirma.pl/term_groups/find",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -96,7 +96,7 @@ class TestAsyncTermGroupsResourceFind:
 
         with respx.mock:
             respx.get(
-                "https://sandbox-api2.wfirma.pl/term_groups/find",
+                "https://api2.wfirma.pl/term_groups/find",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -127,7 +127,7 @@ class TestAsyncTermGroupsResourceGet:
 
         with respx.mock:
             route = respx.get(
-                "https://sandbox-api2.wfirma.pl/term_groups/get/456",
+                "https://api2.wfirma.pl/term_groups/get/456",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -163,7 +163,7 @@ class TestAsyncTermGroupsResourceEdit:
 
         with respx.mock:
             route = respx.post(
-                "https://sandbox-api2.wfirma.pl/term_groups/edit/1",
+                "https://api2.wfirma.pl/term_groups/edit/1",
                 params={
                     "inputFormat": "json",
                     "outputFormat": "json",
@@ -200,7 +200,7 @@ class TestAsyncTermGroupsResourceDelete:
 
         with respx.mock:
             route = respx.delete(
-                "https://sandbox-api2.wfirma.pl/term_groups/delete/1",
+                "https://api2.wfirma.pl/term_groups/delete/1",
                 params={
                     "company_id": "123",
                 },

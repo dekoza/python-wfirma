@@ -29,7 +29,7 @@ class TestDeclarationBodyJpkvatResourceGet:
 
         with respx.mock:
             route = respx.get(
-                "https://sandbox-api2.wfirma.pl/declaration_body_jpkvat/get/2025/6",
+                "https://api2.wfirma.pl/declaration_body_jpkvat/get/2025/6",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -72,7 +72,7 @@ class TestDeclarationBodyJpkvatResourceGet:
 
         with respx.mock:
             respx.get(
-                "https://sandbox-api2.wfirma.pl/declaration_body_jpkvat/get/2025/3",
+                "https://api2.wfirma.pl/declaration_body_jpkvat/get/2025/3",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -111,7 +111,7 @@ class TestDeclarationBodyJpkvatResourceGet:
 
         with respx.mock:
             respx.get(
-                "https://sandbox-api2.wfirma.pl/declaration_body_jpkvat/get/2024/12",
+                "https://api2.wfirma.pl/declaration_body_jpkvat/get/2024/12",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",

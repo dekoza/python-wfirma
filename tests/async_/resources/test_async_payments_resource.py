@@ -33,7 +33,7 @@ class TestPaymentsResource:
         async with client:
             with respx.mock:
                 route = respx.get(
-                    "https://sandbox-api2.wfirma.pl/payments/get/456",
+                    "https://api2.wfirma.pl/payments/get/456",
                     params={
                         "outputFormat": "json",
                         "company_id": "123",
@@ -65,7 +65,7 @@ class TestPaymentsResource:
         async with client:
             with respx.mock:
                 route = respx.get(
-                    "https://sandbox-api2.wfirma.pl/payments/find",
+                    "https://api2.wfirma.pl/payments/find",
                     params={
                         "outputFormat": "json",
                         "company_id": "123",
@@ -100,7 +100,7 @@ class TestPaymentsResource:
         async with client:
             with respx.mock:
                 route = respx.get(
-                    "https://sandbox-api2.wfirma.pl/payments/find",
+                    "https://api2.wfirma.pl/payments/find",
                     params={
                         "outputFormat": "json",
                         "company_id": "123",
@@ -154,7 +154,7 @@ class TestPaymentsResourceAdd:
                     )
 
                 route = respx.post(
-                    "https://sandbox-api2.wfirma.pl/payments/add",
+                    "https://api2.wfirma.pl/payments/add",
                     params={
                         "inputFormat": "json",
                         "outputFormat": "json",
@@ -202,7 +202,7 @@ class TestPaymentsResourceEdit:
                     )
 
                 route = respx.post(
-                    "https://sandbox-api2.wfirma.pl/payments/edit/456",
+                    "https://api2.wfirma.pl/payments/edit/456",
                     params={
                         "inputFormat": "json",
                         "outputFormat": "json",
@@ -231,7 +231,7 @@ class TestPaymentsResourceDelete:
         async with client:
             with respx.mock:
                 route = respx.delete(
-                    "https://sandbox-api2.wfirma.pl/payments/delete/456",
+                    "https://api2.wfirma.pl/payments/delete/456",
                     params={
                         "outputFormat": "json",
                         "company_id": "123",

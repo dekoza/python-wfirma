@@ -1,27 +1,4 @@
-"""
-Configuration management for wFirma API client.
-
-This module provides configuration handling for the wFirma library,
-including loading from environment variables, .env files, and direct
-instantiation with validation.
-
-Environment Variables:
-    WFIRMA_APP_KEY: Application key for API authentication
-    WFIRMA_APP_SECRET: Application secret for API authentication
-    WFIRMA_ENVIRONMENT: API environment (sandbox or production)
-    WFIRMA_COMPANY_ID: Default company ID for API requests
-    WFIRMA_TIMEOUT: Request timeout in seconds
-
-Example:
-    >>> from wfirma.config import WFirmaConfig, Environment
-    >>> config = WFirmaConfig(
-    ...     app_key="your_app_key",
-    ...     app_secret="your_secret",
-    ...     environment=Environment.SANDBOX,
-    ... )
-    >>> config.base_url
-    'https://sandbox-api2.wfirma.pl'
-"""
+"""Configuration management for the production wFirma API client."""
 
 import os
 from dataclasses import dataclass, field
@@ -35,19 +12,8 @@ from wfirma.exceptions import InvalidConfigurationError, MissingConfigurationErr
 
 
 class Environment(Enum):
-    """
-    API environment enumeration.
+    """API environment enumeration."""
 
-    The wFirma API provides two environments:
-    - SANDBOX: For testing and development
-    - PRODUCTION: For live data
-
-    Attributes:
-        SANDBOX: Development/testing environment
-        PRODUCTION: Live production environment
-    """
-
-    SANDBOX = "sandbox"
     PRODUCTION = "production"
 
     @property
@@ -58,11 +24,7 @@ class Environment(Enum):
         Returns:
             The API base URL for the environment.
         """
-        urls = {
-            Environment.SANDBOX: "https://sandbox-api2.wfirma.pl",
-            Environment.PRODUCTION: "https://api2.wfirma.pl",
-        }
-        return urls[self]
+        return "https://api2.wfirma.pl"
 
 
 def _parse_environment(value: str | Environment) -> Environment:
@@ -106,7 +68,7 @@ class WFirmaConfig:
     Attributes:
         app_key: Application key for API authentication.
         app_secret: Application secret for API authentication.
-        environment: API environment (sandbox or production).
+        environment: API environment.
         company_id: Default company ID for API requests.
         timeout: Request timeout in seconds.
 
@@ -115,13 +77,13 @@ class WFirmaConfig:
         ...     app_key="your_app_key",
         ...     app_secret="your_secret",
         ... )
-        >>> config.is_sandbox
+        >>> config.is_production
         True
     """
 
     app_key: str
     app_secret: str
-    environment: Environment = field(default=Environment.SANDBOX)
+    environment: Environment = field(default=Environment.PRODUCTION)
     company_id: str | None = field(default=None)
     timeout: float = field(default=30.0)
 
@@ -157,16 +119,6 @@ class WFirmaConfig:
             The base URL string.
         """
         return self.environment.base_url
-
-    @property
-    def is_sandbox(self) -> bool:
-        """
-        Check if the configuration is for sandbox environment.
-
-        Returns:
-            True if sandbox environment, False otherwise.
-        """
-        return self.environment == Environment.SANDBOX
 
     @property
     def is_production(self) -> bool:
@@ -232,7 +184,7 @@ class WFirmaConfig:
         if environment is not None:
             resolved_environment = _parse_environment(environment)
         else:
-            env_str = os.environ.get("WFIRMA_ENVIRONMENT", "sandbox")
+            env_str = os.environ.get("WFIRMA_ENVIRONMENT", "production")
             resolved_environment = _parse_environment(env_str)
 
         # Handle company_id
@@ -306,8 +258,8 @@ class WFirmaConfig:
         if environment is not None:
             resolved_environment = _parse_environment(environment)
         else:
-            env_str = env_values.get("WFIRMA_ENVIRONMENT", "sandbox")
-            resolved_environment = _parse_environment(env_str or "sandbox")
+            env_str = env_values.get("WFIRMA_ENVIRONMENT", "production")
+            resolved_environment = _parse_environment(env_str or "production")
 
         # Handle company_id
         resolved_company_id = company_id or env_values.get("WFIRMA_COMPANY_ID") or None
@@ -385,7 +337,7 @@ def get_config(
     Args:
         app_key: Application key for API authentication.
         app_secret: Application secret for API authentication.
-        environment: API environment (sandbox or production).
+        environment: API environment.
         company_id: Default company ID for API requests.
         timeout: Request timeout in seconds.
 
@@ -408,7 +360,7 @@ def get_config(
     """
     # If explicit credentials provided, use them
     if app_key is not None and app_secret is not None:
-        env = environment if environment is not None else Environment.SANDBOX
+        env = environment if environment is not None else Environment.PRODUCTION
         return WFirmaConfig(
             app_key=app_key,
             app_secret=app_secret,

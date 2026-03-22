@@ -26,8 +26,8 @@ This branch is preparing the `1.0b1` beta release.
 - Development status is now beta instead of alpha
 
 ### Fixed
-- Sync and async clients now default to the sandbox environment to match configuration defaults
-- `WFirmaClient` now fails fast when `OAuth1Auth` is passed during the `1.0b1` beta
+- Sync and async clients now default to the documented production API base URL
+- `WFirmaClient` now supports `OAuth1Auth` as a first-class auth mode
 - HTTP and XML error handling is hardened for non-JSON and binary responses
 
 [Unreleased]: https://github.com/dekoza/python-wfirma/compare/main...HEAD

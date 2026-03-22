@@ -28,7 +28,7 @@ class TestGoodsResourceGet:
 
         with respx.mock:
             route = respx.get(
-                "https://sandbox-api2.wfirma.pl/goods/get/456",
+                "https://api2.wfirma.pl/goods/get/456",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -77,7 +77,7 @@ class TestGoodsResourceFind:
 
         with respx.mock:
             route = respx.get(
-                "https://sandbox-api2.wfirma.pl/goods/find",
+                "https://api2.wfirma.pl/goods/find",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -113,7 +113,7 @@ class TestGoodsResourceFind:
 
         with respx.mock:
             route = respx.get(
-                "https://sandbox-api2.wfirma.pl/goods/find",
+                "https://api2.wfirma.pl/goods/find",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -148,7 +148,7 @@ class TestGoodsResourceAdd:
 
         with respx.mock:
             route = respx.post(
-                "https://sandbox-api2.wfirma.pl/goods/add",
+                "https://api2.wfirma.pl/goods/add",
                 params={
                     "inputFormat": "json",
                     "outputFormat": "json",
@@ -198,7 +198,7 @@ class TestGoodsResourceDelete:
 
         with respx.mock:
             route = respx.delete(
-                "https://sandbox-api2.wfirma.pl/goods/delete/456",
+                "https://api2.wfirma.pl/goods/delete/456",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -224,7 +224,7 @@ class TestGoodsResourceEdit:
 
         with respx.mock:
             route = respx.post(
-                "https://sandbox-api2.wfirma.pl/goods/edit/456",
+                "https://api2.wfirma.pl/goods/edit/456",
                 params={
                     "inputFormat": "json",
                     "outputFormat": "json",

@@ -108,7 +108,7 @@ API key authentication from environment:
 WFIRMA_APP_KEY=your_app_key
 WFIRMA_ACCESS_KEY=your_access_key
 WFIRMA_SECRET_KEY=your_secret_key
-WFIRMA_ENVIRONMENT=sandbox
+WFIRMA_ENVIRONMENT=production
 WFIRMA_COMPANY_ID=123
 ```
 
@@ -124,7 +124,7 @@ Shared configuration helper:
 # .env
 WFIRMA_APP_KEY=your_app_key
 WFIRMA_APP_SECRET=your_app_secret
-WFIRMA_ENVIRONMENT=sandbox  # or production
+WFIRMA_ENVIRONMENT=production
 WFIRMA_COMPANY_ID=123
 ```
 
@@ -132,7 +132,7 @@ WFIRMA_COMPANY_ID=123
 from wfirma import get_config
 
 config = get_config()
-print(config.base_url)  # https://sandbox-api2.wfirma.pl
+print(config.base_url)  # https://api2.wfirma.pl
 ```
 
 ## Supported Resources

@@ -29,7 +29,7 @@ class TestExpensesResourceGet:
         async with client:
             with respx.mock:
                 route = respx.get(
-                    "https://sandbox-api2.wfirma.pl/expenses/get/456",
+                    "https://api2.wfirma.pl/expenses/get/456",
                     params={
                         "outputFormat": "json",
                         "company_id": "123",
@@ -71,7 +71,7 @@ class TestExpensesResourceFind:
         async with client:
             with respx.mock:
                 route = respx.get(
-                    "https://sandbox-api2.wfirma.pl/expenses/find",
+                    "https://api2.wfirma.pl/expenses/find",
                     params={
                         "outputFormat": "json",
                         "company_id": "123",
@@ -122,7 +122,7 @@ class TestExpensesResourceFind:
         async with client:
             with respx.mock:
                 route = respx.get(
-                    "https://sandbox-api2.wfirma.pl/expenses/find",
+                    "https://api2.wfirma.pl/expenses/find",
                     params={
                         "outputFormat": "json",
                         "company_id": "123",

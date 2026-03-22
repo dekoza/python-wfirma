@@ -29,7 +29,7 @@ class TestCompanyResource:
 
         with respx.mock:
             route = respx.get(
-                "https://sandbox-api2.wfirma.pl/companies/get/123",
+                "https://api2.wfirma.pl/companies/get/123",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -74,7 +74,7 @@ class TestCompanyResource:
 
         with respx.mock:
             route = respx.get(
-                "https://sandbox-api2.wfirma.pl/company_addresses/findmain",
+                "https://api2.wfirma.pl/company_addresses/findmain",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",

@@ -26,7 +26,7 @@ class TestWarehouseDocumentZPMResourceGet:
 
         with respx.mock:
             route = respx.get(
-                "https://sandbox-api2.wfirma.pl/warehouse_document_z_p_m/get/53487196",
+                "https://api2.wfirma.pl/warehouse_document_z_p_m/get/53487196",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -72,7 +72,7 @@ class TestWarehouseDocumentZPMResourceFind:
 
         with respx.mock:
             route = respx.get(
-                "https://sandbox-api2.wfirma.pl/warehouse_document_z_p_m/find",
+                "https://api2.wfirma.pl/warehouse_document_z_p_m/find",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -108,7 +108,7 @@ class TestWarehouseDocumentZPMResourceFind:
 
         with respx.mock:
             route = respx.get(
-                "https://sandbox-api2.wfirma.pl/warehouse_document_z_p_m/find",
+                "https://api2.wfirma.pl/warehouse_document_z_p_m/find",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -143,7 +143,7 @@ class TestWarehouseDocumentZPMResourceAdd:
 
         with respx.mock:
             route = respx.post(
-                "https://sandbox-api2.wfirma.pl/warehouse_document_z_p_m/add",
+                "https://api2.wfirma.pl/warehouse_document_z_p_m/add",
                 params={
                     "inputFormat": "json",
                     "outputFormat": "json",
@@ -183,7 +183,7 @@ class TestWarehouseDocumentZPMResourceEdit:
 
         with respx.mock:
             route = respx.post(
-                "https://sandbox-api2.wfirma.pl/warehouse_document_z_p_m/edit/456",
+                "https://api2.wfirma.pl/warehouse_document_z_p_m/edit/456",
                 params={
                     "inputFormat": "json",
                     "outputFormat": "json",
@@ -222,7 +222,7 @@ class TestWarehouseDocumentZPMResourceDelete:
 
         with respx.mock:
             route = respx.delete(
-                "https://sandbox-api2.wfirma.pl/warehouse_document_z_p_m/delete/456",
+                "https://api2.wfirma.pl/warehouse_document_z_p_m/delete/456",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",

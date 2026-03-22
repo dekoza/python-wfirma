@@ -65,16 +65,16 @@ def test_authentication_docs_match_beta_public_api() -> None:
     assert 'secret="your_secret"' not in docs
     assert "WFIRMA_ACCESS_KEY" in docs
     assert "WFIRMA_SECRET_KEY" in docs
-    assert "``WFirmaClient`` supports API Key and OAuth 2.0 in 1.0b1" in docs
-    assert "OAuth 1.0a helper flows remain available" in docs
+    assert "``WFirmaClient`` supports API Key, OAuth 2.0, and OAuth 1.0a in ``1.0b1``." in docs
+    assert "first-class ``WFirmaClient`` support is deferred" not in docs
 
 
-def test_quickstart_docs_use_sandbox_for_default_client_examples() -> None:
-    """Test that quickstart mocks match the sandbox default client environment."""
+def test_quickstart_docs_use_production_for_default_client_examples() -> None:
+    """Test that quickstart mocks match the production default client environment."""
     docs = (REPO_ROOT / "docs" / "quickstart.rst").read_text(encoding="utf-8")
 
-    assert "https://sandbox-api2.wfirma.pl/users/get/123" in docs
-    assert "https://api2.wfirma.pl/users/get/123" not in docs
+    assert "https://api2.wfirma.pl/users/get/123" in docs
+    assert "https://sandbox-api2.wfirma.pl/users/get/123" not in docs
 
 
 def test_troubleshooting_docs_do_not_claim_missing_features() -> None:
@@ -102,7 +102,7 @@ def test_fixture_availability(wfirma_config_data, api_key_auth_data):
     """Test that pytest fixtures are available."""
     assert wfirma_config_data["app_key"] == "test_app_key"
     assert wfirma_config_data["app_secret"] == "test_app_secret"
-    assert wfirma_config_data["environment"] == "sandbox"
+    assert wfirma_config_data["environment"] == "production"
 
     assert api_key_auth_data["access_key"] == "test_access_key"
     assert api_key_auth_data["secret_key"] == "test_secret_key"

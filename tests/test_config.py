@@ -22,17 +22,9 @@ from wfirma.exceptions import (
 class TestEnvironmentEnum:
     """Test Environment enum values."""
 
-    def test_sandbox_environment_value(self):
-        """Sandbox environment should have correct value."""
-        assert Environment.SANDBOX.value == "sandbox"
-
     def test_production_environment_value(self):
         """Production environment should have correct value."""
         assert Environment.PRODUCTION.value == "production"
-
-    def test_sandbox_base_url(self):
-        """Sandbox environment should return sandbox API URL."""
-        assert Environment.SANDBOX.base_url == "https://sandbox-api2.wfirma.pl"
 
     def test_production_base_url(self):
         """Production environment should return production API URL."""
@@ -42,8 +34,6 @@ class TestEnvironmentEnum:
         """Environment should be parseable from string."""
         from wfirma.config import _parse_environment
 
-        assert _parse_environment("sandbox") == Environment.SANDBOX
-        assert _parse_environment("SANDBOX") == Environment.SANDBOX
         assert _parse_environment("production") == Environment.PRODUCTION
         assert _parse_environment("PRODUCTION") == Environment.PRODUCTION
 
@@ -51,7 +41,6 @@ class TestEnvironmentEnum:
         """Parsing Environment enum should return the same enum."""
         from wfirma.config import _parse_environment
 
-        assert _parse_environment(Environment.SANDBOX) is Environment.SANDBOX
         assert _parse_environment(Environment.PRODUCTION) is Environment.PRODUCTION
 
 
@@ -67,13 +56,13 @@ class TestWFirmaConfigCreation:
         assert config.app_key == "test_app_key"
         assert config.app_secret == "test_secret"
 
-    def test_default_environment_is_sandbox(self):
-        """Default environment should be sandbox."""
+    def test_default_environment_is_production(self):
+        """Default environment should be production."""
         config = WFirmaConfig(
             app_key="test_app_key",
             app_secret="test_secret",
         )
-        assert config.environment == Environment.SANDBOX
+        assert config.environment == Environment.PRODUCTION
 
     def test_create_config_with_production_environment(self):
         """Config should accept production environment."""
@@ -199,15 +188,6 @@ class TestWFirmaConfigValidation:
 class TestWFirmaConfigProperties:
     """Test WFirmaConfig computed properties."""
 
-    def test_base_url_for_sandbox(self):
-        """Config should return correct base_url for sandbox."""
-        config = WFirmaConfig(
-            app_key="test_app_key",
-            app_secret="test_secret",
-            environment=Environment.SANDBOX,
-        )
-        assert config.base_url == "https://sandbox-api2.wfirma.pl"
-
     def test_base_url_for_production(self):
         """Config should return correct base_url for production."""
         config = WFirmaConfig(
@@ -217,16 +197,6 @@ class TestWFirmaConfigProperties:
         )
         assert config.base_url == "https://api2.wfirma.pl"
 
-    def test_is_sandbox_property(self):
-        """Config should correctly identify sandbox environment."""
-        config = WFirmaConfig(
-            app_key="test_app_key",
-            app_secret="test_secret",
-            environment=Environment.SANDBOX,
-        )
-        assert config.is_sandbox is True
-        assert config.is_production is False
-
     def test_is_production_property(self):
         """Config should correctly identify production environment."""
         config = WFirmaConfig(
@@ -234,7 +204,6 @@ class TestWFirmaConfigProperties:
             app_secret="test_secret",
             environment=Environment.PRODUCTION,
         )
-        assert config.is_sandbox is False
         assert config.is_production is True
 
 
@@ -268,7 +237,7 @@ class TestWFirmaConfigFromEnvironment:
 
         assert config.app_key == "env_app_key"
         assert config.app_secret == "env_app_secret"
-        assert config.environment == Environment.SANDBOX
+        assert config.environment == Environment.PRODUCTION
         assert config.company_id is None
 
     def test_missing_required_env_var_raises_error(self):
@@ -302,7 +271,7 @@ class TestWFirmaConfigFromEnvironment:
         env_vars = {
             "WFIRMA_APP_KEY": "env_app_key",
             "WFIRMA_APP_SECRET": "env_app_secret",
-            "WFIRMA_ENVIRONMENT": "sandbox",
+            "WFIRMA_ENVIRONMENT": "production",
         }
         with patch.dict(os.environ, env_vars, clear=True):
             config = WFirmaConfig.from_env(
@@ -350,7 +319,7 @@ class TestWFirmaConfigFromDotenv:
         dotenv_file.write_text(
             "WFIRMA_APP_KEY=dotenv_app_key\n"
             "WFIRMA_APP_SECRET=dotenv_secret\n"
-            "WFIRMA_ENVIRONMENT=sandbox\n"
+            "WFIRMA_ENVIRONMENT=production\n"
             "WFIRMA_COMPANY_ID=file_company\n"
             "WFIRMA_TIMEOUT=10\n"
         )
@@ -406,7 +375,7 @@ class TestWFirmaConfigSerialization:
         config = WFirmaConfig(
             app_key="test_app_key",
             app_secret="test_secret",
-            environment=Environment.SANDBOX,
+            environment=Environment.PRODUCTION,
             company_id="12345",
         )
 
@@ -414,7 +383,7 @@ class TestWFirmaConfigSerialization:
 
         assert "app_secret" not in config_dict
         assert config_dict["app_key"] == "test_app_key"
-        assert config_dict["environment"] == "sandbox"
+        assert config_dict["environment"] == "production"
         assert config_dict["company_id"] == "12345"
 
     def test_to_dict_includes_all_non_secret_fields(self):

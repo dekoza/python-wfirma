@@ -21,7 +21,7 @@ class TestNotesResourceAdd:
 
         with respx.mock:
             respx.post(
-                "https://sandbox-api2.wfirma.pl/notes/add",
+                "https://api2.wfirma.pl/notes/add",
                 params={
                     "inputFormat": "json",
                     "outputFormat": "json",
@@ -60,7 +60,7 @@ class TestNotesResourceAdd:
 
         with respx.mock:
             route = respx.post(
-                "https://sandbox-api2.wfirma.pl/notes/add",
+                "https://api2.wfirma.pl/notes/add",
                 params={
                     "inputFormat": "json",
                     "outputFormat": "json",
@@ -91,7 +91,7 @@ class TestNotesResourceFind:
 
         with respx.mock:
             respx.get(
-                "https://sandbox-api2.wfirma.pl/notes/find",
+                "https://api2.wfirma.pl/notes/find",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -124,7 +124,7 @@ class TestNotesResourceFind:
 
         with respx.mock:
             respx.get(
-                "https://sandbox-api2.wfirma.pl/notes/find",
+                "https://api2.wfirma.pl/notes/find",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -142,7 +142,7 @@ class TestNotesResourceFind:
         resource = NotesResource(client)
 
         with respx.mock:
-            route = respx.get("https://sandbox-api2.wfirma.pl/notes/find").mock(
+            route = respx.get("https://api2.wfirma.pl/notes/find").mock(
                 return_value=httpx.Response(200, json={"status": {"code": "OK"}, "notes": {}})
             )
 
@@ -163,7 +163,7 @@ class TestNotesResourceGet:
 
         with respx.mock:
             respx.get(
-                "https://sandbox-api2.wfirma.pl/notes/get/123",
+                "https://api2.wfirma.pl/notes/get/123",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
@@ -196,7 +196,7 @@ class TestNotesResourceEdit:
 
         with respx.mock:
             respx.put(
-                "https://sandbox-api2.wfirma.pl/notes/edit/123",
+                "https://api2.wfirma.pl/notes/edit/123",
                 params={
                     "inputFormat": "json",
                     "outputFormat": "json",
@@ -226,7 +226,7 @@ class TestNotesResourceEdit:
 
         with respx.mock:
             route = respx.put(
-                "https://sandbox-api2.wfirma.pl/notes/edit/123",
+                "https://api2.wfirma.pl/notes/edit/123",
                 params={
                     "inputFormat": "json",
                     "outputFormat": "json",
@@ -238,7 +238,7 @@ class TestNotesResourceEdit:
                 )
             )
 
-            respx.put("https://sandbox-api2.wfirma.pl/goods/notes/123").mock(
+            respx.put("https://api2.wfirma.pl/goods/notes/123").mock(
                 side_effect=Exception("Wrong endpoint!")
             )
 
@@ -254,7 +254,7 @@ class TestNotesResourceEdit:
 
         with respx.mock:
             route = respx.put(
-                "https://sandbox-api2.wfirma.pl/notes/edit/123",
+                "https://api2.wfirma.pl/notes/edit/123",
                 params={
                     "inputFormat": "json",
                     "outputFormat": "json",
@@ -285,7 +285,7 @@ class TestNotesResourceDelete:
 
         with respx.mock:
             respx.delete(
-                "https://sandbox-api2.wfirma.pl/notes/delete/123",
+                "https://api2.wfirma.pl/notes/delete/123",
                 params={
                     "outputFormat": "json",
                     "company_id": "123",
