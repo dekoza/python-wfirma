@@ -53,7 +53,7 @@ class TestAsyncVatCodesResourceGet:
 
             result = await resource.get(vat_code_id=456)
 
-        client.close()
+        await client.close()
 
         assert route.called
         assert result["id"] == 456
@@ -108,7 +108,7 @@ class TestAsyncVatCodesResourceFind:
 
             result = await resource.find()
 
-        client.close()
+        await client.close()
 
         assert route.called
         assert isinstance(result, list)
@@ -145,7 +145,7 @@ class TestAsyncVatCodesResourceFind:
 
             result = await resource.find()
 
-        client.close()
+        await client.close()
 
         assert route.called
         assert result == []

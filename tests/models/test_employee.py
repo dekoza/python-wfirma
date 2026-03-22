@@ -6,11 +6,14 @@ This module tests the User model which represents users in wFirma API.
 
 from __future__ import annotations
 
+import importlib
+import warnings
 from datetime import datetime
 
 import pytest
 from pydantic import ValidationError
 
+import wfirma.models.employee as employee_module
 from wfirma.models.employee import User
 
 
@@ -148,3 +151,17 @@ class TestEmployeeModuleExports:
         from wfirma.models import User
 
         assert User is not None
+
+    def test_reloading_employee_module_emits_no_shadowing_warnings(self) -> None:
+        """Test that the User model does not redefine timestamp fields from the mixin."""
+        with warnings.catch_warnings(record=True) as caught:
+            warnings.simplefilter("always")
+            importlib.reload(employee_module)
+
+        shadow_warnings = [
+            warning
+            for warning in caught
+            if "shadows an attribute in parent" in str(warning.message)
+        ]
+
+        assert not shadow_warnings

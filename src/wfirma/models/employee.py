@@ -19,7 +19,7 @@ Note:
 
 from pydantic_xml import element
 
-from wfirma.models.base import BaseXMLModel, OptionalDateTimeField, TimestampedFieldsMixin
+from wfirma.models.base import BaseXMLModel, TimestampedFieldsMixin
 
 
 class User(TimestampedFieldsMixin, BaseXMLModel, tag="user"):
@@ -48,8 +48,6 @@ class User(TimestampedFieldsMixin, BaseXMLModel, tag="user"):
 
     id: int = element()
     login: str = element()
-    created: OptionalDateTimeField = element(default=None)
-    modified: OptionalDateTimeField = element(default=None)
 
 
 __all__ = [
