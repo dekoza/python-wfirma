@@ -47,6 +47,15 @@ def test_gitignore_excludes_temporary_virtualenvs():
     assert ".venv*/" in gitignore or ".venv-smoke/" in gitignore
 
 
+def test_integration_readme_describes_beta_smoke_scope():
+    """Test that the integration readme reflects the current beta contract."""
+    readme = (REPO_ROOT / "tests" / "integration" / "README.md").read_text(encoding="utf-8")
+
+    assert "1.0b1" in readme
+    assert "WFIRMA_RUN_INTEGRATION=1 pytest" in readme
+    assert "WFIRMA_OAUTH2_ACCESS_TOKEN" in readme
+
+
 def test_fixture_availability(wfirma_config_data, api_key_auth_data):
     """Test that pytest fixtures are available."""
     assert wfirma_config_data["app_key"] == "test_app_key"

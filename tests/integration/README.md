@@ -1,66 +1,67 @@
 # Integration Tests
-Integration tests are planned for version 0.2.0 (see ROADMAP.md).
 
-## Roadmap
+This directory contains optional live tests against the public wFirma docs and the sandbox API.
 
-```
-    await async_client.invoices.delete(invoice.id)
-    yield invoice
-    invoice = await async_client.invoices.create(...)
-async def test_invoice(async_client):
-@pytest.fixture
-```python
+## Scope for `1.0b1`
 
-Use fixtures for reliable cleanup:
+The beta release only claims live coverage for:
 
-3. Clean up (delete created resources)
-2. Perform operations
-1. Create test data
-Integration tests should clean up any data they create. Each test should:
+- public Postman collection availability via `WFirmaAPIScraper`
+- API Key sync client reading company details from sandbox
+- API Key async client reading company details from sandbox
+- OAuth2 sync client reading company details from sandbox
+- OAuth2 async client reading company details from sandbox
 
-## Test Data Cleanup
+The suite is intentionally read-only. It does not create, edit, or delete sandbox data.
 
-- They are **not run in CI** by default
-- They may **modify data** in your sandbox account
-- They require valid credentials
-- They are **slower** than unit tests
-- Integration tests make real API calls to wFirma sandbox
+## How to Run
 
-## Important Notes
+Integration tests are marked with `@pytest.mark.integration` and are skipped by default.
 
-```
-pytest tests/integration/test_sandbox.py -m integration
-# Run specific integration test
+Run the full live suite:
 
-pytest -m ""
-# Run all tests including integration
-
-pytest -m integration
-# Run only integration tests
 ```bash
+pytest -m integration
+```
 
-To run integration tests:
+Or opt in with an environment flag:
 
-Integration tests are marked with `@pytest.mark.integration` and are **skipped by default**.
+```bash
+WFIRMA_RUN_INTEGRATION=1 pytest
+```
 
-## Running Integration Tests
+Run a specific file:
 
-   ```
-   pip install -e ".[dev]"
-   ```bash
-2. Install test dependencies:
+```bash
+pytest tests/integration/test_sandbox_smoke.py -m integration
+```
 
-   ```
-   WFIRMA_ENVIRONMENT=sandbox
-   WFIRMA_SECRET=your_sandbox_secret
-   WFIRMA_APP_KEY=your_sandbox_app_key
-   ```bash
-1. Create a `.env` file in the project root:
+## Required Environment Variables
 
-Integration tests are **optional** and require valid wFirma API credentials.
+### API Key smoke tests
 
-## Setup
+```bash
+WFIRMA_APP_KEY=your_app_key
+WFIRMA_ACCESS_KEY=your_access_key
+WFIRMA_SECRET_KEY=your_secret_key
+WFIRMA_COMPANY_ID=123456
+```
 
-This directory contains optional integration tests that run against the actual wFirma API sandbox.
+### OAuth2 smoke tests
 
+```bash
+WFIRMA_OAUTH2_CLIENT_ID=your_client_id
+WFIRMA_OAUTH2_CLIENT_SECRET=your_client_secret
+WFIRMA_OAUTH2_REDIRECT_URI=https://your.app/callback
+WFIRMA_OAUTH2_ACCESS_TOKEN=your_access_token
+```
+
+OAuth2 smoke tests assume the provided bearer token is already valid for the sandbox company.
+
+## Notes
+
+- These tests are not run in CI by default.
+- They make real network calls.
+- They are release-gating evidence, not unit tests.
+- If a required variable is missing, the corresponding test skips instead of failing noisily.
 
