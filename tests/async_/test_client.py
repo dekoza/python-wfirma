@@ -102,6 +102,17 @@ class TestWFirmaClientInitialization:
         assert client.base_url == "https://api2.wfirma.pl"
 
     @pytest.mark.asyncio
+    async def test_client_accepts_base_url_override(self) -> None:
+        from wfirma.async_.client import WFirmaClient
+
+        auth = APIKeyAuth(access_key="ak", secret_key="sk", app_key="appk")
+        client = WFirmaClient(auth=auth, base_url="http://localhost:8088/")
+
+        assert client.environment == Environment.PRODUCTION
+        assert client.base_url == "http://localhost:8088"
+        await client.close()
+
+    @pytest.mark.asyncio
     async def test_client_accepts_company_id(self) -> None:
         from wfirma.async_.client import WFirmaClient
 
@@ -159,6 +170,27 @@ class TestWFirmaClientHTTPMethods:
         assert request.headers["accessKey"] == "ak"
         assert request.headers["secretKey"] == "sk"
         assert request.headers["appKey"] == "appk"
+
+    @pytest.mark.asyncio
+    @respx.mock
+    async def test_get_request_uses_base_url_override(self) -> None:
+        from wfirma.async_.client import WFirmaClient
+
+        client = WFirmaClient(auth=self.auth, base_url="http://localhost:8088/")
+        route = respx.get("http://localhost:8088/users/get/123").mock(
+            return_value=httpx.Response(
+                200,
+                json={
+                    "users": {"0": {"user": {"id": "123", "login": "test@example.com"}}},
+                    "status": {"code": "OK"},
+                },
+            )
+        )
+
+        await client.get("/users/get/123")
+        await client.close()
+
+        assert route.called
 
     @pytest.mark.asyncio
     @respx.mock

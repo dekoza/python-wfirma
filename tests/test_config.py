@@ -197,6 +197,17 @@ class TestWFirmaConfigProperties:
         )
         assert config.base_url == "https://api2.wfirma.pl"
 
+    def test_base_url_override_takes_precedence(self):
+        """Explicit base_url should override the environment base URL."""
+        config = WFirmaConfig(
+            app_key="test_app_key",
+            app_secret="test_secret",
+            environment=Environment.PRODUCTION,
+            base_url="http://localhost:8088/",
+        )
+
+        assert config.base_url == "http://localhost:8088"
+
     def test_is_production_property(self):
         """Config should correctly identify production environment."""
         config = WFirmaConfig(
@@ -265,6 +276,18 @@ class TestWFirmaConfigFromEnvironment:
             config = WFirmaConfig.from_env()
 
         assert config.timeout == 60.0
+
+    def test_load_base_url_from_environment(self):
+        """Config should load base_url override from environment."""
+        env_vars = {
+            "WFIRMA_APP_KEY": "env_app_key",
+            "WFIRMA_APP_SECRET": "env_app_secret",
+            "WFIRMA_BASE_URL": "http://localhost:8088/",
+        }
+        with patch.dict(os.environ, env_vars, clear=True):
+            config = WFirmaConfig.from_env()
+
+        assert config.base_url == "http://localhost:8088"
 
     def test_explicit_values_override_env_vars(self):
         """Explicit values should override environment variables."""
@@ -440,6 +463,16 @@ class TestGetConfigFunction:
 
         assert isinstance(config, WFirmaConfig)
         assert config.app_key == "test_key"
+
+    def test_get_config_accepts_base_url_override(self):
+        """get_config should forward explicit base_url override."""
+        config = get_config(
+            app_key="test_key",
+            app_secret="test_secret",
+            base_url="http://localhost:8088/",
+        )
+
+        assert config.base_url == "http://localhost:8088"
 
     def test_get_config_from_env_when_no_args(self):
         """get_config should load from env when no args provided."""

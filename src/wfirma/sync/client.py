@@ -13,7 +13,7 @@ from typing import Any
 
 import httpx
 
-from wfirma.config import Environment
+from wfirma.config import Environment, _normalize_base_url
 from wfirma.exceptions import (
     APIError,
     BadRequestError,
@@ -66,6 +66,7 @@ class WFirmaClient:
         environment: Environment = Environment.PRODUCTION,
         company_id: int | None = None,
         timeout: float = DEFAULT_TIMEOUT,
+        base_url: str | None = None,
     ) -> None:
         """Initialize the wFirma client.
 
@@ -74,18 +75,20 @@ class WFirmaClient:
             environment: API environment (default: PRODUCTION).
             company_id: Optional company ID for multi-company accounts.
             timeout: HTTP request timeout in seconds (default: 30.0).
+            base_url: Optional explicit API base URL override.
         """
         self.auth: APIKeyAuth | OAuth1Auth | OAuth2Auth = auth
         self.environment = environment
         self.company_id = company_id
         self.timeout = timeout
+        self._base_url_override = _normalize_base_url(base_url)
         self._http_client = httpx.Client(timeout=timeout)
         self._resources: dict[str, Any] = {}
 
     @property
     def base_url(self) -> str:
         """Return the base URL for the API."""
-        return self.environment.base_url
+        return self._base_url_override or self.environment.base_url
 
     @property
     def company(self) -> Any:

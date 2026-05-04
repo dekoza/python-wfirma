@@ -5,6 +5,7 @@ from dataclasses import dataclass, field
 from enum import Enum
 from pathlib import Path
 from typing import Any
+from urllib.parse import urlparse
 
 from dotenv import dotenv_values
 
@@ -53,6 +54,24 @@ def _parse_environment(value: str | Environment) -> Environment:
         ) from err
 
 
+def _normalize_base_url(value: str | None) -> str | None:
+    """Validate and normalize an explicit API base URL override."""
+    if value is None:
+        return None
+
+    normalized = value.strip().rstrip("/")
+    if not normalized:
+        return None
+
+    parsed = urlparse(normalized)
+    if not parsed.scheme or not parsed.netloc:
+        raise InvalidConfigurationError(
+            f"Configuration field 'base_url' must be an absolute URL, got: {value!r}"
+        )
+
+    return normalized
+
+
 @dataclass(frozen=True)
 class WFirmaConfig:
     """
@@ -71,6 +90,7 @@ class WFirmaConfig:
         environment: API environment.
         company_id: Default company ID for API requests.
         timeout: Request timeout in seconds.
+        base_url: Optional explicit API base URL override.
 
     Example:
         >>> config = WFirmaConfig(
@@ -86,6 +106,7 @@ class WFirmaConfig:
     environment: Environment = field(default=Environment.PRODUCTION)
     company_id: str | None = field(default=None)
     timeout: float = field(default=30.0)
+    base_url: str | None = field(default=None)
 
     def __post_init__(self) -> None:
         """Validate configuration after initialization."""
@@ -110,15 +131,10 @@ class WFirmaConfig:
                 f"Configuration field 'timeout' must be positive, got: {self.timeout}"
             )
 
-    @property
-    def base_url(self) -> str:
-        """
-        Return the API base URL for the configured environment.
-
-        Returns:
-            The base URL string.
-        """
-        return self.environment.base_url
+        resolved_base_url = _normalize_base_url(self.base_url)
+        if resolved_base_url is None:
+            resolved_base_url = self.environment.base_url
+        object.__setattr__(self, "base_url", resolved_base_url)
 
     @property
     def is_production(self) -> bool:
@@ -139,6 +155,7 @@ class WFirmaConfig:
         environment: str | Environment | None = None,
         company_id: str | None = None,
         timeout: float | None = None,
+        base_url: str | None = None,
     ) -> "WFirmaConfig":
         """
         Create configuration from environment variables.
@@ -149,6 +166,7 @@ class WFirmaConfig:
             - WFIRMA_ENVIRONMENT
             - WFIRMA_COMPANY_ID
             - WFIRMA_TIMEOUT
+            - WFIRMA_BASE_URL
 
         Explicit arguments override environment variables.
 
@@ -158,6 +176,7 @@ class WFirmaConfig:
             environment: Override for WFIRMA_ENVIRONMENT.
             company_id: Override for WFIRMA_COMPANY_ID.
             timeout: Override for WFIRMA_TIMEOUT.
+            base_url: Override for WFIRMA_BASE_URL.
 
         Returns:
             WFirmaConfig instance.
@@ -197,12 +216,15 @@ class WFirmaConfig:
             timeout_str = os.environ.get("WFIRMA_TIMEOUT")
             resolved_timeout = float(timeout_str) if timeout_str else 30.0
 
+        resolved_base_url = base_url or os.environ.get("WFIRMA_BASE_URL") or None
+
         return cls(
             app_key=resolved_app_key,
             app_secret=resolved_app_secret,
             environment=resolved_environment,
             company_id=resolved_company_id,
             timeout=resolved_timeout,
+            base_url=resolved_base_url,
         )
 
     @classmethod
@@ -215,6 +237,7 @@ class WFirmaConfig:
         environment: str | Environment | None = None,
         company_id: str | None = None,
         timeout: float | None = None,
+        base_url: str | None = None,
     ) -> "WFirmaConfig":
         """
         Create configuration from a .env file.
@@ -226,6 +249,7 @@ class WFirmaConfig:
             environment: Override for WFIRMA_ENVIRONMENT.
             company_id: Override for WFIRMA_COMPANY_ID.
             timeout: Override for WFIRMA_TIMEOUT.
+            base_url: Override for WFIRMA_BASE_URL.
 
         Returns:
             WFirmaConfig instance.
@@ -271,12 +295,15 @@ class WFirmaConfig:
             timeout_str = env_values.get("WFIRMA_TIMEOUT")
             resolved_timeout = float(timeout_str) if timeout_str else 30.0
 
+        resolved_base_url = base_url or env_values.get("WFIRMA_BASE_URL") or None
+
         return cls(
             app_key=resolved_app_key,
             app_secret=resolved_app_secret,
             environment=resolved_environment,
             company_id=resolved_company_id,
             timeout=resolved_timeout,
+            base_url=resolved_base_url,
         )
 
     def to_dict(self, *, include_secrets: bool = False) -> dict[str, Any]:
@@ -326,6 +353,7 @@ def get_config(
     environment: str | Environment | None = None,
     company_id: str | None = None,
     timeout: float | None = None,
+    base_url: str | None = None,
 ) -> WFirmaConfig:
     """
     Get wFirma configuration.
@@ -340,6 +368,7 @@ def get_config(
         environment: API environment.
         company_id: Default company ID for API requests.
         timeout: Request timeout in seconds.
+        base_url: Optional explicit API base URL override.
 
     Returns:
         WFirmaConfig instance.
@@ -367,6 +396,7 @@ def get_config(
             environment=env if isinstance(env, Environment) else _parse_environment(env),
             company_id=company_id,
             timeout=timeout or 30.0,
+            base_url=base_url,
         )
 
     # Otherwise, load from environment
@@ -376,4 +406,5 @@ def get_config(
         environment=environment,
         company_id=company_id,
         timeout=timeout,
+        base_url=base_url,
     )

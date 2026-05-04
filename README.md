@@ -163,6 +163,32 @@ config = get_config()
 print(config.base_url)  # https://api2.wfirma.pl
 ```
 
+Custom API base URL override (useful for local simulators):
+
+```bash
+# .env
+WFIRMA_BASE_URL=http://localhost:18088
+```
+
+```python
+from wfirma.sync.auth import APIKeyAuth
+from wfirma.sync.client import WFirmaClient
+
+
+auth = APIKeyAuth(
+    access_key="your_access_key",
+    secret_key="your_secret_key",
+    app_key="your_app_key",
+)
+
+with WFirmaClient(
+    auth=auth,
+    company_id=123,
+    base_url="http://localhost:18088",
+) as client:
+    company = client.company.get()
+```
+
 ## Choosing Auth Mode
 
 - `APIKeyAuth`: best for service integrations and manual CLI verification
