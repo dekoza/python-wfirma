@@ -1,7 +1,7 @@
 Migration Guide
 ===============
 
-This guide summarizes the user-visible changes across the beta line and what stays fixed as the project moves toward ``1.0rc1``.
+This guide summarizes the user-visible changes across the beta line and what stays fixed through ``1.0rc2``.
 
 From 1.0b1 to 1.0b2
 -------------------
@@ -33,10 +33,10 @@ Use least-privilege credentials and re-check the safe read-only flows:
    wfirma terms list
    wfirma warehouses list
 
-What freezes for 1.0rc1
------------------------
+What stayed frozen from 1.0rc1 into 1.0rc2
+------------------------------------------
 
-The release candidate is expected to freeze these public surfaces:
+The release candidate line is expected to keep these public surfaces frozen:
 
 - import paths under ``wfirma``
 - auth constructors and expected arguments

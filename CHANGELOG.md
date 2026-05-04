@@ -9,6 +9,18 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Work toward `1.0.0`.
 
+## [1.0rc2] - 2026-05-04
+
+### Added
+- Explicit `base_url` overrides for `WFirmaConfig`, `get_config()`, and the sync/async `WFirmaClient`
+- `WFIRMA_BASE_URL` environment variable support for local simulators and custom API endpoints
+- Stable `1.0.0` go/no-go checklist in `RELEASING.md`
+
+### Changed
+- Version metadata now targets `1.0rc2`
+- README, troubleshooting, authentication, and integration docs now describe the current release candidate
+- Roadmap now records `1.0rc2` as the latest shipped release candidate before `1.0.0`
+
 ## [1.0rc1] - 2026-03-23
 
 ### Added
@@ -61,7 +73,8 @@ Work toward `1.0.0`.
 - `WFirmaClient` now supports `OAuth1Auth` as a first-class auth mode
 - HTTP and XML error handling is hardened for non-JSON and binary responses
 
-[Unreleased]: https://github.com/dekoza/python-wfirma/compare/v1.0rc1...HEAD
+[Unreleased]: https://github.com/dekoza/python-wfirma/compare/v1.0rc2...HEAD
+[1.0rc2]: https://github.com/dekoza/python-wfirma/releases/tag/v1.0rc2
 [1.0rc1]: https://github.com/dekoza/python-wfirma/releases/tag/v1.0rc1
 [1.0b2]: https://github.com/dekoza/python-wfirma/releases/tag/v1.0b2
 [1.0b1]: https://github.com/dekoza/python-wfirma/releases/tag/v1.0b1

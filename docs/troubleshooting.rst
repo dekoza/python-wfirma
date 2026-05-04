@@ -87,7 +87,7 @@ Rate Limiting
 
 **Solution**:
 
-1. ``python-wfirma`` raises ``RateLimitError`` but does not retry automatically in ``1.0rc1``
+1. ``python-wfirma`` raises ``RateLimitError`` but does not retry automatically in ``1.0rc2``
 2. If the exception includes ``retry_after``, wait that many seconds before retrying
 3. Reduce request frequency
 4. Contact wFirma support if your integration needs a higher limit
@@ -194,7 +194,7 @@ Frequently Asked Questions
 
 **Q: Can I use this library in production?**
 
-A: ``1.0rc1`` is the release candidate and API freeze point. ``WFirmaClient`` supports API Key, OAuth2, and OAuth1, but you should still validate your exact flows before ``1.0.0``.
+A: ``1.0rc2`` is the current release candidate, continuing the API freeze that started at ``1.0rc1``. ``WFirmaClient`` supports API Key, OAuth2, and OAuth1, but you should still validate your exact flows before ``1.0.0``.
 
 **Q: Does this library support Python 3.11?**
 

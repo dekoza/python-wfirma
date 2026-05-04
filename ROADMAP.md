@@ -1,7 +1,7 @@
 # Roadmap
 
 Current target version: **1.0.0**.
-Last updated: 2026-03-23.
+Last updated: 2026-05-04.
 
 ## 1.0b1 — Released
 
@@ -37,6 +37,16 @@ Release candidate that freezes the public API for `1.0.0`.
 - Added migration guidance for post-beta users
 - Tightened release verification wording around installed CLI checks
 - Expanded targeted coverage for CLI env parsing and auth/client edge cases
+
+## 1.0rc2 — Released
+
+Second release candidate focused on blocker-class fixes and stable-release evidence.
+
+**Done:**
+- Added an explicit `base_url` override for config helpers and sync/async clients
+- Documented `WFIRMA_BASE_URL` for local simulators and custom API endpoints
+- Added a stable `1.0.0` go/no-go checklist in `RELEASING.md`
+- Refreshed release metadata and RC docs for `1.0rc2`
 
 ## 1.0.0 — Stable release
 
