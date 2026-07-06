@@ -26,7 +26,7 @@ def test_project_setup():
 
     docs_conf = _load_docs_conf()
 
-    assert wfirma.__version__ == "1.0rc2"
+    assert wfirma.__version__ == "1.0.0"
     assert docs_conf.release == wfirma.__version__
 
 
@@ -131,9 +131,9 @@ def test_release_metadata_reflects_rc_preparation_state() -> None:
     assert "## 1.0rc1 — Released" in roadmap
     assert "## 1.0rc2 — Released" in roadmap
     assert "This branch is preparing the `1.0b1` beta release." not in changelog
-    assert "## [1.0rc2] - 2026-05-04" in changelog
+    assert "## [1.0.0] - 2026-07-07" in changelog
     assert (
-        "[Unreleased]: https://github.com/dekoza/python-wfirma/compare/v1.0rc2...HEAD" in changelog
+        "[Unreleased]: https://github.com/dekoza/python-wfirma/compare/v1.0.0...HEAD" in changelog
     )
 
 

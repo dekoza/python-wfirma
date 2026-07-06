@@ -7,7 +7,35 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased]
 
-Work toward `1.0.0`.
+## [1.0.0] - 2026-07-07
+
+Stable release.
+
+### Fixed
+- Write requests for `notes`, `tags`, `series`, `term_groups`, `webhooks`,
+  `vehicles`, and all eight `warehouse_document_*` types now wrap records in
+  the documented module envelope (`{"tags": {"0": {"tag": {...}}}}`); the
+  previous bare-object bodies were rejected or ignored by the API
+- `notes/edit` and `series/edit` now use POST (previously PUT), matching the
+  wFirma API convention
+- Warehouse document writes now use the shared `warehouse_documents`
+  container instead of a per-type container
+- `invoices/download` and `invoices/send` now serialize their options as the
+  documented numbered `parameter` name/value list nested directly under the
+  module branch
+- All request envelopes use numbered record branches (`{"0": {...}}`) as
+  required by the wFirma JSON dialect ("Format wymiany danych"), replacing
+  JSON arrays
+- Version metadata tests now track `1.0.0`
+
+### Added
+- Filtered `find` (``conditions``/``limit``/``page``) for every find-capable
+  resource, sync and async — previously only invoices supported it
+- `tags`, `webhooks`, and `vehicles` `add`/`edit` accept a full payload dict
+  covering all documented fields (e.g. webhook ``event``/``data_type``),
+  alongside the existing keyword arguments
+- `user_scoped` option for `post`/`post_json` on both clients, used by the
+  user-scoped `user_companies` filtered find
 
 ## [1.0rc3] - 2026-07-07
 
@@ -83,7 +111,8 @@ Work toward `1.0.0`.
 - `WFirmaClient` now supports `OAuth1Auth` as a first-class auth mode
 - HTTP and XML error handling is hardened for non-JSON and binary responses
 
-[Unreleased]: https://github.com/dekoza/python-wfirma/compare/v1.0rc3...HEAD
+[Unreleased]: https://github.com/dekoza/python-wfirma/compare/v1.0.0...HEAD
+[1.0.0]: https://github.com/dekoza/python-wfirma/releases/tag/v1.0.0
 [1.0rc3]: https://github.com/dekoza/python-wfirma/releases/tag/v1.0rc3
 [1.0rc2]: https://github.com/dekoza/python-wfirma/releases/tag/v1.0rc2
 [1.0rc1]: https://github.com/dekoza/python-wfirma/releases/tag/v1.0rc1
