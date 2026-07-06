@@ -9,6 +9,16 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 Work toward `1.0.0`.
 
+## [1.0rc3] - 2026-07-07
+
+### Added
+- KSeF read fields on invoice models
+- `price_type` support for invoices
+- Filtered `find` for invoices
+
+### Changed
+- Version metadata now targets `1.0rc3`
+
 ## [1.0rc2] - 2026-05-04
 
 ### Added
@@ -73,7 +83,8 @@ Work toward `1.0.0`.
 - `WFirmaClient` now supports `OAuth1Auth` as a first-class auth mode
 - HTTP and XML error handling is hardened for non-JSON and binary responses
 
-[Unreleased]: https://github.com/dekoza/python-wfirma/compare/v1.0rc2...HEAD
+[Unreleased]: https://github.com/dekoza/python-wfirma/compare/v1.0rc3...HEAD
+[1.0rc3]: https://github.com/dekoza/python-wfirma/releases/tag/v1.0rc3
 [1.0rc2]: https://github.com/dekoza/python-wfirma/releases/tag/v1.0rc2
 [1.0rc1]: https://github.com/dekoza/python-wfirma/releases/tag/v1.0rc1
 [1.0b2]: https://github.com/dekoza/python-wfirma/releases/tag/v1.0b2
