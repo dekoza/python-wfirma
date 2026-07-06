@@ -22,7 +22,12 @@ from __future__ import annotations
 
 from typing import Any
 
-from wfirma._payloads import extract_object_list_payloads, extract_single_object_payload
+from wfirma._payloads import (
+    build_find_parameters,
+    build_module_payload,
+    extract_object_list_payloads,
+    extract_single_object_payload,
+)
 from wfirma.sync.client import WFirmaClient
 
 
@@ -46,40 +51,72 @@ class TagsResource:
         data = self._client.get_json(f"/tags/get/{tag_id}")
         return self._extract_tag_payload(data)
 
-    def find(self) -> list[dict[str, Any]]:
+    def find(
+        self,
+        *,
+        conditions: list[dict[str, Any]] | None = None,
+        limit: int | None = None,
+        page: int | None = None,
+    ) -> list[dict[str, Any]]:
         """Find/list tags.
 
         Endpoint: GET /tags/find
 
         Returns:
             List of raw tag payload dicts.
+
+        Args:
+            conditions: Condition dicts with ``field``/``operator``/``value`` keys.
+            limit: Page size.
+            page: Page number.
         """
-        data = self._client.get_json("/tags/find")
+        if conditions is None and limit is None and page is None:
+            data = self._client.get_json("/tags/find")
+        else:
+            parameters = build_find_parameters(conditions, limit=limit, page=page)
+            data = self._client.post_json(
+                "/tags/find",
+                data={"tags": {"parameters": parameters}},
+            )
         payloads = extract_object_list_payloads(data, container_key="tags", object_key="tag")
         return [dict(payload) for payload in payloads]
 
-    def add(self, *, name: str, visibility: str | None = None) -> dict[str, Any]:
+    def add(
+        self,
+        tag: dict[str, Any] | None = None,
+        *,
+        name: str | None = None,
+        visibility: str | None = None,
+    ) -> dict[str, Any]:
         """Create a new tag.
 
         Endpoint: POST /tags/add
 
         Args:
-            name: Tag name.
-            visibility: Tag visibility (e.g. "visible"), if supported.
+            tag: Full tag payload dict (documented fields include ``name``,
+                ``color_background``, ``color_text``, module flags, etc.).
+            name: Tag name, merged into the payload when given.
+            visibility: Tag visibility, merged into the payload when given.
 
         Returns:
             Created tag payload.
         """
-        tag: dict[str, Any] = {"name": name}
+        tag = dict(tag or {})
+        if name is not None:
+            tag["name"] = name
         if visibility is not None:
             tag["visibility"] = visibility
 
-        data = self._client.post_json("/tags/add", data={"tag": tag})
+        data = self._client.post_json(
+            "/tags/add",
+            data=build_module_payload(container_key="tags", object_key="tag", obj=tag),
+        )
         return self._extract_tag_payload(data)
 
     def edit(
         self,
         tag_id: int,
+        tag: dict[str, Any] | None = None,
         *,
         name: str | None = None,
         visibility: str | None = None,
@@ -90,19 +127,23 @@ class TagsResource:
 
         Args:
             tag_id: Tag identifier.
-            name: New tag name.
-            visibility: New visibility value.
+            tag: Full tag payload dict with updated fields.
+            name: New tag name, merged into the payload when given.
+            visibility: New visibility value, merged into the payload when given.
 
         Returns:
             Updated tag payload.
         """
-        tag: dict[str, Any] = {}
+        tag = dict(tag or {})
         if name is not None:
             tag["name"] = name
         if visibility is not None:
             tag["visibility"] = visibility
 
-        data = self._client.post_json(f"/tags/edit/{tag_id}", data={"tag": tag})
+        data = self._client.post_json(
+            f"/tags/edit/{tag_id}",
+            data=build_module_payload(container_key="tags", object_key="tag", obj=tag),
+        )
         return self._extract_tag_payload(data)
 
     def delete(self, tag_id: int) -> bool:

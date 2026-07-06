@@ -37,7 +37,7 @@ def test_pyproject_uses_dynamic_beta_version_metadata():
     assert "version" not in pyproject["project"]
     assert "version" in pyproject["project"]["dynamic"]
     assert pyproject["tool"]["hatch"]["version"]["path"] == "src/wfirma/__init__.py"
-    assert "Development Status :: 4 - Beta" in pyproject["project"]["classifiers"]
+    assert "Development Status :: 5 - Production/Stable" in pyproject["project"]["classifiers"]
 
 
 def test_gitignore_excludes_temporary_virtualenvs():
@@ -51,7 +51,7 @@ def test_integration_readme_describes_rc_smoke_scope():
     """Test that the integration readme reflects the current rc contract."""
     readme = (REPO_ROOT / "tests" / "integration" / "README.md").read_text(encoding="utf-8")
 
-    assert "1.0rc2" in readme
+    assert "1.0.0" in readme
     assert "WFIRMA_RUN_INTEGRATION=1 pytest" in readme
     assert "WFIRMA_OAUTH2_ACCESS_TOKEN" in readme
 
@@ -65,7 +65,7 @@ def test_authentication_docs_match_rc_public_api() -> None:
     assert 'secret="your_secret"' not in docs
     assert "WFIRMA_ACCESS_KEY" in docs
     assert "WFIRMA_SECRET_KEY" in docs
-    assert "``WFirmaClient`` supports API Key, OAuth 2.0, and OAuth 1.0a in ``1.0rc2``." in docs
+    assert "``WFirmaClient`` supports API Key, OAuth 2.0, and OAuth 1.0a in ``1.0.0``." in docs
     assert "first-class ``WFirmaClient`` support is deferred" not in docs
 
 
@@ -86,7 +86,7 @@ def test_troubleshooting_docs_do_not_claim_missing_features() -> None:
     assert "client.company.get_info()" not in docs
     assert "client.company.switch(company_id)" not in docs
     assert "Version 0.1.x" not in docs
-    assert "1.0rc2" in docs
+    assert "1.0.0" in docs
 
 
 def test_releasing_guide_covers_release_checks_and_manual_verification() -> None:
@@ -166,9 +166,9 @@ def test_readme_mentions_rc_freeze_scope() -> None:
     """Test that the README tells users what remains frozen for rc2."""
     readme = (REPO_ROOT / "README.md").read_text(encoding="utf-8")
 
-    assert "> **Status**: Release candidate (`1.0rc2`)." in readme
+    assert "> **Status**: Stable (`1.0.0`)." in readme
     assert "## Stability Policy" in readme
-    assert "1.0rc2" in readme
+    assert "1.0.0" in readme
     assert "CLI command names and flags" in readme
 
 

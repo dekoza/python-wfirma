@@ -80,6 +80,55 @@ def extract_object_list_payloads(
     return payloads
 
 
+def build_module_payload(
+    *, container_key: str, object_key: str, obj: dict[str, Any]
+) -> dict[str, Any]:
+    """Wrap a single record in wFirma's JSON request envelope.
+
+    Per doc.wfirma.pl ("Format wymiany danych"), request bodies nest records
+    under the plural module branch, number each record by key (even a single
+    one), and wrap it in the singular object branch::
+
+        {"tags": {"0": {"tag": {...}}}}
+
+    Args:
+        container_key: Plural module branch (e.g. "tags").
+        object_key: Singular object branch (e.g. "tag").
+        obj: Record fields.
+
+    Returns:
+        The request body mapping.
+    """
+    return {container_key: {"0": {object_key: dict(obj)}}}
+
+
+def build_parameters_payload(parameters: dict[str, Any]) -> dict[str, Any]:
+    """Build a name/value ``parameters`` block in wFirma's JSON dialect.
+
+    Used by action endpoints such as ``invoices/download`` and
+    ``invoices/send``, whose XML bodies carry repeated ``parameter``
+    branches::
+
+        <parameters><parameter><name>page</name><value>all</value></parameter></parameters>
+
+    In JSON, repeated branches must be numbered objects, so this maps to::
+
+        {"parameters": {"0": {"parameter": {"name": "page", "value": "all"}}}}
+
+    Args:
+        parameters: Mapping of parameter names to values.
+
+    Returns:
+        The ``parameters`` mapping ready to nest under a module branch.
+    """
+    return {
+        "parameters": {
+            str(index): {"parameter": {"name": name, "value": value}}
+            for index, (name, value) in enumerate(parameters.items())
+        }
+    }
+
+
 def build_find_parameters(
     conditions: list[dict[str, Any]] | None,
     *,

@@ -16,7 +16,11 @@ from __future__ import annotations
 
 from typing import Any
 
-from wfirma._payloads import extract_object_list_payloads, extract_single_object_payload
+from wfirma._payloads import (
+    build_find_parameters,
+    extract_object_list_payloads,
+    extract_single_object_payload,
+)
 from wfirma.sync.client import WFirmaClient
 
 
@@ -40,15 +44,33 @@ class VatCodesResource:
         data = self._client.get_json(f"/vat_codes/get/{vat_code_id}")
         return self._extract_vat_code_payload(data)
 
-    def find(self) -> list[dict[str, Any]]:
+    def find(
+        self,
+        *,
+        conditions: list[dict[str, Any]] | None = None,
+        limit: int | None = None,
+        page: int | None = None,
+    ) -> list[dict[str, Any]]:
         """Find/list VAT codes.
 
         Endpoint: GET /vat_codes/find
 
         Returns:
             List of raw VAT code payload dicts.
+
+        Args:
+            conditions: Condition dicts with ``field``/``operator``/``value`` keys.
+            limit: Page size.
+            page: Page number.
         """
-        data = self._client.get_json("/vat_codes/find")
+        if conditions is None and limit is None and page is None:
+            data = self._client.get_json("/vat_codes/find")
+        else:
+            parameters = build_find_parameters(conditions, limit=limit, page=page)
+            data = self._client.post_json(
+                "/vat_codes/find",
+                data={"vat_codes": {"parameters": parameters}},
+            )
         payloads = extract_object_list_payloads(
             data, container_key="vat_codes", object_key="vat_code"
         )

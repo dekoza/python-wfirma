@@ -6,7 +6,7 @@
 
 ## Authentication
 
-Supported authentication methods: oauth2, apikey
+Supported authentication methods: oauth2, apikey, oauth1
 
 ## Endpoints
 
@@ -418,9 +418,17 @@ Supported authentication methods: oauth2, apikey
 
 ---
 
+#### contractor_receiver
+
+**Method:** `POST`
+
+**Path:** `/{{host}}/invoices/add?outputFormat=xml&inputFormat=xml&company_id={{companyId}}`
+
+---
+
 #### ereceipt_integration_receipt
 
-**Method:** `GET`
+**Method:** `POST`
 
 **Path:** `/{{host}}/invoices/add?outputFormat=xml&inputFormat=xml&company_id={{companyId}}`
 
@@ -502,7 +510,7 @@ Supported authentication methods: oauth2, apikey
 
 **Method:** `POST`
 
-**Path:** `/{{host}}/goods/notes/{{noteId}}?outputFormat=xml&inputFormat=xml&company_id={{companyId}}`
+**Path:** `/{{host}}/notes/edit/{{noteId}}?outputFormat=xml&inputFormat=xml&company_id={{companyId}}`
 
 ---
 
@@ -1269,3 +1277,5 @@ Supported authentication methods: oauth2, apikey
 **Method:** `DELETE`
 
 **Path:** `/{{host}}/webhooks/delete/{{webhookId}}?outputFormat=xml&inputFormat=xml&company_id={{companyId}}`
+
+---

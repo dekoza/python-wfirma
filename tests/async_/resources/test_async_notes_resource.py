@@ -72,7 +72,7 @@ class TestNotesResourceAdd:
 
     @pytest.mark.asyncio
     async def test_add_sends_correct_payload_wrapping(self, resource):
-        """Verify add() wraps payload in {'note': {...}}."""
+        """Verify add() wraps the note in the numbered module envelope."""
         with respx.mock:
             route = respx.post(
                 "https://api2.wfirma.pl/notes/add",
@@ -91,8 +91,9 @@ class TestNotesResourceAdd:
 
             assert route.called
             request_data = json.loads(route.calls.last.request.content)
-            assert "note" in request_data
-            assert request_data["note"]["object_name"] == "invoice"
+            assert request_data == {
+                "notes": {"0": {"note": {"object_name": "invoice", "text": "Test"}}}
+            }
 
 
 class TestNotesResourceFind:
@@ -193,9 +194,9 @@ class TestNotesResourceEdit:
 
     @pytest.mark.asyncio
     async def test_edit_calls_expected_endpoint_and_returns_dict(self, resource):
-        """Verify edit() calls PUT /notes/edit/{id} and returns dict."""
+        """Verify edit() calls POST /notes/edit/{id} and returns dict."""
         with respx.mock:
-            respx.put(
+            respx.post(
                 "https://api2.wfirma.pl/notes/edit/123",
                 params={
                     "inputFormat": "json",
@@ -222,7 +223,7 @@ class TestNotesResourceEdit:
     async def test_edit_uses_correct_url_not_goods_notes(self, resource):
         """CRITICAL: Verify edit() uses /notes/edit/{id} NOT /goods/notes/{id}."""
         with respx.mock:
-            route = respx.put(
+            route = respx.post(
                 "https://api2.wfirma.pl/notes/edit/123",
                 params={
                     "inputFormat": "json",
@@ -235,7 +236,7 @@ class TestNotesResourceEdit:
                 )
             )
 
-            respx.put("https://api2.wfirma.pl/goods/notes/123").mock(
+            respx.post("https://api2.wfirma.pl/goods/notes/123").mock(
                 side_effect=Exception("Wrong endpoint!")
             )
 
@@ -245,9 +246,9 @@ class TestNotesResourceEdit:
 
     @pytest.mark.asyncio
     async def test_edit_sends_correct_payload_wrapping(self, resource):
-        """Verify edit() wraps payload in {'note': {...}}."""
+        """Verify edit() wraps the note in the numbered module envelope."""
         with respx.mock:
-            route = respx.put(
+            route = respx.post(
                 "https://api2.wfirma.pl/notes/edit/123",
                 params={
                     "inputFormat": "json",
@@ -264,8 +265,7 @@ class TestNotesResourceEdit:
 
             assert route.called
             request_data = json.loads(route.calls.last.request.content)
-            assert "note" in request_data
-            assert request_data["note"]["text"] == "Updated"
+            assert request_data == {"notes": {"0": {"note": {"text": "Updated"}}}}
 
 
 class TestNotesResourceDelete:

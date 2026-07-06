@@ -16,7 +16,11 @@ from __future__ import annotations
 
 from typing import Any
 
-from wfirma._payloads import extract_object_list_payloads, extract_single_object_payload
+from wfirma._payloads import (
+    build_find_parameters,
+    extract_object_list_payloads,
+    extract_single_object_payload,
+)
 from wfirma.async_.client import WFirmaClient
 
 
@@ -40,15 +44,33 @@ class CompanyAccountsResource:
         data = await self._client.get_json(f"/company_accounts/get/{company_account_id}")
         return self._extract_company_account_payload(data)
 
-    async def find(self) -> list[dict[str, Any]]:
+    async def find(
+        self,
+        *,
+        conditions: list[dict[str, Any]] | None = None,
+        limit: int | None = None,
+        page: int | None = None,
+    ) -> list[dict[str, Any]]:
         """Find/list company accounts.
 
         Endpoint: GET /company_accounts/find
 
         Returns:
             List of raw company account payload dicts.
+
+        Args:
+            conditions: Condition dicts with ``field``/``operator``/``value`` keys.
+            limit: Page size.
+            page: Page number.
         """
-        data = await self._client.get_json("/company_accounts/find")
+        if conditions is None and limit is None and page is None:
+            data = await self._client.get_json("/company_accounts/find")
+        else:
+            parameters = build_find_parameters(conditions, limit=limit, page=page)
+            data = await self._client.post_json(
+                "/company_accounts/find",
+                data={"company_accounts": {"parameters": parameters}},
+            )
         payloads = extract_object_list_payloads(
             data, container_key="company_accounts", object_key="company_account"
         )

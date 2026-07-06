@@ -36,7 +36,7 @@ def test_add_calls_expected_endpoint_and_returns_dict(client_mock: Any) -> None:
     client_mock.post_json.assert_called_once()
     call_args = client_mock.post_json.call_args
     assert call_args[0][0] == "/terms/add"
-    assert call_args[1]["data"]["terms"][0]["term"]["description"] == "Payment term A"
+    assert call_args[1]["data"]["terms"]["0"]["term"]["description"] == "Payment term A"
 
 
 def test_find_calls_expected_endpoint_and_returns_list(client_mock: Any) -> None:
@@ -114,7 +114,7 @@ def test_edit_calls_expected_endpoint_and_returns_dict(client_mock: Any) -> None
     client_mock.post_json.assert_called_once()
     call_args = client_mock.post_json.call_args
     assert call_args[0][0] == "/terms/edit/1"
-    assert call_args[1]["data"]["terms"][0]["term"]["description"] == "Updated Term"
+    assert call_args[1]["data"]["terms"]["0"]["term"]["description"] == "Updated Term"
 
 
 def test_delete_calls_expected_endpoint_and_returns_dict(client_mock: Any) -> None:

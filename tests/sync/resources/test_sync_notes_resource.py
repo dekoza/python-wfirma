@@ -53,7 +53,7 @@ class TestNotesResourceAdd:
             assert result["text"] == "Test note"
 
     def test_add_sends_correct_payload_wrapping(self) -> None:
-        """Verify add() wraps payload in {'note': {...}}."""
+        """Verify add() wraps the note in the numbered module envelope."""
         auth = APIKeyAuth(access_key="ak", secret_key="sk", app_key="app")
         client = WFirmaClient(auth=auth, company_id=123)
         resource = NotesResource(client)
@@ -76,8 +76,9 @@ class TestNotesResourceAdd:
 
             assert route.called
             request_data = json.loads(route.calls.last.request.content)
-            assert "note" in request_data
-            assert request_data["note"]["object_name"] == "invoice"
+            assert request_data == {
+                "notes": {"0": {"note": {"object_name": "invoice", "text": "Test"}}}
+            }
 
 
 class TestNotesResourceFind:
@@ -189,13 +190,13 @@ class TestNotesResourceEdit:
     """Tests for edit() method."""
 
     def test_edit_calls_expected_endpoint_and_returns_dict(self) -> None:
-        """Verify edit() calls PUT /notes/edit/{id} and returns dict."""
+        """Verify edit() calls POST /notes/edit/{id} and returns dict."""
         auth = APIKeyAuth(access_key="ak", secret_key="sk", app_key="app")
         client = WFirmaClient(auth=auth, company_id=123)
         resource = NotesResource(client)
 
         with respx.mock:
-            respx.put(
+            respx.post(
                 "https://api2.wfirma.pl/notes/edit/123",
                 params={
                     "inputFormat": "json",
@@ -225,7 +226,7 @@ class TestNotesResourceEdit:
         resource = NotesResource(client)
 
         with respx.mock:
-            route = respx.put(
+            route = respx.post(
                 "https://api2.wfirma.pl/notes/edit/123",
                 params={
                     "inputFormat": "json",
@@ -238,7 +239,7 @@ class TestNotesResourceEdit:
                 )
             )
 
-            respx.put("https://api2.wfirma.pl/goods/notes/123").mock(
+            respx.post("https://api2.wfirma.pl/goods/notes/123").mock(
                 side_effect=Exception("Wrong endpoint!")
             )
 
@@ -247,13 +248,13 @@ class TestNotesResourceEdit:
             assert route.called
 
     def test_edit_sends_correct_payload_wrapping(self) -> None:
-        """Verify edit() wraps payload in {'note': {...}}."""
+        """Verify edit() wraps the note in the numbered module envelope."""
         auth = APIKeyAuth(access_key="ak", secret_key="sk", app_key="app")
         client = WFirmaClient(auth=auth, company_id=123)
         resource = NotesResource(client)
 
         with respx.mock:
-            route = respx.put(
+            route = respx.post(
                 "https://api2.wfirma.pl/notes/edit/123",
                 params={
                     "inputFormat": "json",
@@ -270,8 +271,7 @@ class TestNotesResourceEdit:
 
             assert route.called
             request_data = json.loads(route.calls.last.request.content)
-            assert "note" in request_data
-            assert request_data["note"]["text"] == "Updated"
+            assert request_data == {"notes": {"0": {"note": {"text": "Updated"}}}}
 
 
 class TestNotesResourceDelete:

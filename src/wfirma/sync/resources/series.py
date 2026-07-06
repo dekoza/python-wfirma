@@ -11,7 +11,7 @@ The wFirma API reference lists these endpoints:
 - POST /series/add
 - GET /series/find
 - GET /series/get/{seriesId}
-- PUT /series/edit/{seriesId}
+- POST /series/edit/{seriesId}
 - DELETE /series/del/{seriesId}
 """
 
@@ -19,7 +19,12 @@ from __future__ import annotations
 
 from typing import Any
 
-from wfirma._payloads import extract_object_list_payloads, extract_single_object_payload
+from wfirma._payloads import (
+    build_find_parameters,
+    build_module_payload,
+    extract_object_list_payloads,
+    extract_single_object_payload,
+)
 from wfirma.sync.client import WFirmaClient
 
 
@@ -40,21 +45,42 @@ class SeriesResource:
         Returns:
             Created series payload.
         """
-        data = self._client.post_json("/series/add", data={"series": series})
+        data = self._client.post_json(
+            "/series/add",
+            data=build_module_payload(container_key="series", object_key="series", obj=series),
+        )
         return self._extract_series_payload(data)
 
-    def find(self, params: dict[str, Any] | None = None) -> list[dict[str, Any]]:
+    def find(
+        self,
+        params: dict[str, Any] | None = None,
+        *,
+        conditions: list[dict[str, Any]] | None = None,
+        limit: int | None = None,
+        page: int | None = None,
+    ) -> list[dict[str, Any]]:
         """Find/list series.
 
         Endpoint: GET /series/find
 
         Args:
+            conditions: Condition dicts with ``field``/``operator``/``value`` keys.
+            limit: Page size.
+            page: Page number.
             params: Optional query parameters.
 
         Returns:
             List of raw series payload dicts.
         """
-        data = self._client.get_json("/series/find", params=params)
+        if conditions is None and limit is None and page is None:
+            data = self._client.get_json("/series/find", params=params)
+        else:
+            parameters = build_find_parameters(conditions, limit=limit, page=page)
+            data = self._client.post_json(
+                "/series/find",
+                data={"series": {"parameters": parameters}},
+                params=params,
+            )
         payloads = extract_object_list_payloads(data, container_key="series", object_key="series")
         return [dict(payload) for payload in payloads]
 
@@ -75,7 +101,7 @@ class SeriesResource:
     def edit(self, series_id: int, series: dict[str, Any]) -> dict[str, Any]:
         """Update an existing series.
 
-        Endpoint: PUT /series/edit/{seriesId}
+        Endpoint: POST /series/edit/{seriesId}
 
         Args:
             series_id: Series identifier.
@@ -84,7 +110,10 @@ class SeriesResource:
         Returns:
             Updated series payload.
         """
-        data = self._client.put_json(f"/series/edit/{series_id}", data={"series": series})
+        data = self._client.post_json(
+            f"/series/edit/{series_id}",
+            data=build_module_payload(container_key="series", object_key="series", obj=series),
+        )
         return self._extract_series_payload(data)
 
     def delete(self, series_id: int) -> dict[str, Any]:

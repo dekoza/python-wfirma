@@ -14,7 +14,12 @@ from __future__ import annotations
 
 from typing import Any
 
-from wfirma._payloads import extract_object_list_payloads, extract_single_object_payload
+from wfirma._payloads import (
+    build_find_parameters,
+    build_module_payload,
+    extract_object_list_payloads,
+    extract_single_object_payload,
+)
 from wfirma.async_.client import WFirmaClient
 from wfirma.models.payment import Payment
 
@@ -40,15 +45,33 @@ class PaymentsResource:
         payload = self._extract_payment_payload(data)
         return Payment.model_validate(payload)
 
-    async def find(self) -> list[Payment]:
+    async def find(
+        self,
+        *,
+        conditions: list[dict[str, Any]] | None = None,
+        limit: int | None = None,
+        page: int | None = None,
+    ) -> list[Payment]:
         """Find/list payments.
 
         Endpoint: GET /payments/find
 
         Returns:
             List of parsed payment models.
+
+        Args:
+            conditions: Condition dicts with ``field``/``operator``/``value`` keys.
+            limit: Page size.
+            page: Page number.
         """
-        data = await self._client.get_json("/payments/find")
+        if conditions is None and limit is None and page is None:
+            data = await self._client.get_json("/payments/find")
+        else:
+            parameters = build_find_parameters(conditions, limit=limit, page=page)
+            data = await self._client.post_json(
+                "/payments/find",
+                data={"payments": {"parameters": parameters}},
+            )
         return self._extract_payment_list(data)
 
     async def add(self, *, payment: dict[str, Any]) -> Payment:
@@ -62,7 +85,7 @@ class PaymentsResource:
         Returns:
             Created payment model.
         """
-        payload = {"payments": [{"payment": payment}]}
+        payload = build_module_payload(container_key="payments", object_key="payment", obj=payment)
         data = await self._client.post_json("/payments/add", data=payload)
         result_payload = self._extract_payment_payload(data)
         return Payment.model_validate(result_payload)
@@ -79,7 +102,7 @@ class PaymentsResource:
         Returns:
             Updated payment model.
         """
-        payload = {"payments": [{"payment": payment}]}
+        payload = build_module_payload(container_key="payments", object_key="payment", obj=payment)
         data = await self._client.post_json(f"/payments/edit/{payment_id}", data=payload)
         result_payload = self._extract_payment_payload(data)
         return Payment.model_validate(result_payload)

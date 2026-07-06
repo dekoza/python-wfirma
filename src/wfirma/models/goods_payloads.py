@@ -5,9 +5,10 @@ They intentionally support only the subset of fields exposed by the current reso
 methods.
 
 Notes:
-    The wFirma API expects wrapped payloads like::
+    The wFirma API expects wrapped payloads with numbered record branches
+    (doc.wfirma.pl, "Format wymiany danych")::
 
-        {"goods": [{"good": {...}}]}
+        {"goods": {"0": {"good": {...}}}}
 
     which matches how other resources in this library structure requests.
 """
@@ -43,11 +44,11 @@ class GoodsUpsertRequest(BaseModel):
 
     model_config = ConfigDict(extra="forbid")
 
-    goods: list[dict[str, GoodUpsertData]]
+    goods: dict[str, dict[str, GoodUpsertData]]
 
     @classmethod
     def from_good_data(cls, good: GoodUpsertData) -> GoodsUpsertRequest:
-        return cls(goods=[{"good": good}])
+        return cls(goods={"0": {"good": good}})
 
 
 __all__ = [

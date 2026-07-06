@@ -103,11 +103,11 @@ def test_get_calls_expected_endpoint(client: WFirmaClient) -> None:
 
 @respx.mock
 def test_edit_calls_expected_endpoint_with_correct_path(client: WFirmaClient) -> None:
-    """CRITICAL: Verify edit() PUTs to /series/edit/{id} (NOT /series/notes/)."""
+    """CRITICAL: Verify edit() POSTs to /series/edit/{id} (NOT /series/notes/)."""
     series_id = 123
     updated_data = {"name": "Updated Series"}
 
-    respx.put(
+    respx.post(
         "/series/edit/123",
         params={"company_id": "123", "outputFormat": "json", "inputFormat": "json"},
     ).mock(

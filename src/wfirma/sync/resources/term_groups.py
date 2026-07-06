@@ -19,7 +19,12 @@ from __future__ import annotations
 
 from typing import Any
 
-from wfirma._payloads import extract_object_list_payloads, extract_single_object_payload
+from wfirma._payloads import (
+    build_find_parameters,
+    build_module_payload,
+    extract_object_list_payloads,
+    extract_single_object_payload,
+)
 from wfirma.sync.client import WFirmaClient
 
 
@@ -40,21 +45,44 @@ class TermGroupsResource:
         Returns:
             Created term group payload.
         """
-        data = self._client.post_json("/term_groups/add", data={"term_group": term_group})
+        data = self._client.post_json(
+            "/term_groups/add",
+            data=build_module_payload(
+                container_key="term_groups", object_key="term_group", obj=term_group
+            ),
+        )
         return self._extract_term_group_payload(data)
 
-    def find(self, params: dict[str, Any] | None = None) -> list[dict[str, Any]]:
+    def find(
+        self,
+        params: dict[str, Any] | None = None,
+        *,
+        conditions: list[dict[str, Any]] | None = None,
+        limit: int | None = None,
+        page: int | None = None,
+    ) -> list[dict[str, Any]]:
         """Find/list term groups.
 
         Endpoint: GET /term_groups/find
 
         Args:
+            conditions: Condition dicts with ``field``/``operator``/``value`` keys.
+            limit: Page size.
+            page: Page number.
             params: Optional query parameters.
 
         Returns:
             List of raw term group payload dicts.
         """
-        data = self._client.get_json("/term_groups/find", params=params)
+        if conditions is None and limit is None and page is None:
+            data = self._client.get_json("/term_groups/find", params=params)
+        else:
+            parameters = build_find_parameters(conditions, limit=limit, page=page)
+            data = self._client.post_json(
+                "/term_groups/find",
+                data={"term_groups": {"parameters": parameters}},
+                params=params,
+            )
         payloads = extract_object_list_payloads(
             data, container_key="term_groups", object_key="term_group"
         )
@@ -87,7 +115,10 @@ class TermGroupsResource:
             Updated term group payload.
         """
         data = self._client.post_json(
-            f"/term_groups/edit/{term_group_id}", data={"term_group": term_group}
+            f"/term_groups/edit/{term_group_id}",
+            data=build_module_payload(
+                container_key="term_groups", object_key="term_group", obj=term_group
+            ),
         )
         return self._extract_term_group_payload(data)
 

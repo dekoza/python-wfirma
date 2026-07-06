@@ -22,7 +22,12 @@ from __future__ import annotations
 
 from typing import Any
 
-from wfirma._payloads import extract_object_list_payloads, extract_single_object_payload
+from wfirma._payloads import (
+    build_find_parameters,
+    build_module_payload,
+    extract_object_list_payloads,
+    extract_single_object_payload,
+)
 from wfirma.async_.client import WFirmaClient
 
 
@@ -43,21 +48,42 @@ class NotesResource:
         Returns:
             Created note payload.
         """
-        data = await self._client.post_json("/notes/add", data={"note": note})
+        data = await self._client.post_json(
+            "/notes/add",
+            data=build_module_payload(container_key="notes", object_key="note", obj=note),
+        )
         return self._extract_note_payload(data)
 
-    async def find(self, params: dict[str, Any] | None = None) -> list[dict[str, Any]]:
+    async def find(
+        self,
+        params: dict[str, Any] | None = None,
+        *,
+        conditions: list[dict[str, Any]] | None = None,
+        limit: int | None = None,
+        page: int | None = None,
+    ) -> list[dict[str, Any]]:
         """Find/list notes.
 
         Endpoint: GET /notes/find
 
         Args:
+            conditions: Condition dicts with ``field``/``operator``/``value`` keys.
+            limit: Page size.
+            page: Page number.
             params: Optional query parameters.
 
         Returns:
             List of raw note payload dicts.
         """
-        data = await self._client.get_json("/notes/find", params=params)
+        if conditions is None and limit is None and page is None:
+            data = await self._client.get_json("/notes/find", params=params)
+        else:
+            parameters = build_find_parameters(conditions, limit=limit, page=page)
+            data = await self._client.post_json(
+                "/notes/find",
+                data={"notes": {"parameters": parameters}},
+                params=params,
+            )
         payloads = extract_object_list_payloads(data=data, container_key="notes", object_key="note")
         return [dict(payload) for payload in payloads]
 
@@ -87,7 +113,10 @@ class NotesResource:
         Returns:
             Updated note payload.
         """
-        data = await self._client.put_json(f"/notes/edit/{note_id}", data={"note": note})
+        data = await self._client.post_json(
+            f"/notes/edit/{note_id}",
+            data=build_module_payload(container_key="notes", object_key="note", obj=note),
+        )
         return self._extract_note_payload(data)
 
     async def delete(self, note_id: int) -> dict[str, Any]:

@@ -129,8 +129,8 @@ class TestPaymentsResourceAdd:
             def _check_request(request: httpx.Request) -> httpx.Response:
                 assert request.headers.get("Content-Type") == "application/json"
                 assert json.loads(request.content.decode("utf-8")) == {
-                    "payments": [
-                        {
+                    "payments": {
+                        "0": {
                             "payment": {
                                 "object_name": "invoice",
                                 "object_id": 1000,
@@ -138,7 +138,7 @@ class TestPaymentsResourceAdd:
                                 "date": "2026-01-19",
                             }
                         }
-                    ]
+                    }
                 }
                 return httpx.Response(
                     200,
@@ -186,7 +186,7 @@ class TestPaymentsResourceEdit:
 
             def _check_request(request: httpx.Request) -> httpx.Response:
                 assert json.loads(request.content.decode("utf-8")) == {
-                    "payments": [{"payment": {"description": "Updated"}}]
+                    "payments": {"0": {"payment": {"description": "Updated"}}}
                 }
                 return httpx.Response(
                     200,

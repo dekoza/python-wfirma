@@ -10,6 +10,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from wfirma._payloads import build_find_parameters, build_module_payload
 from wfirma.models.contractor import Contractor
 from wfirma.sync.client import WFirmaClient
 
@@ -53,15 +54,33 @@ class ContractorResource:
         payload = self._extract_contractor_payload(data)
         return Contractor.model_validate(payload)
 
-    def find(self) -> list[Contractor]:
+    def find(
+        self,
+        *,
+        conditions: list[dict[str, Any]] | None = None,
+        limit: int | None = None,
+        page: int | None = None,
+    ) -> list[Contractor]:
         """Find/list contractors.
 
         Endpoint: GET /contractors/find
 
         Returns:
             List of parsed contractor models.
+
+        Args:
+            conditions: Condition dicts with ``field``/``operator``/``value`` keys.
+            limit: Page size.
+            page: Page number.
         """
-        data = self._client.get_json("/contractors/find")
+        if conditions is None and limit is None and page is None:
+            data = self._client.get_json("/contractors/find")
+        else:
+            parameters = build_find_parameters(conditions, limit=limit, page=page)
+            data = self._client.post_json(
+                "/contractors/find",
+                data={"contractors": {"parameters": parameters}},
+            )
         return self._extract_contractor_list(data)
 
     def add(
@@ -291,4 +310,6 @@ class ContractorResource:
         Filters out None values and wraps in expected API structure.
         """
         contractor_data = {k: v for k, v in kwargs.items() if v is not None}
-        return {"contractors": [{"contractor": contractor_data}]}
+        return build_module_payload(
+            container_key="contractors", object_key="contractor", obj=contractor_data
+        )

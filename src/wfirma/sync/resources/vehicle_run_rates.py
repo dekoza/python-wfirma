@@ -15,7 +15,7 @@ from __future__ import annotations
 
 from typing import Any
 
-from wfirma._payloads import extract_object_list_payloads
+from wfirma._payloads import build_find_parameters, extract_object_list_payloads
 from wfirma.sync.client import WFirmaClient
 
 
@@ -25,15 +25,33 @@ class VehicleRunRatesResource:
     def __init__(self, client: WFirmaClient) -> None:
         self._client = client
 
-    def find(self) -> list[dict[str, Any]]:
+    def find(
+        self,
+        *,
+        conditions: list[dict[str, Any]] | None = None,
+        limit: int | None = None,
+        page: int | None = None,
+    ) -> list[dict[str, Any]]:
         """Find/list vehicle run rates.
 
         Endpoint: GET /vehicle_run_rates/find
 
         Returns:
             List of raw vehicle_run_rate payload dicts.
+
+        Args:
+            conditions: Condition dicts with ``field``/``operator``/``value`` keys.
+            limit: Page size.
+            page: Page number.
         """
-        data = self._client.get_json("/vehicle_run_rates/find")
+        if conditions is None and limit is None and page is None:
+            data = self._client.get_json("/vehicle_run_rates/find")
+        else:
+            parameters = build_find_parameters(conditions, limit=limit, page=page)
+            data = self._client.post_json(
+                "/vehicle_run_rates/find",
+                data={"vehicle_run_rates": {"parameters": parameters}},
+            )
         payloads = extract_object_list_payloads(
             data, container_key="vehicle_run_rates", object_key="vehicle_run_rate"
         )

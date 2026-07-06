@@ -2,7 +2,7 @@
 
 This directory contains optional live tests against the public wFirma docs and the production API.
 
-## Scope for `1.0rc2`
+## Scope for `1.0.0`
 
 The release candidate claims live coverage for:
 

@@ -16,6 +16,8 @@ from typing import Any
 
 from wfirma._payloads import (
     build_find_parameters,
+    build_module_payload,
+    build_parameters_payload,
     extract_object_list_payloads,
     extract_single_object_payload,
 )
@@ -81,7 +83,7 @@ class InvoicesResource:
         Returns:
             Created invoice model.
         """
-        payload = {"invoices": [{"invoice": invoice}]}
+        payload = build_module_payload(container_key="invoices", object_key="invoice", obj=invoice)
         data = self._client.post_json("/invoices/add", data=payload)
         result_payload = self._extract_invoice_payload(data)
         return Invoice.model_validate(result_payload)
@@ -98,7 +100,7 @@ class InvoicesResource:
         Returns:
             Updated invoice model.
         """
-        payload = {"invoices": [{"invoice": invoice}]}
+        payload = build_module_payload(container_key="invoices", object_key="invoice", obj=invoice)
         data = self._client.post_json(f"/invoices/edit/{invoice_id}", data=payload)
         result_payload = self._extract_invoice_payload(data)
         return Invoice.model_validate(result_payload)
@@ -130,7 +132,7 @@ class InvoicesResource:
         """
         payload: dict[str, Any] | None = None
         if parameters:
-            payload = {"invoices": [{"parameters": parameters}]}
+            payload = {"invoices": build_parameters_payload(parameters)}
 
         return self._client.post_binary(f"/invoices/download/{invoice_id}", data=payload)
 
@@ -153,7 +155,7 @@ class InvoicesResource:
         """
         payload: dict[str, Any] = {}
         if parameters:
-            payload = {"invoices": [{"parameters": parameters}]}
+            payload = {"invoices": build_parameters_payload(parameters)}
 
         return self._client.post_json(f"/invoices/send/{invoice_id}", data=payload)
 

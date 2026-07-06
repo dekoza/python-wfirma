@@ -11,7 +11,7 @@ The wFirma API reference lists these endpoints:
 - POST /terms/add
 - GET /terms/find
 - GET /terms/get/{termId}
-- PUT /terms/edit/{termId}  (API spec shows /terms/notes/ typo - use /terms/edit/)
+- POST /terms/edit/{termId}  (API spec shows /terms/notes/ typo - use /terms/edit/)
 - DELETE /terms/delete/{termId}
 """
 
@@ -19,7 +19,12 @@ from __future__ import annotations
 
 from typing import Any
 
-from wfirma._payloads import extract_object_list_payloads, extract_single_object_payload
+from wfirma._payloads import (
+    build_find_parameters,
+    build_module_payload,
+    extract_object_list_payloads,
+    extract_single_object_payload,
+)
 from wfirma.async_.client import WFirmaClient
 
 
@@ -40,21 +45,42 @@ class TermsResource:
         Returns:
             Created term payload.
         """
-        data = await self._client.post_json("/terms/add", data={"terms": [{"term": term}]})
+        data = await self._client.post_json(
+            "/terms/add",
+            data=build_module_payload(container_key="terms", object_key="term", obj=term),
+        )
         return self._extract_term_payload(data)
 
-    async def find(self, params: dict[str, Any] | None = None) -> list[dict[str, Any]]:
+    async def find(
+        self,
+        params: dict[str, Any] | None = None,
+        *,
+        conditions: list[dict[str, Any]] | None = None,
+        limit: int | None = None,
+        page: int | None = None,
+    ) -> list[dict[str, Any]]:
         """Find/list terms.
 
         Endpoint: GET /terms/find
 
         Args:
+            conditions: Condition dicts with ``field``/``operator``/``value`` keys.
+            limit: Page size.
+            page: Page number.
             params: Optional query parameters.
 
         Returns:
             List of raw term payload dicts.
         """
-        data = await self._client.get_json("/terms/find", params=params)
+        if conditions is None and limit is None and page is None:
+            data = await self._client.get_json("/terms/find", params=params)
+        else:
+            parameters = build_find_parameters(conditions, limit=limit, page=page)
+            data = await self._client.post_json(
+                "/terms/find",
+                data={"terms": {"parameters": parameters}},
+                params=params,
+            )
         payloads = extract_object_list_payloads(data, container_key="terms", object_key="term")
         return [dict(payload) for payload in payloads]
 
@@ -85,7 +111,8 @@ class TermsResource:
             Updated term payload.
         """
         data = await self._client.post_json(
-            f"/terms/edit/{term_id}", data={"terms": [{"term": term}]}
+            f"/terms/edit/{term_id}",
+            data=build_module_payload(container_key="terms", object_key="term", obj=term),
         )
         return self._extract_term_payload(data)
 

@@ -14,7 +14,12 @@ from __future__ import annotations
 
 from typing import Any
 
-from wfirma._payloads import extract_object_list_payloads, extract_single_object_payload
+from wfirma._payloads import (
+    build_find_parameters,
+    build_module_payload,
+    extract_object_list_payloads,
+    extract_single_object_payload,
+)
 from wfirma.models.warehouse import WarehouseDocument
 from wfirma.sync.client import WFirmaClient
 
@@ -38,12 +43,30 @@ class WarehouseDocumentZDResource:
         payload = self._extract_document_payload(data)
         return WarehouseDocument.model_validate(payload)
 
-    def find(self) -> list[WarehouseDocument]:
+    def find(
+        self,
+        *,
+        conditions: list[dict[str, Any]] | None = None,
+        limit: int | None = None,
+        page: int | None = None,
+    ) -> list[WarehouseDocument]:
         """Find/list ZD warehouse documents.
 
         Endpoint: GET /warehouse_document_z_d/find
+
+        Args:
+            conditions: Condition dicts with ``field``/``operator``/``value`` keys.
+            limit: Page size.
+            page: Page number.
         """
-        data = self._client.get_json("/warehouse_document_z_d/find")
+        if conditions is None and limit is None and page is None:
+            data = self._client.get_json("/warehouse_document_z_d/find")
+        else:
+            parameters = build_find_parameters(conditions, limit=limit, page=page)
+            data = self._client.post_json(
+                "/warehouse_document_z_d/find",
+                data={"warehouse_documents": {"parameters": parameters}},
+            )
         return self._extract_document_list(data)
 
     def add(self, document: dict[str, Any]) -> WarehouseDocument:
@@ -57,7 +80,11 @@ class WarehouseDocumentZDResource:
         Returns:
             Created WarehouseDocument.
         """
-        payload = {"warehouse_document": document}
+        payload = build_module_payload(
+            container_key="warehouse_documents",
+            object_key="warehouse_document",
+            obj=document,
+        )
         data = self._client.post_json("/warehouse_document_z_d/add", data=payload)
         result_payload = self._extract_document_payload(data)
         return WarehouseDocument.model_validate(result_payload)
@@ -74,7 +101,11 @@ class WarehouseDocumentZDResource:
         Returns:
             Updated WarehouseDocument.
         """
-        payload = {"warehouse_document": document}
+        payload = build_module_payload(
+            container_key="warehouse_documents",
+            object_key="warehouse_document",
+            obj=document,
+        )
         data = self._client.post_json(
             f"/warehouse_document_z_d/edit/{warehouse_document_id}",
             data=payload,

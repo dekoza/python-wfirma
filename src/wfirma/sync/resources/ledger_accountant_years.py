@@ -16,7 +16,11 @@ from __future__ import annotations
 
 from typing import Any
 
-from wfirma._payloads import extract_object_list_payloads, extract_single_object_payload
+from wfirma._payloads import (
+    build_find_parameters,
+    extract_object_list_payloads,
+    extract_single_object_payload,
+)
 from wfirma.sync.client import WFirmaClient
 
 
@@ -40,15 +44,33 @@ class LedgerAccountantYearsResource:
         data = self._client.get_json(f"/ledger_accountant_years/get/{ledger_accountant_year_id}")
         return self._extract_ledger_accountant_year_payload(data)
 
-    def find(self) -> list[dict[str, Any]]:
+    def find(
+        self,
+        *,
+        conditions: list[dict[str, Any]] | None = None,
+        limit: int | None = None,
+        page: int | None = None,
+    ) -> list[dict[str, Any]]:
         """Find/list ledger accountant years.
 
         Endpoint: GET /ledger_accountant_years/find
 
         Returns:
             List of raw ledger accountant year payload dicts.
+
+        Args:
+            conditions: Condition dicts with ``field``/``operator``/``value`` keys.
+            limit: Page size.
+            page: Page number.
         """
-        data = self._client.get_json("/ledger_accountant_years/find")
+        if conditions is None and limit is None and page is None:
+            data = self._client.get_json("/ledger_accountant_years/find")
+        else:
+            parameters = build_find_parameters(conditions, limit=limit, page=page)
+            data = self._client.post_json(
+                "/ledger_accountant_years/find",
+                data={"ledger_accountant_years": {"parameters": parameters}},
+            )
         payloads = extract_object_list_payloads(
             data, container_key="ledger_accountant_years", object_key="ledger_accountant_year"
         )

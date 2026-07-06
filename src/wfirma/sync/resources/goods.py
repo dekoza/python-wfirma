@@ -15,7 +15,11 @@ from __future__ import annotations
 from decimal import Decimal
 from typing import Any
 
-from wfirma._payloads import extract_object_list_payloads, extract_single_object_payload
+from wfirma._payloads import (
+    build_find_parameters,
+    extract_object_list_payloads,
+    extract_single_object_payload,
+)
 from wfirma.models.good import Good
 from wfirma.models.goods_payloads import GoodsUpsertRequest, GoodUpsertData
 from wfirma.sync.client import WFirmaClient
@@ -40,12 +44,30 @@ class GoodsResource:
         payload = self._extract_good_payload(data)
         return Good.model_validate(payload)
 
-    def find(self) -> list[Good]:
+    def find(
+        self,
+        *,
+        conditions: list[dict[str, Any]] | None = None,
+        limit: int | None = None,
+        page: int | None = None,
+    ) -> list[Good]:
         """Find/list goods.
 
         Endpoint: GET /goods/find
+
+        Args:
+            conditions: Condition dicts with ``field``/``operator``/``value`` keys.
+            limit: Page size.
+            page: Page number.
         """
-        data = self._client.get_json("/goods/find")
+        if conditions is None and limit is None and page is None:
+            data = self._client.get_json("/goods/find")
+        else:
+            parameters = build_find_parameters(conditions, limit=limit, page=page)
+            data = self._client.post_json(
+                "/goods/find",
+                data={"goods": {"parameters": parameters}},
+            )
         return self._extract_good_list(data)
 
     def add(

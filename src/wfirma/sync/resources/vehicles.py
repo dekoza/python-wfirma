@@ -22,7 +22,12 @@ from __future__ import annotations
 
 from typing import Any
 
-from wfirma._payloads import extract_object_list_payloads, extract_single_object_payload
+from wfirma._payloads import (
+    build_find_parameters,
+    build_module_payload,
+    extract_object_list_payloads,
+    extract_single_object_payload,
+)
 from wfirma.sync.client import WFirmaClient
 
 
@@ -46,42 +51,74 @@ class VehiclesResource:
         data = self._client.get_json(f"/vehicles/get/{vehicle_id}")
         return self._extract_vehicle_payload(data)
 
-    def find(self) -> list[dict[str, Any]]:
+    def find(
+        self,
+        *,
+        conditions: list[dict[str, Any]] | None = None,
+        limit: int | None = None,
+        page: int | None = None,
+    ) -> list[dict[str, Any]]:
         """Find/list vehicles.
 
         Endpoint: GET /vehicles/find
 
         Returns:
             List of raw vehicle payload dicts.
+
+        Args:
+            conditions: Condition dicts with ``field``/``operator``/``value`` keys.
+            limit: Page size.
+            page: Page number.
         """
-        data = self._client.get_json("/vehicles/find")
+        if conditions is None and limit is None and page is None:
+            data = self._client.get_json("/vehicles/find")
+        else:
+            parameters = build_find_parameters(conditions, limit=limit, page=page)
+            data = self._client.post_json(
+                "/vehicles/find",
+                data={"vehicles": {"parameters": parameters}},
+            )
         payloads = extract_object_list_payloads(
             data, container_key="vehicles", object_key="vehicle"
         )
         return [dict(payload) for payload in payloads]
 
-    def add(self, *, name: str, visibility: str | None = None) -> dict[str, Any]:
+    def add(
+        self,
+        vehicle: dict[str, Any] | None = None,
+        *,
+        name: str | None = None,
+        visibility: str | None = None,
+    ) -> dict[str, Any]:
         """Create a new vehicle.
 
         Endpoint: POST /vehicles/add
 
         Args:
-            name: Vehicle name.
-            visibility: Vehicle visibility (e.g. "visible"), if supported.
+            vehicle: Full vehicle payload dict (documented fields include
+                ``name``, ``register``, ``type``, ``ownership``, etc.).
+            name: Vehicle name, merged into the payload when given.
+            visibility: Vehicle visibility, merged into the payload when given.
 
         Returns:
             Created vehicle payload.
         """
-        vehicle: dict[str, Any] = {"name": name}
+        fields: dict[str, Any] = dict(vehicle or {})
+        if name is not None:
+            fields["name"] = name
         if visibility is not None:
-            vehicle["visibility"] = visibility
+            fields["visibility"] = visibility
 
-        data = self._client.post_json("/vehicles/add", data={"vehicle": vehicle})
+        data = self._client.post_json(
+            "/vehicles/add",
+            data=build_module_payload(container_key="vehicles", object_key="vehicle", obj=fields),
+        )
         return self._extract_vehicle_payload(data)
 
     def edit(
         self,
         vehicle_id: int,
+        vehicle: dict[str, Any] | None = None,
         *,
         name: str | None = None,
         visibility: str | None = None,
@@ -92,19 +129,23 @@ class VehiclesResource:
 
         Args:
             vehicle_id: Vehicle identifier.
-            name: New vehicle name.
-            visibility: New visibility value.
+            vehicle: Full vehicle payload dict with updated fields.
+            name: New vehicle name, merged into the payload when given.
+            visibility: New visibility value, merged into the payload when given.
 
         Returns:
             Updated vehicle payload.
         """
-        vehicle: dict[str, Any] = {}
+        fields: dict[str, Any] = dict(vehicle or {})
         if name is not None:
-            vehicle["name"] = name
+            fields["name"] = name
         if visibility is not None:
-            vehicle["visibility"] = visibility
+            fields["visibility"] = visibility
 
-        data = self._client.post_json(f"/vehicles/edit/{vehicle_id}", data={"vehicle": vehicle})
+        data = self._client.post_json(
+            f"/vehicles/edit/{vehicle_id}",
+            data=build_module_payload(container_key="vehicles", object_key="vehicle", obj=fields),
+        )
         return self._extract_vehicle_payload(data)
 
     def delete(self, vehicle_id: int) -> dict[str, Any]:

@@ -1,10 +1,10 @@
 Authentication
 ==============
 
-wFirma exposes API Key, OAuth 2.0, and OAuth 1.0a authentication modes. This guide explains the parts that ``python-wfirma`` supports in ``1.0rc2``.
+wFirma exposes API Key, OAuth 2.0, and OAuth 1.0a authentication modes. This guide explains the parts that ``python-wfirma`` supports in ``1.0.0``.
 
 .. important::
-   ``WFirmaClient`` supports API Key, OAuth 2.0, and OAuth 1.0a in ``1.0rc2``.
+   ``WFirmaClient`` supports API Key, OAuth 2.0, and OAuth 1.0a in ``1.0.0``.
 
 .. note::
    OAuth2 support in this library is implemented using **Authlib** under the hood.

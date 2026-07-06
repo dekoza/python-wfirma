@@ -21,7 +21,12 @@ from __future__ import annotations
 
 from typing import Any
 
-from wfirma._payloads import extract_object_list_payloads, extract_single_object_payload
+from wfirma._payloads import (
+    build_find_parameters,
+    build_module_payload,
+    extract_object_list_payloads,
+    extract_single_object_payload,
+)
 from wfirma.async_.client import WFirmaClient
 
 
@@ -44,22 +49,42 @@ class DocumentsResource:
         """
         data = await self._client.post_json(
             "/documents/add",
-            data={"documents": [{"document": document}]},
+            data=build_module_payload(
+                container_key="documents", object_key="document", obj=document
+            ),
         )
         return self._extract_document_payload(data)
 
-    async def find(self, params: dict[str, Any] | None = None) -> list[dict[str, Any]]:
+    async def find(
+        self,
+        params: dict[str, Any] | None = None,
+        *,
+        conditions: list[dict[str, Any]] | None = None,
+        limit: int | None = None,
+        page: int | None = None,
+    ) -> list[dict[str, Any]]:
         """Find/list documents.
 
         Endpoint: GET /documents/find
 
         Args:
+            conditions: Condition dicts with ``field``/``operator``/``value`` keys.
+            limit: Page size.
+            page: Page number.
             params: Optional query parameters.
 
         Returns:
             List of raw document payload dicts.
         """
-        data = await self._client.get_json("/documents/find", params=params)
+        if conditions is None and limit is None and page is None:
+            data = await self._client.get_json("/documents/find", params=params)
+        else:
+            parameters = build_find_parameters(conditions, limit=limit, page=page)
+            data = await self._client.post_json(
+                "/documents/find",
+                data={"documents": {"parameters": parameters}},
+                params=params,
+            )
         payloads = extract_object_list_payloads(
             data, container_key="documents", object_key="document"
         )

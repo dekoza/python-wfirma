@@ -967,6 +967,7 @@ class WFirmaClient:
         content: str | bytes | None = None,
         content_type: str = "application/json",
         params: dict[str, str] | None = None,
+        user_scoped: bool = False,
     ) -> dict[str, Any]:
         """Send a POST request to the API.
 
@@ -976,13 +977,18 @@ class WFirmaClient:
             content: Raw content to send (mutually exclusive with json).
             content_type: Content type for raw content.
             params: Optional query parameters.
+            user_scoped: If True, skip automatic company_id injection (for user-scoped endpoints).
 
         Returns:
             Parsed response data.
         """
         url = self._build_url(path)
         headers = await self._get_auth_headers()
-        params = self._add_default_params(params)
+        params = (
+            self._add_default_params(params)
+            if not user_scoped
+            else (params.copy() if params else {})
+        )
 
         if content is not None:
             headers["Content-Type"] = content_type
@@ -1056,6 +1062,7 @@ class WFirmaClient:
         *,
         data: dict[str, Any],
         params: dict[str, str] | None = None,
+        user_scoped: bool = False,
     ) -> dict[str, Any]:
         """Send a POST request with JSON data.
 
@@ -1063,6 +1070,7 @@ class WFirmaClient:
             path: The API endpoint path.
             data: JSON data to send.
             params: Optional query parameters.
+            user_scoped: If True, skip automatic company_id injection (for user-scoped endpoints).
 
         Returns:
             Parsed JSON response data.
@@ -1070,7 +1078,7 @@ class WFirmaClient:
         params = params.copy() if params else {}
         params["inputFormat"] = "json"
         params["outputFormat"] = "json"
-        return await self.post(path, json=data, params=params)
+        return await self.post(path, json=data, params=params, user_scoped=user_scoped)
 
     async def post_xml(
         self,
