@@ -54,6 +54,19 @@ class InvoiceType(str, Enum):
     FINAL = "final"
 
 
+class PriceType(str, Enum):
+    """
+    Enum for invoice price interpretation.
+
+    Attributes:
+        NETTO: Line prices are net; VAT is added on top.
+        BRUTTO: Line prices are gross; VAT is derived downward.
+    """
+
+    NETTO = "netto"
+    BRUTTO = "brutto"
+
+
 class PaymentMethod(str, Enum):
     """
     Enum for payment methods.
@@ -276,6 +289,14 @@ class Invoice(TimestampedFieldsMixin, BaseXMLModel, tag="invoice"):
 
     # Split payment (MPP - mechanizm podzielonej płatności)
     split_payment: bool | None = element(default=None)
+
+    # Price interpretation for invoicecontents (netto | brutto)
+    price_type: PriceType | None = element(default=None)
+
+    # KSeF (read-only, assigned once wFirma submits the document)
+    ksef_reference_number: str | None = element(default=None)
+    ksef_status: str | None = element(default=None)
+    ksef_registration_date: str | None = element(default=None)
 
     # Foreign key references
     contractor_id: int | None = element(default=None)

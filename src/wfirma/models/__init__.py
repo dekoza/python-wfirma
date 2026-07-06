@@ -48,6 +48,7 @@ from wfirma.models.invoice import (
     InvoiceType,
     PaymentMethod,
     PaymentState,
+    PriceType,
 )
 from wfirma.models.payment import (
     Payment,
@@ -104,6 +105,7 @@ __all__ = [
     "InvoiceType",
     "PaymentMethod",
     "PaymentState",
+    "PriceType",
     # Payment models
     "Payment",
     "PaymentCashbox",

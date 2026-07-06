@@ -6,6 +6,7 @@ map payloads into ``wfirma.models.invoice.Invoice``.
 
 from __future__ import annotations
 
+import json
 from decimal import Decimal
 
 import httpx
@@ -454,3 +455,77 @@ class TestInvoicesResourceUnfiscalize:
         assert route.called
         assert isinstance(result, dict)
         assert result["status"]["code"] == "OK"
+
+
+class TestSyncInvoicesFindFiltered:
+    """Filtered find posts the documented numbered-object parameters body."""
+
+    def test_find_with_conditions_posts_parameters(self) -> None:
+        auth = APIKeyAuth(access_key="ak", secret_key="sk", app_key="app")
+        client = WFirmaClient(auth=auth, company_id=123)
+        resource = InvoicesResource(client)
+
+        with respx.mock:
+            route = respx.post(
+                "https://api2.wfirma.pl/invoices/find",
+                params={
+                    "inputFormat": "json",
+                    "outputFormat": "json",
+                    "company_id": "123",
+                },
+            ).mock(
+                return_value=httpx.Response(
+                    200,
+                    json={
+                        "status": {"code": "OK"},
+                        "invoices": {
+                            "0": {"invoice": {"id": 100, "fullnumber": "FV/100"}},
+                        },
+                    },
+                )
+            )
+
+            invoices = resource.find(
+                conditions=[{"field": "description", "operator": "eq", "value": "BN:x"}],
+                limit=5,
+                page=2,
+            )
+
+        assert [invoice.id for invoice in invoices] == [100]
+        sent = json.loads(route.calls.last.request.content)
+        # Per doc.wfirma.pl: repeated JSON branches must be numbered objects.
+        assert sent == {
+            "invoices": {
+                "parameters": {
+                    "conditions": {
+                        "0": {
+                            "condition": {
+                                "field": "description",
+                                "operator": "eq",
+                                "value": "BN:x",
+                            }
+                        }
+                    },
+                    "limit": 5,
+                    "page": 2,
+                }
+            }
+        }
+
+    def test_find_without_filters_keeps_plain_get(self) -> None:
+        auth = APIKeyAuth(access_key="ak", secret_key="sk", app_key="app")
+        client = WFirmaClient(auth=auth, company_id=123)
+        resource = InvoicesResource(client)
+
+        with respx.mock:
+            respx.get(
+                "https://api2.wfirma.pl/invoices/find",
+                params={"outputFormat": "json", "company_id": "123"},
+            ).mock(
+                return_value=httpx.Response(
+                    200,
+                    json={"status": {"code": "OK"}, "invoices": {}},
+                )
+            )
+
+            assert resource.find() == []

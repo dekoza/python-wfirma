@@ -14,7 +14,11 @@ from __future__ import annotations
 
 from typing import Any
 
-from wfirma._payloads import extract_object_list_payloads, extract_single_object_payload
+from wfirma._payloads import (
+    build_find_parameters,
+    extract_object_list_payloads,
+    extract_single_object_payload,
+)
 from wfirma.models.invoice import Invoice
 from wfirma.sync.client import WFirmaClient
 
@@ -38,12 +42,32 @@ class InvoicesResource:
         payload = self._extract_invoice_payload(data)
         return Invoice.model_validate(payload)
 
-    def find(self) -> list[Invoice]:
-        """Find/list invoices.
+    def find(
+        self,
+        *,
+        conditions: list[dict[str, Any]] | None = None,
+        limit: int | None = None,
+        page: int | None = None,
+    ) -> list[Invoice]:
+        """Find/list invoices, optionally filtered.
 
-        Endpoint: GET /invoices/find
+        Endpoint: GET /invoices/find (plain), or POST /invoices/find with a
+        ``parameters`` block when any filter is given.
+
+        Args:
+            conditions: Condition dicts with ``field``/``operator``/``value``
+                keys, e.g. ``{"field": "type", "operator": "eq", "value": "normal"}``.
+            limit: Page size.
+            page: Page number.
         """
-        data = self._client.get_json("/invoices/find")
+        if conditions is None and limit is None and page is None:
+            data = self._client.get_json("/invoices/find")
+            return self._extract_invoice_list(data)
+
+        parameters = build_find_parameters(conditions, limit=limit, page=page)
+        data = self._client.post_json(
+            "/invoices/find", data={"invoices": {"parameters": parameters}}
+        )
         return self._extract_invoice_list(data)
 
     def add(self, *, invoice: dict[str, Any]) -> Invoice:

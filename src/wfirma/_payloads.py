@@ -78,3 +78,34 @@ def extract_object_list_payloads(
             payloads.append(inner)
 
     return payloads
+
+
+def build_find_parameters(
+    conditions: list[dict[str, Any]] | None,
+    *,
+    limit: int | None = None,
+    page: int | None = None,
+) -> dict[str, Any]:
+    """Build a find ``parameters`` block in wFirma's JSON dialect.
+
+    Repeated branches in JSON payloads must be numbered objects, not arrays
+    (see doc.wfirma.pl, "Format wymiany danych").
+
+    Args:
+        conditions: Condition dicts with ``field``/``operator``/``value`` keys.
+        limit: Page size.
+        page: Page number.
+
+    Returns:
+        The ``parameters`` mapping ready to nest under a module branch.
+    """
+    parameters: dict[str, Any] = {}
+    if conditions:
+        parameters["conditions"] = {
+            str(index): {"condition": dict(condition)} for index, condition in enumerate(conditions)
+        }
+    if limit is not None:
+        parameters["limit"] = limit
+    if page is not None:
+        parameters["page"] = page
+    return parameters

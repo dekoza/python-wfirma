@@ -35,6 +35,7 @@ from wfirma.models.invoice import (
     InvoiceType,
     PaymentMethod,
     PaymentState,
+    PriceType,
 )
 
 
@@ -535,3 +536,47 @@ class TestInvoice:
         assert invoice.series_id == 1
         assert invoice.company_detail_id == 123
         assert invoice.user_company_id == 456
+
+
+class TestInvoicePriceTypeAndKsef:
+    """price_type and KSeF read-only fields, per doc.wfirma.pl (invoices module)."""
+
+    def test_invoice_price_type_values(self) -> None:
+        assert PriceType.NETTO == "netto"
+        assert PriceType.BRUTTO == "brutto"
+
+    def test_invoice_with_price_type_and_ksef_fields(self) -> None:
+        invoice = Invoice(
+            id=1,
+            price_type=PriceType.BRUTTO,
+            ksef_reference_number="5252248481-20260707-ABCDEF012345-01",
+            ksef_status="sent",
+            ksef_registration_date="2026-07-07 10:15:00",
+        )
+        assert invoice.price_type == PriceType.BRUTTO
+        assert invoice.ksef_reference_number == "5252248481-20260707-ABCDEF012345-01"
+        assert invoice.ksef_status == "sent"
+        assert invoice.ksef_registration_date == "2026-07-07 10:15:00"
+
+    def test_invoice_from_xml_parses_price_type_and_ksef(self) -> None:
+        xml_data = (
+            "<invoice>"
+            "<id>1207242</id>"
+            "<price_type>brutto</price_type>"
+            "<ksef_reference_number>5252248481-20260707-ABCDEF012345-01</ksef_reference_number>"
+            "<ksef_status>sent</ksef_status>"
+            "<ksef_registration_date>2026-07-07 10:15:00</ksef_registration_date>"
+            "</invoice>"
+        )
+        invoice = Invoice.from_xml(xml_data)
+        assert invoice.price_type == PriceType.BRUTTO
+        assert invoice.ksef_reference_number == "5252248481-20260707-ABCDEF012345-01"
+        assert invoice.ksef_status == "sent"
+        assert invoice.ksef_registration_date == "2026-07-07 10:15:00"
+
+    def test_invoice_ksef_fields_default_to_none(self) -> None:
+        invoice = Invoice(id=1)
+        assert invoice.price_type is None
+        assert invoice.ksef_reference_number is None
+        assert invoice.ksef_status is None
+        assert invoice.ksef_registration_date is None
